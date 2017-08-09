@@ -653,6 +653,7 @@ if [ -d $tempDIR  ] ; then
 				echo "$categorie" >> $CATEGORIES_AVAILABLE
 				echo -n "."
 				cp -f "$tempDIR"/blacklists/"$categorie"/domains "$FILE_tmp"
+				$SED "/.*blogspot\..*/d""$FILE_tmp" # on suprime les 1313541 entrée xx.blogspot.xx qui son gérai par une liste beaucoup plus courte dans la catégorie ctparental
 				$SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' "$FILE_tmp"
 				$SED "/[äâëêïîöôüû]/d" "$FILE_tmp"
 				$SED "/^#.*/d" "$FILE_tmp"
@@ -679,6 +680,7 @@ if [ -d $tempDIR  ] ; then
 	echo -n "."
 	# suppression des @IP, de caractères acccentués et des lignes commentées ou vides
 	cp -f $DNS_FILTER_OSSI "$FILE_tmp"
+	$SED "/.*blogspot\..*/d""$FILE_tmp"
 	$SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' "$FILE_tmp"
 	$SED "/[äâëêïîöôüû]/d" "$FILE_tmp" 
 	$SED "/^#.*/d" "$FILE_tmp" 
@@ -692,6 +694,7 @@ else
 	echo -n "."
 	# suppression des @IP, de caractères acccentués et des lignes commentées ou vides
 	cp -f $DNS_FILTER_OSSI "$FILE_tmp"
+	$SED "/.*blogspot\..*/d""$FILE_tmp"
 	$SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' "$FILE_tmp"
 	$SED "/[äâëêïîöôüû]/d" "$FILE_tmp" 
 	$SED "/^#.*/d" "$FILE_tmp" 
