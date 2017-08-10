@@ -1,3 +1,9 @@
+ctparental (4.20.22-1.0) unstable; urgency=medium
+
+  * Correction des fautes d'orthographe, typo et certaines formulations.
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Thu, 10 Aug 2017 12:12:00 +0200
+
 ctparental (4.20.21-1.0) unstable; urgency=medium
 
   * on supprime en virons 1313541 entrée .....blogspot.... dans la catégorie adult qui son remplacer par une liste beaucoup 
