@@ -91,7 +91,7 @@ echo "</div>";
 
 echo "<div class='row'>";
 echo "<div class='col-md-6'>";
-echo "<h3>".gettext('Rehabilitated domain names')."</h3>".gettext('2-Enter the domain names permitted in addition to the white list of Toulouse.')." ".gettext('Enter one domain name per row (example : .domain.org)');
+echo "<h3>".gettext('Rehabilitated domain names')."</h3>".gettext('2-Enter the domain names permitted in addition to the Toulouse white list.')." ".gettext('Enter one domain name per row (example : .domain.org)');
 echo "<br /><br />";
 echo "</div>";
 echo "</div>";
