@@ -42,6 +42,18 @@ gbp buildpackage
 git checkout dansguardian
 git branch -D ubuntu16.04
 
+pour ubuntu 17.04:
+cd CTparental/
+git checkout master
+git branch ubuntu17.04
+git checkout ubuntu17.04
+cp ubuntu17.04/dist.conf debian/dist.conf
+/bin/sed -i "s/debian-branch =.*/debian-branch = ubuntu17.04/g" debian/gbp.conf
+git commit -a
+gbp buildpackage
+git checkout master
+git branch -D ubuntu17.04
+
 pour ubuntu 12.04 et 14.04
 cd CTparental/
 git checkout dansguardian
