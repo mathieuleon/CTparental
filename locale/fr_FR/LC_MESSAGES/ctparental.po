@@ -16,46 +16,46 @@ msgstr ""
 # License: GPL-3+
 # # CTparental
 msgid "It root of the need to run this script."
-msgstr "Il vous faut des droits root pour lancer ce script"
+msgstr "Il vous faut des droits root pour lancer ce script."
 
 msgid "invalid directory path!"
 msgstr "Chemin de répertoire non valide !"
 
-msgid "continue to press a button:"
+msgid "to continue press a button:"
 msgstr "pour continuer appuyez sur une touche :"
 
-msgid "monday"
+msgid "Monday"
 msgstr "lundi"
 
-msgid "tuesday"
+msgid "Tuesday"
 msgstr "mardi"
 
-msgid "wednesday"
+msgid "Wednesday"
 msgstr "mercredi"
 
-msgid "thursday"
+msgid "Thursday"
 msgstr "jeudi"
 
-msgid "friday"
+msgid "Friday"
 msgstr "vendredi"
 
-msgid "saturday"
+msgid "Saturday"
 msgstr "samedi"
 
-msgid "sunday"
+msgid "Sunday"
 msgstr "dimanche"
 
-msgid "No known package manager, was detected."
-msgstr "Aucun gestionnaire de paquet connu, n'a été détecté."
+msgid "No known package manager was detected."
+msgstr "Aucun gestionnaire de paquet connu n'a été détecté."
 
-msgid "#the domain filtering is handled by dnsmasq, do not touch this file !!"
+msgid "#the domain filtering is handled by dnsmasq, do not touch this file!"
 msgstr "#le filtrage de domaines est géré par dnsmasq, ne pas toucher ce fichier !"
 
-msgid "Waiting to Connect to Server from Toulouse:"
-msgstr "attente de connexion au serveur de Toulouse :"
+msgid "Waiting to connect to Toulouse server:"
+msgstr "Attente de connexion au serveur de Toulouse :"
 
-msgid "The connection to the server of Toulouse is impossible."
-msgstr "connexion au serveur de Toulouse impossible."
+msgid "Connection to Toulouse server is impossible."
+msgstr "Connexion au serveur de Toulouse impossible."
 
 msgid "connection established:"
 msgstr "connexion établie :"
@@ -63,26 +63,26 @@ msgstr "connexion établie :"
 msgid "error when downloading, interrupted process"
 msgstr "erreur lors du téléchargement, processus interrompu"
 
-msgid "archive extraction error , interrupted process"
+msgid "archive extraction error, interrupted process"
 msgstr "erreur d'extraction de l'archive, processus interrompu"
 
-msgid "blacklist and WhiteList , migration process. Please wait :"
+msgid "Toulouse Blacklist and WhiteList migration process. Please wait."
 msgstr "Migration de la Blacklist et de la whitelist de Toulouse. Veuillez patienter."
 
 msgid "Application whitelisting (restored area):"
 msgstr "Application de la liste blanche (domaine réhabilité) :"
 
-msgid "Error launching of lighttpd Service"
+msgid "Error launching of lighttpd service"
 msgstr "Erreur au lancement du service lighttpd"
 
 msgid "Login"
-msgstr "identifiant"
+msgstr "Identifiant"
 
 msgid "Enter login to the administration interface"
-msgstr "Entrer l'identifiant  pour l'interface d'administration "
+msgstr "Entrez l'identifiant pour l'interface d'administration "
 
 msgid "- Only letters or numbers."
-msgstr "- que des lettres ou des chiffres."
+msgstr "- Que des lettres ou des chiffres."
 
 msgid "- 5 characters minimum:"
 msgstr "- 5 caractères minimum :"
@@ -91,46 +91,46 @@ msgid "Password"
 msgstr "Mot de passe"
 
 msgid "Enter your password and press OK to continue."
-msgstr "Entrez votre mot de passe et validez par Ok pour continuer."
+msgstr "Entrez votre mot de passe et validez par OK pour continuer."
 
 msgid "Confirm your password and press OK to continue."
-msgstr "Confirmez votre mot de passe et validez par Ok pour continuer."
+msgstr "Confirmez votre mot de passe et validez par OK pour continuer."
 
 msgid "Password is not complex enough, it must contain at least:"
-msgstr "Mot de passe n'est pas assez complexe, il doit contenir au moins:"
+msgstr "Le mot de passe n'est pas assez complexe, il doit contenir au moins:"
 
-msgid "- 8 characters total, 1 Uppercase, lowercase 1, number 1"
-msgstr "- 8 caractères au total, 1 Majuscule, 1 minuscule, 1 nombre"
+msgid "- 8 characters total, 1 uppercase, lowercase 1, number 1"
+msgstr "- 8 caractères au total, 1 majuscule, 1 minuscule, 1 nombre"
 
 msgid "and one special character among the following"
-msgstr "et 1 caractère spécial parmi les suivants"
+msgstr "et un caractère spécial parmi les suivants"
 
 msgid "The password entered is not identical to the first."
 msgstr "Le mot de passe rentré n'est pas identique au premier."
 
 msgid "Enter: S to continue with these parameters."
-msgstr "Entrer : S pour continuer avec ces paramètres."
+msgstr "Entrez : S pour continuer avec ces paramètres."
 
-msgid "Enter Q to Quit Setup."
-msgstr "Entrer : Q pour Quiter l'installation."
+msgid "Enter: Q to Quit setup."
+msgstr "Entrez : Q pour Quiter l'installation."
 
 msgid "Enter any other choice to change settings."
 msgstr "Entrez tout autre choix pour modifier les paramètres."
 
-msgid "Install a packet was detected please use this command to uninstall ctparental."
+msgid "Install by package was detected, please use this command to uninstall ctparental."
 msgstr "Une installation par paquet a été détectée, veuillez utiliser cette commande pour désinstaller ctparental."
 
-msgid "Want to filter by, Blacklist or Whitelist B/W :"
+msgid "Do you want to filter by Blacklist or Whitelist B/W:"
 msgstr "Voulez-vous filtrer par Blacklist ou Whitelist B/W :"
 
-msgid "Choice of filtered categories."
+msgid "Choice of filtered categories to apply."
 msgstr "Choisir les catégories filtrées à appliquer."
 
-msgid "You want to enable this category $CATEGORIE  O/N :"
-msgstr "Voulez vous activer la catégorie $CATEGORIE  O/N :"
+msgid "Do you want to enable this category $CATEGORIE  O/N:"
+msgstr "Voulez-vous activer la catégorie $CATEGORIE  O/N :"
 
 msgid "Choice of unfiltered categories."
-msgstr "Choisir les catégories qui ne serons pas filtrées à appliquer."
+msgstr "Choisir les catégories qui ne seront pas filtrées à appliquer."
 
 msgid "The start time must be strictly less than the end time:"
 msgstr "L'heure de début doit être strictement inférieure à l'heure de fin:"
@@ -138,7 +138,7 @@ msgstr "L'heure de début doit être strictement inférieure à l'heure de fin:"
 msgid "is allowed to connect the"
 msgstr "est autorisé à se connecter le"
 
-msgid "at :"
+msgid "at:"
 msgstr "de :"
 
 msgid "Bad syntax:"
@@ -154,32 +154,32 @@ msgid "Use"
 msgstr "Usage"
 
 msgid ""
-"\t=> Install parental controls on the computer (desktop PC). Can be used with\n"
+"\t=> Install parental control on the computer (desktop PC). Can be used with\n"
 "\t   an additional parameter to specify a source path for the redirection page.\n"
 "\t   example: CTparental -dirhtml -i /home/toto/html/\n"
-"\t   if no option a page by default is used."
+"\t   if no option a default page is used."
 msgstr ""
-"\t=> Installe le contrôle parental sur l'ordinateur (pc de bureau). Peut être utilisé avec\n"
-"\t    un paramètre supplémentaire pour indiquer un chemin de sources pour la page web de redirection.\n"
-"\t    exemple : CTparental -i -dirhtml /home/toto/html/\n"
-"\t    si pas d'option la page par défaut est utilisée."
+"\t=> Installe le contrôle parental sur l'ordinateur (PC de bureau). Peut être utilisé avec\n"
+"\t   un paramètre supplémentaire pour indiquer un chemin de sources pour la page web de redirection.\n"
+"\t   exemple : CTparental -i -dirhtml /home/toto/html/\n"
+"\t   si pas d'option la page par défaut est utilisée."
 
 msgid "\t=> uninstall the Parental Control Computer (desktop PC)"
-msgstr "\t=> désinstalle le contrôle parental de l'ordinateur (pc de bureau)"
+msgstr "\t=> désinstalle le contrôle parental de l'ordinateur (PC de bureau)"
 
 msgid "\t=> updates parental control from the blacklist of the University of Toulouse"
-msgstr "\t=> met à jour le contrôle parental à partir de la blackliste de l'université de Toulouse"
+msgstr "\t=> met à jour le contrôle parental à partir de la blacklist de l'université de Toulouse"
 
-msgid "\t=> What to do after each change of the file $DNS_FILTER_OSSI"
+msgid "\t=> To be done after each change of the file $DNS_FILTER_OSSI"
 msgstr "\t=> A faire après chaque modification du fichier $DNS_FILTER_OSSI"
 
-msgid "\t=> What to do after each change of the file $DREAB"
+msgid "\t=> To be done after each change of the file $DREAB"
 msgstr "\t=> A faire après chaque modification du fichier $DREAB"
 
 msgid "\t=> Enable parental control"
 msgstr "\t=> Activer le contrôle parental"
 
-msgid "\t=> Disable parental controls"
+msgid "\t=> Disable parental control"
 msgstr "\t=> Désactiver le contrôle parental"
 
 msgid ""
@@ -187,10 +187,10 @@ msgid ""
 "\t   and the categories that you want to activate."
 msgstr ""
 "\t=> Configure le mode de filtrage par liste blanche ou par liste noire (défaut)\n"
-"\t   ainsi que les catégories que l'on veut activer."
+"\t   ainsi que les catégories que vous voulez activer."
 
-msgid "\t=> Resets the default active categories and blacklist filtering."
-msgstr "\t=> Remet les catégories actives par défaut et le filtrage par Blacklist."
+msgid "\t=> Reset the default active categories and blacklist filtering."
+msgstr "\t=> Remet les catégories actives par défaut et le filtrage par blacklist."
 
 msgid "\t=> Enable and configure the login time restrictions for users."
 msgstr "\t=> Active et paramètre les restrictions horaires de login pour les utilisateurs."
@@ -211,17 +211,17 @@ msgstr ""
 "\t           - par défaut : CTparental -uhtml\n"
 "\t   permet aussi de changer le couple identifiant-mot de passe de l'interface web."
 
-msgid "\t=> Enable the automatic update of the blacklist of Toulouse (every 7 days)."
-msgstr "\t=> active la mise à jour automatique de la Blacklist de Toulouse (tous les 7 jours)."
+msgid "\t=> Enable the automatic update of the Toulouse blacklist (every 7 days)."
+msgstr "\t=> Active la mise à jour automatique de la blacklist de Toulouse (tous les 7 jours)."
 
-msgid "\t=> Disable the automatic update of the blacklist of Toulouse."
-msgstr "\t=> désactive la mise à jour automatique de la Blacklist de Toulouse."
+msgid "\t=> Disable the automatic update of the Toulouse blacklist."
+msgstr "\t=> Désactive la mise à jour automatique de la blacklist de Toulouse."
 
 msgid "\t=> as -dl but only if there is no update for more than 7 days."
-msgstr "\t=> comme -dl mais seulement si il n'y a pas eu de mise à jour depuis plus de 7 jours."
+msgstr "\t=> comme -dl mais seulement s'il n'y a pas eu de mise à jour depuis plus de 7 jours."
 
 msgid ""
-"\t=> if placed after -i or -u allows not install / uninstall the dependencies useful if\n"
+"\t=> if placed after -i or -u allows not install / uninstall the dependencies, useful if\n"
 "\t   we prefer to install them by hand, or for the postinst and prerm script of deb.\n"
 "\t   examples:\n"
 "\t   CTparental -i -nodep\n"
@@ -229,7 +229,7 @@ msgid ""
 "\t   CTparental -u -nodep"
 msgstr ""
 "\t=> si placé aprés -i ou -u permet de ne pas installer/désinstaller les dépendances, utiles si\n"
-"\t   on préfère les installer à la main , ou pour le script de postinst et prerm du deb.\n"
+"\t   on préfère les installer à la main, ou pour le script de postinst et prerm du deb.\n"
 "\t   exemples:\n"
 "\t           CTparental -i -nodep\n"
 "\t           CTparental -i -dirhtml /home/toto/html/ -nodep\n"
@@ -239,28 +239,28 @@ msgid "\t=> used only for the postinst and prerm script."
 msgstr "\t=> utilisé uniquement pour les scripts de postinst et prerm."
 
 msgid ""
-"\t=> Enable privileged group.\n"
+"\t=> Enable a group of privileged user that will not undergo filtering.\n"
 "\t   exemples:\n"
 "\t           CTparental.sh -gctulist\n"
 "\t           Comment all users that you want to filter in $FILE_GCTOFFCONF\n"
 "\t           CTparental -gctalist"
 msgstr ""
-"\t=> crée un groupe de privilégiés ne subissant pas le filtrage.\n"
+"\t=> Active un groupe d'utilsiateurs privilégiés ne subissant pas le filtrage.\n"
 "\t   exemples:\n"
 "\t           CTparental -gctulist\n"
-"\t           commenter tous les utilisateurs que l'on veut filtrer dans $FILE_GCTOFFCONF\n"
+"\t           Commenter tous les utilisateurs que vous voulez filtrer dans $FILE_GCTOFFCONF\n"
 "\t           CTparental -gctalist"
 
 msgid "\t=> Disable privileged group."
-msgstr "\t=> supprime le groupe de privilégiés ."
+msgstr "\t=> Supprime le groupe de privilégiés ."
 
-msgid "all users of the system undergo the filtering !!"
-msgstr "tous les utilisateurs du système subissent le filtrages !!"
+msgid "all users of the system undergo the filtering!"
+msgstr "tous les utilisateurs du système subissent le filtrage !"
 
-msgid "\t=> Add remove Users added in sytem on the config file ,"
+msgid "\t=> Update the config file ,"
 msgstr "\t=> Met à jour le fichier de configuration,"
 
-msgid "\t=> Add / delete users in the ctoff group based on the config file, $FILE_GCTOFFCONF"
+msgid "\t=> Add / Delete users in the ctoff group based on the config file, $FILE_GCTOFFCONF"
 msgstr "\t=> Ajoute/Supprime les utilisateurs dans le groupe ctoff en fonction du fichier de configuration, $FILE_GCTOFFCONF"
 
 msgid "\t=> Enable rules of custom firewall."
@@ -278,7 +278,7 @@ msgstr ""
 "$FILEIPTABLES \n"
 "puis relancez la commande CTparental -ipton"
 
-msgid "unknown argument"
+msgid "Unknown argument"
 msgstr "Argument inconnu"
 
 msgid "at"
@@ -302,7 +302,7 @@ msgstr "Fermeture session dans $count minutes"
 msgid "minutes"
 msgstr "minutes"
 
-msgid "Your surf time as expird!"
+msgid "Your surf time as expired!"
 msgstr "Votre temps de navigation a expiré !"
 
 msgid "$PCUSER is allowed to connect 7/7 24/24 O/N?"
@@ -312,7 +312,7 @@ msgid ""
 "$PCUSER is allowed to connect X minutes per day \n"
 "X (1 a 1440) = "
 msgstr ""
-"$PCUSER est autorisé à se connecter X minutes par jours \n"
+"$PCUSER est autorisé à se connecter X minutes par jour \n"
 "X (1 a 1440) = "
 
 msgid "X must take a value between 1 and 1440 \n"
@@ -322,11 +322,11 @@ msgid ""
 "$PCUSER is allowed to surf the Internet X minutes per day \n"
 "X ( 1 a $timesession )= "
 msgstr ""
-"$PCUSER est autorisé à surfer X minutes par jours \n"
+"$PCUSER est autorisé à surfer X minutes par jour \n"
 "X ( 1 a $timesession )= "
 
 msgid "X must take a value between 1 and $timesession \n"
-msgstr "X doit prendre un valeur entre 1 et $timesession \n"
+msgstr "X doit prendre une valeur entre 1 et $timesession \n"
 
 msgid "error recovery network settings"
 msgstr "erreur de récupération des paramètres réseaux"
@@ -371,32 +371,32 @@ msgstr "08h00 à 24h00 ou 08h00 à 12h00 et 14h00 à 24h00"
 msgid "time max pc connection"
 msgstr "Temps de connection maximum au pc"
 
-msgid "time max for web surfing"
+msgid "maximum time for web surfing"
 msgstr "temps max pour surfer sur le web"
 
-msgid "( minutes for 24 hours )"
-msgstr "( minutes par 24 heures )"
+msgid "(minutes for 24 hours)"
+msgstr "(minutes par 24 heures)"
 
 msgid "Logout"
 msgstr "Déconnexion"
 
 msgid "A bad time format has been found: 8h30 instance must be written 08h30"
-msgstr "un mauvais format horaire a été trouvé :exemple 8h30 doit s'écrire 08h30"
+msgstr "Un mauvais format horaire a été trouvé : par exemple 8h30 doit s'écrire 08h30"
 
 msgid "time inconsistency: "
 msgstr "incohérence horaire : "
 
 msgid "You must enter a value between 1 and 1440 minutes."
-msgstr "Vous devez rentrer une valeur entre 1 et 1440 minutes."
+msgstr "Vous devez entrer une valeur entre 1 et 1440 minutes."
 
 msgid "Time surf between 1 to"
-msgstr "Le temps de navigation doit ètre entre 1 et"
+msgstr "Le temps de navigation doit être entre 1 et"
 
 msgid "Connection schedules are currently enabled"
-msgstr "Les horaires de connexion sont actuellement activés"
+msgstr "Les horaires de connexion sont actuellement activées"
 
 msgid "Connection schedules are currently disabled"
-msgstr "Les horaires de connexion sont actuellement désactivés"
+msgstr "Les horaires de connexion sont actuellement désactivées"
 
 msgid "Disable logon hours"
 msgstr "Désactiver les horaires de connexion"
@@ -405,15 +405,15 @@ msgid "Enable logon hours"
 msgstr "Activer les horaires de connexion"
 
 msgid "Hours of allowed connections"
-msgstr "Heures de connexions autorisées"
+msgstr "Heures de connexion autorisées"
 
 msgid "Init Categories"
 msgstr "Init Catégories"
 
-msgid "The update of the blacklist Toulouse every 7 days is activated"
-msgstr "La mise à jour de la Blacklist de Toulouse tous les 7 jours est activée"
+msgid "The update of the Toulouse blacklist every 7 days is activated"
+msgstr "La mise à jour de la blacklist de Toulouse tous les 7 jours est activée"
 
-msgid "The update of the blacklist Toulouse every 7 days is disabled"
+msgid "The update of the Toulouse blacklist every 7 days is disabled"
 msgstr "La mise à jour de la Blacklist de Toulouse tous les 7 jours est désactivée"
 
 msgid "Enable"
@@ -429,7 +429,7 @@ msgid "WhiteList Filtering"
 msgstr "Filtrage par WhiteList"
 
 msgid "Domain names filtering"
-msgstr "Filtrage de noms de domaine "
+msgstr "Filtrage de noms de domaine"
 
 msgid "Error opening the file"
 msgstr "Erreur d'ouverture du fichier"
@@ -449,7 +449,7 @@ msgstr "Désactiver le filtrage"
 msgid "Blacklist/Whitelist"
 msgstr "Liste noire/blanche"
 
-msgid "Current version : "
+msgid "Current version: "
 msgstr "Version actuelle :"
 
 msgid "Choice of filtered categories"
@@ -461,10 +461,10 @@ msgstr "Choix des catégories à autoriser"
 msgid "Download the last version"
 msgstr "Télécharger la dernière version"
 
-msgid "The digital fingerprint of the downloaded blacklist is : "
+msgid "The digital fingerprint of the downloaded blacklist is: "
 msgstr "L'empreinte numérique du fichier téléchargé est : "
 
-msgid "Verify it with this link (line 'blacklists.tar.gz') : "
+msgid "Verify it with this link (line 'blacklists.tar.gz'): "
 msgstr "Vérifiez-là en suivant ce lien (ligne 'blacklists.tar.gz') : "
 
 msgid "Activate the new version"
@@ -491,7 +491,7 @@ msgstr "Noms de domaine réhabilités"
 msgid "1-Enter here domain names that are blocked by the blacklist and you want to rehabilitate."
 msgstr "1-Entrez ici des noms de domaine bloqués par la liste noire que vous souhaitez réhabiliter."
 
-msgid "2-Enter the domain names permitted in addition to the white list of Toulouse."
+msgid "2-Enter the domain names permitted in addition to the Toulouse white list."
 msgstr "2-Entrez ici des noms de domaine autorisés en plus de ceux de la liste blanche de Toulouse."
 
 msgid "Domain names to add to blacklist"
@@ -506,7 +506,7 @@ msgstr "Une fois validées, 30 secondes sont nécessaires pour traiter vos modif
 msgid "privileged group"
 msgstr "Groupe privilégié"
 
-msgid "Select users who should not undergo screening"
+msgid "Select users who should not undergo filtering"
 msgstr "Cocher des utilisateurs ne devant pas subir de filtrage"
 
 msgid "Username"
@@ -522,10 +522,10 @@ msgid "Disable privileged group."
 msgstr "Désactiver le groupe de privilégiés."
 
 msgid "The preferred Group is currently enabled"
-msgstr "Le Groupe privilégié est actuellement activés"
+msgstr "Le Groupe privilégié est actuellement activé"
 
 msgid "The preferred Group is currently disabled"
-msgstr "Le Groupe privilégié est actuellement désactivés"
+msgstr "Le Groupe privilégié est actuellement désactivé"
 
 msgid "Blacklist categories"
 msgstr "Catégories de la liste noire"
@@ -540,7 +540,7 @@ msgid "Number of filtered domain names :"
 msgstr "Nombre de noms de domaine filtrés :"
 
 msgid "Number of filtered URL :"
-msgstr "Nombre d'URL filtrés :"
+msgstr "Nombre d'URL filtrées :"
 
 msgid "Some adult site from erotic to hard pornography."
 msgstr "Des sites adultes allant de l'érotique à la pornographie dure."
@@ -549,7 +549,7 @@ msgid "Sites extremist, racist, anti-Semitic or hate"
 msgstr "Sites extrémistes, racistes, antisémites ou incitant à la haine"
 
 msgid "Online gambling sites allowed by the french authority 'ARJEL' (Autorité de Régulation des Jeux En Ligne)"
-msgstr "Sites de pari en ligne certifies par l'ARJEL (Autorité de Régulation des Jeux En Ligne)"
+msgstr "Sites de pari en ligne certifiés par l'ARJEL (Autorité de Régulation des Jeux En Ligne)"
 
 msgid "Sites related to astrology"
 msgstr "Sites relatifs à l'astrologie"
@@ -585,7 +585,7 @@ msgid "Sites related to narcotic"
 msgstr "Sites relatifs aux produits stupéfiants"
 
 msgid "Warehouses of files (video, images, sound, software, etc.)"
-msgstr "Entrepôts de fichiers  (vidéo, images, son, logiciels, etc.)"
+msgstr "Hébergement de fichiers  (vidéo, images, son, logiciels, etc.)"
 
 msgid "Sites of financial information"
 msgstr "Sites d'informations financières, bourses, etc."
@@ -605,8 +605,8 @@ msgstr "Sites de piratage et d'agressions informatiques."
 msgid "Job search sites"
 msgstr "Sites de recherche d'emplois"
 
-msgid "A french list for educational sites. VERY locally oriented. may help libraries."
-msgstr "Une liste très  « univ-tlse1.fr  » de sites éducatifs pour notre bibliothèque."
+msgid "A french list for educational sites. VERY locally oriented. May help libraries."
+msgstr "Une liste très  « univ-tlse1.fr » de sites éducatifs. TRES orienté "local". Pourrait aider les bibliothèques."
 
 msgid "Malware sites (viruses, worms, trojans, etc.)."
 msgstr "Site relatifs au logiciels malveillants (virus, vers, trojans, etc.)"
@@ -614,7 +614,7 @@ msgstr "Site relatifs au logiciels malveillants (virus, vers, trojans, etc.)"
 msgid "Manga site"
 msgstr "Site de Mangas"
 
-msgid "doubtful commercial sites"
+msgid "Doubtful commercial sites"
 msgstr "Sites marchands douteux (X, organes, enfants, etc.)"
 
 msgid "Adult sites (shock, gore, war, etc.)."
@@ -693,7 +693,7 @@ msgid "Sites of Religious Associations"
 msgstr "Sites d'associations religieuses"
 
 msgid "URLs shortening sites"
-msgstr "Raccoursisseur d'URL"
+msgstr "Raccourcisseur d'URL"
 
 msgid "Intentionally malformed URL"
 msgstr "URL intentionnellement mal formées"
@@ -705,16 +705,16 @@ msgid "Sites related to cheating (tests, examinations, etc.)"
 msgstr "Sites relatifs aux tricheries (examens, concours, etc.)"
 
 msgid "Web sites for e-mail consultation"
-msgstr "Site WEB permettant de consultation son courrier électronique"
+msgstr "Site WEB permettant de consulter son courrier électronique"
 
 msgid "Sites related to cracked softwares"
 msgstr "Sites relatifs aux logiciels piratés (crackés), aux générateurs de clés, etc."
 
-msgid "Access has been Denied!"
+msgid "Access has been denied!"
 msgstr "ACCÈS REFUSÉ"
 
-msgid "Access to the page:"
-msgstr "L'accès à au domaine :"
+msgid "Access to the domain:"
+msgstr "L'accès au domaine :"
 
 msgid "... has been denied."
 msgstr "... a été refusé."
@@ -731,38 +731,38 @@ msgstr "Contactez votre responsable informatique (RSSI/OSSI), si vous pensez que
 msgid "Filtered by "
 msgstr "Filtré par "
 
-msgid "extensions has filtered"
-msgstr "extensions a filtrer"
+msgid "extensions to be filtered"
+msgstr "extensions à filtrer"
 
-msgid "mimetype has filtered"
-msgstr "type MIME a filtrer"
+msgid "mimetype to be filtered"
+msgstr "type MIME à filtrer"
 
 msgid "web filtering"
 msgstr "filtrage web"
 
-msgid "Select the extensions has filtered"
-msgstr "Sélectionnez les extensions a filtrées"
+msgid "Select the extensions to be filtered"
+msgstr "Sélectionnez les extensions à filtrer"
 
-msgid "Select the mimetype has filtered"
-msgstr "Sélectionnez le type MIME a filtrer"
+msgid "Select the mimetype to be filtered"
+msgstr "Sélectionnez le type MIME à filtrer"
 
 msgid "e2guardian configuration"
 msgstr "Configuration de e2guardian"
 
-msgid "Select the safesearch has enebled"
-msgstr "Sélectionnez le/les safesearch a activer."
+msgid "Select the safesearch to be enabled"
+msgstr "Sélectionnez le/les safesearch à activer."
 
 msgid "Default filter Pivoxy is activated"
-msgstr "Le filtrage par défaut de privoxy est activé."
+msgstr "Le filtrage par défaut de Privoxy est activé."
 
 msgid "Default filter Pivoxy is disabled"
-msgstr "Le filtrage par défaut de privoxy est désactivé."
+msgstr "Le filtrage par défaut de Privoxy est désactivé."
 
-msgid "Enable rectidect page."
+msgid "Enable redirect page."
 msgstr "Activer la page de redirection."
 
-msgid "Disabled rectidect page."
+msgid "Disabled redirect page."
 msgstr "Désactiver la page de redirection."
 
-msgid "Site related to as pop up advertising or pornography not present in the blacklist of Toulouse."
-msgstr "Site référencé , comme pop up de publicité ou de pornographie  non présent dans la blacklist de Toulouse."
+msgid "Site related to as pop up advertising or pornography not present in the Toulouse blacklist."
+msgstr "Site référencé comme pop up de publicité ou de pornographie non présent dans la blacklist de Toulouse."
