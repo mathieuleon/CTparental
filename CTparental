@@ -146,9 +146,9 @@ PROXYport=${PROXYport:="8888"}
 E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
+DEPENDANCES=${DEPENDANCES:=" console-data dansguardian dnsmasq lighttpd lighttpd-mod-magnet php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
 #### PACKETS EN CONFLI par DEFAULT #####
-CONFLICTS=${CONFLICTS:=" dansguardian mini-httpd apache2 firewalld "}
+CONFLICTS=${CONFLICTS:=" e2guardian mini-httpd apache2 firewalld "}
 
 #### COMMANDES de services par DEFAULT #####
 CMDSERVICE=${CMDSERVICE:="service "}
@@ -167,7 +167,7 @@ NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
 NETWORKINGrestart=${NETWORKINGrestart:="$CMDSERVICE networking restart"}
 IPTABLESsave=${IPTABLESsave:="$CMDSERVICE netfilter-persistent save"}
 IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
-E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE e2guardian restart"}
+E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE dansguardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
 #### LOCALISATION du fichier PID lighttpd par default ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
@@ -188,11 +188,11 @@ ENPRIVOXY=${ENPRIVOXY:=""}
 ENNETWORK=${ENNETWORK:=""}
 
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
-DIRE2G=${DIRE2G:="/etc/e2guardian/"}
-DIRE2GLANG=${DIRE2GLANG:="/usr/share/e2guardian/languages/"}
-NEWTEMPLETE2G=${NEWTEMPLETE2G:="$DIR_SHARE"/confe2guardian}
-FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"e2guardian.conf"}
-FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"e2guardianf1.conf"}
+DIRE2G=${DIRE2G:="/etc/dansguardian/"}
+DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
+NEWTEMPLETE2G=${NEWTEMPLETE2G:="$DIR_SHARE"/confDansgouardian}
+FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
+FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
 E2GUXSITELIST=$DIRE2G"lists/exceptionsitelist"
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
@@ -412,7 +412,7 @@ chmod 664 "$CATEGORIES_ENABLED"
 confe2guardian () {
   # replace the default deny HTML page
  
-  echo "<confe2guardian>"
+  echo "<confdansguardian>"
   $SED "s?^loglevel =.*?loglevel = 0?g" "$FILEConfe2gu"
   $SED "s?^languagedir =.*?languagedir = $DIRE2GLANG?g" "$FILEConfe2gu"
   $SED "s?^language =.*?language = 'french'?g" "$FILEConfe2gu"
@@ -450,10 +450,9 @@ EOF
 $E2GUARDIANrestart
 cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/
 cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
-sed -i "s/é/\&eacute;/g" "$DIRE2GLANG"french/messages
-sed -i "s/è/\&egrave;/g" "$DIRE2GLANG"french/messages
+sed -i "s/\&ecute;/\&eacute;/g" "$DIRE2GLANG"french/messages
 $E2GUARDIANrestart
-echo "</confe2guardian>"
+echo "</confdansguardian>"
 }
 privoxydefaultfilteroff () {
 $SED "s?^PRIVOXYDF.*?PRIVOXYDF=OFF?g" $FILE_CONF
@@ -1652,7 +1651,7 @@ fi
 $NETWORKINGrestart
 	if [ $nomanuel -eq 0 ]; then  
 		cp -rf www "$DIR_SHARE"
-		cp -rf confe2guardian "$DIR_SHARE"
+		cp -rf confDansgouardian "$DIR_SHARE"
 		cp -f locale/fr_FR/LC_MESSAGES/ctparental.mo		/usr/share/locale/fr_FR/LC_MESSAGES/
 	fi
 	iptablesreload

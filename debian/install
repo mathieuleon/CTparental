@@ -4,5 +4,5 @@ debian/CTparental.conf						etc/CTparental
 debian/dist.conf							etc/CTparental
 locale/fr_FR/LC_MESSAGES/ctparental.mo		usr/share/locale/fr_FR/LC_MESSAGES/
 www											usr/share/CTparental
-confe2guardian								usr/share/CTparental
+confDansgouardian							usr/share/CTparental
 man/CTparental.1.gz							usr/share/man/man1
