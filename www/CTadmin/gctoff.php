@@ -22,7 +22,7 @@ if ($GCTOFF == "ON")
     echo "<div class='col-md-8'>";
 
     echo "<p>";
-    echo gettext('Select users who should not undergo screening');
+    echo gettext('Select users who should not undergo filtering');
     echo "</p>";
 
     echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=privileged group' method='post'>";
