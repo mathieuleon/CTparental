@@ -606,7 +606,7 @@ msgid "Job search sites"
 msgstr "Sites de recherche d'emplois"
 
 msgid "A french list for educational sites. VERY locally oriented. May help libraries."
-msgstr "Une liste très  « univ-tlse1.fr » de sites éducatifs. TRES orienté "local". Pourrait aider les bibliothèques."
+msgstr "Une liste très  « univ-tlse1.fr » de sites éducatifs. TRES orienté \"local\". Pourrait aider les bibliothèques."
 
 msgid "Malware sites (viruses, worms, trojans, etc.)."
 msgstr "Site relatifs au logiciels malveillants (virus, vers, trojans, etc.)"
