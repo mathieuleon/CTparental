@@ -18,13 +18,13 @@ function form_filter ($form_content)
 
 $week = array
 (
-    gettext("monday"),
-    gettext("tuesday"),
-    gettext("wednesday"),
-    gettext("thursday"),
-    gettext("friday"),
-    gettext("saturday"),
-    gettext("sunday")
+    gettext("Monday"),
+    gettext("Tuesday"),
+    gettext("Wednesday"),
+    gettext("Thursday"),
+    gettext("Friday"),
+    gettext("Saturday"),
+    gettext("Sunday")
 );
 
 $weeknum               = array(0,1,2,3,4,5,6);
@@ -528,11 +528,11 @@ if ($DNSMASQ <> "OFF")
     (
         'Blacklist filtering',
         'WhiteList Filtering',
-        'extensions has filtered',
-        'mimetype has filtered',
+        'extensions to be filtered',
+        'mimetype to be filtered',
         '*ip **ips ...',
         'privileged group',
-        'safesearch Enebeled'
+        'Safesearch configuration'
     );
     
     foreach ($temp as $item)

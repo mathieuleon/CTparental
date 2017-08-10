@@ -726,6 +726,9 @@ msgstr ""
 msgid "e2guardian configuration"
 msgstr ""
 
+msgid "Safesearch configuration"
+msgstr ""
+
 msgid "Select the safesearch to be enabled"
 msgstr ""
 

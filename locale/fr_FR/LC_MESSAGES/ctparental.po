@@ -755,6 +755,9 @@ msgstr "Sélectionnez le type MIME à filtrer"
 msgid "e2guardian configuration"
 msgstr "Configuration de e2guardian"
 
+msgid "Safesearch configuration"
+msgstr "Safesearch configuration"
+
 msgid "Select the safesearch to be enabled"
 msgstr "Sélectionnez le/les safesearch à activer."
 
