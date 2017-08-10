@@ -644,7 +644,7 @@ if [ -d $tempDIR  ] ; then
 	if [ ! -f $DIR_DNS_FILTER_AVAILABLE/ossi.conf ] ; then
 		echo > $DIR_DNS_FILTER_AVAILABLE/ossi.conf
 	fi
-	gettext 'Toulouse Blacklist and WhiteList migration process. Please wait.'" "
+	gettext 'Toulouse Blacklist and WhiteList migration process. Please wait.'
 	cd "$tempDIR"/blacklists
 	for categorie in *
 	do
