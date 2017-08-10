@@ -76,10 +76,10 @@ else
         
 switch ($dg_confswitch)
 {
-    case 'extensions has filtered' :
+    case 'extensions to be filtered' :
         $dg_file_edit="/etc/e2guardian/lists/bannedextensionlist";
         break;
-    case 'mimetype has filtered' :
+    case 'mimetype to be filtered' :
         $dg_file_edit="/etc/e2guardian/lists/bannedmimetypelist";
         break;
     case '*ip **ips ...' :
@@ -91,7 +91,7 @@ switch ($dg_confswitch)
     case 'Blacklist filtering' :
         $bl_categories=$dirconf."bl-categories-available";
         break;
-    case 'safesearch Enebeled' :
+    case 'Safesearch configuration' :
         $dg_file_edit=$dirconf."CTsafe.conf";
         break;
 }
