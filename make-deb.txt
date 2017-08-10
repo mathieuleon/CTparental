@@ -24,6 +24,7 @@ cd CTparental/
 git checkout dansguardian
 git branch jessie
 git checkout jessie
+cp ubuntu16.04/dist.conf debian/dist.conf
 sed -i "s/php-cgi,php-xml/php5-cgi/g" debian/control
 /bin/sed -i "s/debian-branch =.*/debian-branch = jessie/g" debian/gbp.conf
 git commit -a
