@@ -1,7 +1,7 @@
 <?php
 // affichage des formulaires
 
-echo "<h1 class='page-header'>".gettext('e2guardian configuration')."</h1>";
+echo "<h1 class='page-header'>".gettext('Dansguardian configuration')."</h1>";
 echo "<h3>".gettext('Select the type of packet filtering')."</h3>";
 echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=*ip **ips ...' method='post'>";
 
