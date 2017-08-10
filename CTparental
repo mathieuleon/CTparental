@@ -272,7 +272,7 @@ else
 	ipbox_ipv4="$(ip -4 route | grep default | awk '{print $3}')" 
 	ip_i_WAN_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/inet /{print substr($2,1)}')"
 	ip_broadcast_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/brd /{print substr($4,1)}')"
-	reseau_box_ipv4="$(ip -4 route | grep "$i_WAN_ipv4" | grep -v default | awk '//{print substr($1,1)}' )"
+	reseau_box_ipv4="$(ip -4 route | grep "$i_WAN_ipv4" | grep -v default | grep "src" | awk '//{print substr($1,1)}' )"
 fi
 export i_WAN_ipv4
 export ipbox_ipv4
