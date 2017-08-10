@@ -15,7 +15,7 @@ git config --global user.email CTparental@laposte.net
 git clone https://github.com/marsat/CTparental.git
 
 
-debian sid:
+debian 9 testing sid:
 cd CTparental/
 gbp buildpackage
 
@@ -25,13 +25,22 @@ git checkout dansguardian
 git branch jessie
 git checkout jessie
 sed -i "s/php-cgi,php-xml/php5-cgi/g" debian/control
+/bin/sed -i "s/debian-branch =.*/debian-branch = jessie/g" debian/gbp.conf
 git commit -a
 gbp buildpackage
 git branch -D jessie
 
 pour ubuntu 16.04:
+cd CTparental/
 git checkout dansguardian
+git branch ubuntu16.04
+git checkout ubuntu16.04
+cp ubuntu16.04/dist.conf debian/dist.conf
+/bin/sed -i "s/debian-branch =.*/debian-branch = ubuntu16.04/g" debian/gbp.conf
+git commit -a
 gbp buildpackage
+git checkout dansguardian
+git branch -D ubuntu16.04
 
 pour ubuntu 12.04 et 14.04
 cd CTparental/
@@ -40,6 +49,7 @@ git branch ubuntu14.04
 git checkout ubuntu14.04
 sed -i "s/php-cgi,php-xml/php5-cgi/g" debian/control
 cp ubuntu/dist.conf debian/dist.conf
+/bin/sed -i "s/debian-branch =.*/debian-branch = ubuntu14.04/g" debian/gbp.conf
 git commit -a
 gbp buildpackage
 git branch -D ubuntu14.04
