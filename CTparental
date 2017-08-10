@@ -67,7 +67,7 @@ done
 pause () {   # fonction pause pour debugage
       MESSAGE="$*"
       choi=""
-      MESSAGE=${MESSAGE:=$(gettext "continue to press a button:")}
+      MESSAGE=${MESSAGE:=$(gettext "to continue press a button:")}
       echo  "$MESSAGE"
       while (true); do
          read choi
@@ -138,7 +138,7 @@ COMMONFILEGS="common-auth"
 GESTIONNAIREDESESSIONS=" login gdm lightdm slim kdm xdm lxdm gdm3 "
 FILEPAMTIMECONF="/etc/security/time.conf"
 DIRPAM="/etc/pam.d/"
-DAYS=${DAYS:="$(gettext "monday") $(gettext "tuesday") $(gettext "wednesday") $(gettext "thursday") $(gettext "friday") $(gettext "saturday") $(gettext "sunday") "}
+DAYS=${DAYS:="$(gettext "Monday") $(gettext "Tuesday") $(gettext "Wednesday") $(gettext "Thursday") $(gettext "Friday") $(gettext "Saturday") $(gettext "Sunday") "}
 DAYS=( $DAYS )
 DAYSPAM=( Mo Tu We Th Fr Sa Su )
 DAYSCRON=( mon tue wed thu fri sat sun )
@@ -257,7 +257,7 @@ if [ $? -eq 0 ] ; then
 fi
 
 if [ -z "$CMDINSTALL" ] ; then
-   gettext 'No known package manager, was detected.'
+   gettext 'No known package manager was detected.'
    set -e
    exit 1
 fi
@@ -443,7 +443,7 @@ cat << EOF > "$DIRE2G"lists/bannedsitelist
 #remove the # from the next line to leave only a '**ips':
 #**ips
 
-$(gettext "#the domain filtering is handled by dnsmasq, do not touch this file !!")
+$(gettext "#the domain filtering is handled by dnsmasq, do not touch this file!")
 
 EOF
 
@@ -556,7 +556,7 @@ download() {
    rm -rf $tempDIR
    mkdir $tempDIR
    # on attend que la connection remonte suite au redemarage de networkmanager
-   gettext 'Waiting to Connect to Server from Toulouse:'
+   gettext 'Waiting to connect to Toulouse server:'
    i=1
    while [ "$(ping -c 1 $BL_SERVER 2> /dev/null | grep -c "1 received"  )" -eq 0 ]
    do
@@ -564,7 +564,7 @@ download() {
    sleep 1
    i=$(( i + 1 ))
    if [ $i -ge 40 ];then # si au bout de 40 secondes on a toujours pas de connection on considaire qu'il y a une erreur
-		gettext 'The connection to the server of Toulouse is impossible.'
+		gettext 'Connection to Toulouse server is impossible.'
 		set -e
 		exit 1
    fi
@@ -581,7 +581,7 @@ download() {
    fi
    tar -xzf $tempDIR/blacklists.tar.gz -C $tempDIR
    if [ ! $? -eq 0 ]; then
-      gettext 'archive extraction error , interrupted process'
+      gettext 'archive extraction error, interrupted process'
       set -e
       exit 1
    fi
@@ -644,7 +644,7 @@ if [ -d $tempDIR  ] ; then
 	if [ ! -f $DIR_DNS_FILTER_AVAILABLE/ossi.conf ] ; then
 		echo > $DIR_DNS_FILTER_AVAILABLE/ossi.conf
 	fi
-	gettext 'blacklist and WhiteList , migration process. Please wait :'" "
+	gettext 'Toulouse Blacklist and WhiteList migration process. Please wait.'" "
 	cd "$tempDIR"/blacklists
 	for categorie in *
 	do
@@ -1531,7 +1531,7 @@ CActparental
 $LIGHTTPDstart
 test=$?
 if [ ! $test -eq 0 ];then
-	gettext 'Error launching of lighttpd Service'
+	gettext 'Error launching of lighttpd service'
 	set -e
 	exit 1
 fi
@@ -1559,7 +1559,7 @@ password=$(whiptail --title "$(gettext 'Password')" --nocancel --passwordbox "$(
 				break
 			else
 				whiptail --title "$(gettext "Password")" --msgbox "$(gettext "Password is not complex enough, it must contain at least:")
-$(gettext "- 8 characters total, 1 Uppercase, lowercase 1, number 1")
+$(gettext "- 8 characters total, 1 uppercase, lowercase 1, number 1")
 $(gettext "and one special character among the following") &éè~#{}()ç_@à?.;:/!,$<>=£% " 14 60 
 			fi
 		else
@@ -1690,7 +1690,7 @@ $NETWORKINGrestart
 		clear
 		cat < "$DIR_CONF"/dist.conf | grep -v -E ^# | grep -v ^$
 		gettext 'Enter: S to continue with these parameters.'
-		gettext 'Enter Q to Quit Setup.'
+		gettext 'Enter: Q to Quit setup.'
 		gettext 'Enter any other choice to change settings.'
 		 read choi
 		case $choi in
@@ -1906,7 +1906,7 @@ uninstall () {
 
    # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
    if [ $nomanuel -eq 0 ]; then 
-	   muninstall=$(gettext "Install a packet was detected please use this command to uninstall ctparental.")
+	   muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
 	   if [ "$(dpkg -l ctparental | grep -c ^i)" -eq 1 ] ;then
 			echo "$muninstall"
 			echo "$CMDREMOVE ctparental"
@@ -2029,7 +2029,7 @@ $NETWORKINGrestart
 choiblenabled () {
 echo -n > $CATEGORIES_ENABLED
 clear
-gettext 'Want to filter by, Blacklist or Whitelist B/W :'
+gettext 'Do you want to filter by Blacklist or Whitelist B/W:'
 while (true); do
          read choiBW
          case $choiBW in
@@ -2048,9 +2048,9 @@ done
 cat  < $cat_av | while read CATEGORIE
 do
 clear
-gettext 'Choice of unfiltered categories.'
+gettext 'Choice of filtered categories to apply.'
 echo ""
-eval_gettext "You want to enable this category \$CATEGORIE  O/N :"
+eval_gettext "Do you want to enable this category \$CATEGORIE  O/N:"
 (
 	while (true) ; do
 		unset choi
@@ -2081,7 +2081,7 @@ h=$(gettext ":")
 or=$(gettext "or")
 echo -e "$(gettext "The start time must be strictly less than the end time:")$RougeD$input$Fcolor "
 echo "exemple: 00${h}00 $at 23${h}59 $or 08${h}00 $at 12${h}00 $and 14${h}00 $at 16${h}50"
-echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
+echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at:")"
 }
 errortime2 () {
 clear
@@ -2091,7 +2091,7 @@ h=$(gettext ":")
 or=$(gettext "or")
 echo -e "$(gettext "Bad syntax:")$RougeD$input$Fcolor "
 echo "exemple: 00${h}00 $at 23${h}59 $or 08${h}00 $at 12${h}00 $and 14${h}00 $at 16${h}50"
-echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
+echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at:")"
 }
 
 
@@ -2154,7 +2154,7 @@ updatetimelogin () {
 							echo "$IPTABLES -A OUTPUT -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -p tcp --dport $PROXYport -j REJECT" >> "$FILEIPTIMEWEB"
 							iptablesreload
 							HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
-							export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Your surf time as expird!')"
+							export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Your surf time as expired!')"
 						fi
 					else
 						if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -ge 1 ];then
@@ -2290,7 +2290,7 @@ X ( 1 a \$timesession )= "
          h=$(gettext ":")
          or=$(gettext "or")
          echo "exemple: 00${h}00 $at 23${h}59 $or 08${h}00 $at 12${h}00 $and 14${h}00 $at 16${h}50"
-         echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
+         echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at:")"
          while (true); do
             read choi
             input=$choi
@@ -2644,19 +2644,19 @@ fi
 
 usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -off }|{ -cble }|{ -dble }
                                |{ -tlo }|{ -tlu }|{ -uhtml }|{ -aupon }|{ -aupoff }|{ -aup } 
--i$(gettext "	=> Install parental controls on the computer (desktop PC). Can be used with
+-i$(gettext "	=> Install parental control on the computer (desktop PC). Can be used with
 	   an additional parameter to specify a source path for the redirection page.
 	   example: CTparental -dirhtml -i /home/toto/html/
-	   if no option a page by default is used.")
+	   if no option a default page is used.")
 -u$(gettext "	=> uninstall the Parental Control Computer (desktop PC)")
 -dl$(gettext "	=> updates parental control from the blacklist of the University of Toulouse")
--ubl$(eval_gettext "	=> What to do after each change of the file \$DNS_FILTER_OSSI")
--rl$(eval_gettext "	=> What to do after each change of the file \$DREAB") 
+-ubl$(eval_gettext "	=> To be done after each change of the file \$DNS_FILTER_OSSI")
+-rl$(eval_gettext "	=> To be done after each change of the file \$DREAB") 
 -on$(gettext "	=> Enable parental control")
--off$(gettext "	=> Disable parental controls")
+-off$(gettext "	=> Disable parental control")
 -cble$(gettext "	=> Set the filter mode by whitelist or blacklist (default)
 	   and the categories that you want to activate.")
--dble$(gettext "	=> Resets the default active categories and blacklist filtering.")
+-dble$(gettext "	=> Reset the default active categories and blacklist filtering.")
 -tlo$(gettext "	=> Enable and configure the login time restrictions for users.")
 -tlu$(gettext "	=> Disable the login time restrictions for users.")
 -uhtml$(gettext "	=> updates the redirect page from a source directory or default.
@@ -2664,24 +2664,24 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	           - With a source directory: CTparental -uhtml -dirhtml /home/toto/html/
 	           - Default: CTparental -uhtml
 	   also lets you change the login couple password of the web interface.")
--aupon$(gettext "	=> Enable the automatic update of the blacklist of Toulouse (every 7 days).")
--aupoff$(gettext "	=> Disable the automatic update of the blacklist of Toulouse.")
+-aupon$(gettext "	=> Enable the automatic update of the Toulouse blacklist (every 7 days).")
+-aupoff$(gettext "	=> Disable the automatic update of the Toulouse blacklist.")
 -aup$(gettext "	=> as -dl but only if there is no update for more than 7 days.")
--nodep$(gettext "	=> if placed after -i or -u allows not install / uninstall the dependencies useful if
+-nodep$(gettext "	=> if placed after -i or -u allows not install / uninstall the dependencies, useful if
 	   we prefer to install them by hand, or for the postinst and prerm script of deb.
 	   examples:
 	   CTparental -i -nodep
 	   CTparental -dirhtml -i /home/toto/html/ -nodep
 	   CTparental -u -nodep")
 -nomanuel$(gettext "	=> used only for the postinst and prerm script.")
--gcton$(eval_gettext "	=> Enable privileged group.
+-gcton$(eval_gettext "	=> Enable a group of privileged user that will not undergo filtering.
 	   exemples:
 	           CTparental.sh -gctulist
 	           Comment all users that you want to filter in \$FILE_GCTOFFCONF
 	           CTparental -gctalist")
 -gctoff$(gettext "	=> Disable privileged group.")
-	   $(gettext "all users of the system undergo the filtering !!")
--gctalist$(eval_gettext "	=> Add / delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF") 
+	   $(gettext "all users of the system undergo the filtering!")
+-gctalist$(eval_gettext "	=> Add / Delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF") 
 -ipton$(gettext "	=> Enable rules of custom firewall.")
 -iptoff$(gettext "	=> Disable rules of custom firewall.")
 -grubPon$(gettext "	=> Enable the superuser of grub2.")
@@ -2958,7 +2958,7 @@ then run the command CTparental -ipton") $Fcolor"
       ;;
       
    *)
-      echo "$(gettext "unknown argument"):$1";
+      echo "$(gettext "Unknown argument"):$1";
       echo "$usage";
       exit 1
       ;;
