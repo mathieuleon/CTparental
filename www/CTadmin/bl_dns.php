@@ -25,7 +25,7 @@ require("update.php");
 
 echo "<div class='col-md-12'>";
 echo "<hr />";
-echo "<h3>".gettext('Choice of filtered categories')."</h3>";
+echo "<h3>".gettext('Choice of filtered categories to apply.')."</h3>";
 echo "<form action='$_SERVER[PHP_SELF]?dgfile=Blacklist filtering' method=POST>";
 echo "<input type='hidden' name='choix' value='MAJ_cat'>";
 echo "<div class='row'>";

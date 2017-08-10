@@ -2,7 +2,7 @@
 // affichage des formulaires
 
 echo "<h1 class='page-header'>".gettext('e2guardian configuration')."</h1>";
-echo "<h3>".gettext('Select the mimetype has filtered')."</h3>";
+echo "<h3>".gettext('Select the mimetype to be filtered')."</h3>";
 echo "<p class='text-muted'>".$dg_file_edit."</p>";
 
 echo "<FORM action='".$_SERVER["PHP_SELF"]."?dgfile=mimetype has filtered' method='post'>";

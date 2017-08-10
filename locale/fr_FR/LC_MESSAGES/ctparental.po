@@ -343,6 +343,12 @@ msgstr "\t=> Désactiver les règles privoxy par défaut."
 msgid "\t=> Enable default rules privoxy. (default is Enable)"
 msgstr "\t=> Activer les règles par défaut de privoxy."
 
+msgid "\t=> Enable redirect page."
+msgstr "\t=> Activer la page de redirection."
+
+msgid "\t=> Disabled redirect page."
+msgstr "\t=> Désactiver la page de redirection."
+
 # ## CTadmin ###
 msgid "the selected user is: "
 msgstr "l'utilisateur sélectionné est : "
@@ -757,12 +763,6 @@ msgstr "Le filtrage par défaut de Privoxy est activé."
 
 msgid "Default filter Pivoxy is disabled"
 msgstr "Le filtrage par défaut de Privoxy est désactivé."
-
-msgid "Enable redirect page."
-msgstr "Activer la page de redirection."
-
-msgid "Disabled redirect page."
-msgstr "Désactiver la page de redirection."
 
 msgid "Site related to as pop up advertising or pornography not present in the Toulouse blacklist."
 msgstr "Site référencé comme pop up de publicité ou de pornographie non présent dans la blacklist de Toulouse."

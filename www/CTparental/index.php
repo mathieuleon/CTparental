@@ -4,7 +4,7 @@ include 'locale.php';
 <!DOCTYPE html>
 <html>
     <head>
-        <title><?php echo gettext("Access has been Denied!"); ?></title>
+        <title><?php echo gettext("Access has been denied!"); ?></title>
         
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,13 +20,13 @@ include 'locale.php';
     <body>
         <div class="container">
             <div class="header clearfix">
-                <h3 class="text-muted"><?php echo gettext("Access has been Denied!"); ?></h3>
+                <h3 class="text-muted"><?php echo gettext("Access has been denied!"); ?></h3>
             </div>
             
             <div class="jumbotron">
                 <img src="http://127.0.0.1/CTparental/images/2518388623_1.png" />
 
-                <h1><?php echo gettext("Access to the page:");?></h1>
+                <h1><?php echo gettext("Access to the domain:");?></h1>
                 <h2><?php echo $_SERVER["HTTP_HOST"]; ?></h2>
                 <hr />
                 <h3><?php echo gettext("... has been denied.");?></h3>

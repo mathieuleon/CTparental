@@ -24,7 +24,7 @@ $l_explain_financial          = gettext("Sites of financial information");
 $l_explain_forums             = gettext("Sites hosting discussion forums");
 $l_explain_gambling           = gettext("Online gambling sites (casino, virtual scratching, etc.)");
 $l_explain_hacking            = gettext("Hacking sites.");
-$l_explain_liste_bu           = gettext("A french list for educational sites. VERY locally oriented. may help libraries.");
+$l_explain_liste_bu           = gettext("A french list for educational sites. VERY locally oriented. May help libraries.");
 $l_explain_mobile_phone       = gettext("Sites related to GSM mobile (ringtones, logos, etc.)");
 $l_explain_phishing           = gettext("Phishing sites (traps banking, redirect, etc..)");
 $l_explain_publicite          = gettext("Advertising sites");
@@ -43,7 +43,7 @@ $l_explain_reaffected         = gettext("Sites that have changed ownership (and 
 $l_explain_sexual_education   = gettext("Sites related to sex education");
 $l_explain_shopping           = gettext("Shopping sites and online shopping");
 $l_explain_dating             = gettext("Online dating sites");
-$l_explain_marketingware      = gettext("doubtful commercial sites");
+$l_explain_marketingware      = gettext("Doubtful commercial sites");
 $l_explain_astrology          = gettext("Sites related to astrology");
 $l_explain_sect               = gettext("Sectarian sites");
 $l_explain_celebrity          = gettext("Sites « people », stars, etc.");
@@ -68,7 +68,7 @@ $l_explain_update             = gettext("sites of update");
 $l_explain_associations_religieuses = gettext("Sites of Religious Associations");
 $l_explain_shortener          = gettext("URLs shortening sites");
 $l_explain_ossi               = gettext("Domain names and URLs you add to the blacklist (see below)");
-$l_explain_ctparental         = gettext("Site related to as pop up advertising or pornography not present in the blacklist of Toulouse.");
+$l_explain_ctparental         = gettext("Site related to as pop up advertising or pornography not present in the Toulouse blacklist.");
 if (isset($_GET['cat']))
 {
     $categorie = $_GET['cat'];

@@ -2,7 +2,7 @@
 // affichage des formulaires
 
 echo "<h1 class='page-header'>".gettext('Safesearch configuration')."</h1>";
-echo "<h3>".gettext('Select the safesearch has enebled')."</h3>";
+echo "<h3>".gettext('Select the safesearch to be enabled')."</h3>";
 
 echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=safesearch Enebeled' method='POST'>";
 

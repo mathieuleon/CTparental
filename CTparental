@@ -2688,8 +2688,8 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 -grubPoff$(gettext "	=> Disable the superuser of grub2.")
 -pfoff$(gettext "	=> Disable default rules privoxy.")
 -pfon$(gettext "	=> Enable default rules privoxy. (default is Enable)")
--ron$(gettext "	=> Enable rectidect page.")
--roff$(gettext "	=> Disable rectidect page.")
+-ron$(gettext "	=> Enable redirect page.")
+-roff$(gettext "	=> Disabled redirect page.")
 "
 arg1=${1}
 case $arg1 in
