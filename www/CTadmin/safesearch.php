@@ -4,7 +4,7 @@
 echo "<h1 class='page-header'>".gettext('Safesearch configuration')."</h1>";
 echo "<h3>".gettext('Select the safesearch to be enabled')."</h3>";
 
-echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=safesearch Enebeled' method='POST'>";
+echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=Safesearch configuration' method='POST'>";
 
 echo "<p class='text-muted'>".$dg_file_edit."</p>";
 echo "<div class='row'>";

@@ -5,7 +5,7 @@ echo "<h1 class='page-header'>".gettext('e2guardian configuration')."</h1>";
 echo "<h3>".gettext('Select the extensions to be filtered')."</h3>";
 echo "<p class='text-muted'>".$dg_file_edit."</p>";
 
-echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=extensions has filtered' method='post'>";
+echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=extensions to be filtered' method='post'>";
 echo "<input type='hidden' name='choix' value='change_file2'>";
 echo "<button class='btn btn-info'>";
 echo "<span class='glyphicon glyphicon-save' aria-hidden='true'></span>&nbsp;";
@@ -13,7 +13,7 @@ echo gettext('Select all');
 echo "</button>";
 echo "</form>";
 echo "<br />";
-echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=extensions has filtered' method='post'>";
+echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=extensions to be filtered' method='post'>";
 echo "<input type='hidden' name='choix' value='change_file3'>";
 echo "<button class='btn btn-info'>";
 echo "<span class='glyphicon glyphicon-save' aria-hidden='true'></span>&nbsp;";
@@ -21,7 +21,7 @@ echo gettext('Unselect all');
 echo "</button>";
 echo "</form>";
 
-echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=extensions has filtered' method='post'>";
+echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=extensions to be filtered' method='post'>";
 echo "<div class='row'>";
 
 // Read the bannedextensionlist file

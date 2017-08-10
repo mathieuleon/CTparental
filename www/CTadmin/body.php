@@ -562,10 +562,10 @@ switch ($dg_confswitch)
     case 'WhiteList Filtering':
         include 'wl_dns.php';
         break;
-    case 'extensions has filtered':
+    case 'extensions to be filtered':
         include 'dg_extensions.php';
         break;
-    case 'mimetype has filtered':
+    case 'mimetype to be filtered':
         include 'dg_mimetype.php';
         break;
     case '*ip **ips ...':
@@ -574,7 +574,7 @@ switch ($dg_confswitch)
     case 'privileged group':
         include 'gctoff.php';
         break;
-    case 'safesearch Enebeled':
+    case 'Safesearch configuration':
         include 'safesearch.php';
         break;  
     case 'Hours of allowed connections':
