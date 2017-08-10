@@ -3,7 +3,7 @@
 echo "<div class='row'>";
 echo "<div class='col-md-6'>";
 echo "<p>";
-echo gettext('Version actuelle :')." $LASTUPDATE";
+echo gettext('Current version: ')." $LASTUPDATE";
 echo "</p>";
 
 echo "<div class='pull-left' style='margin-right: 10px;'>";
@@ -32,7 +32,7 @@ echo "<div class='clearfix col-md-6'>";
 if ($AUTOUPDATE == "ON")
 {
     echo "<p><br /><br />";
-    echo gettext('The update of the blacklist Toulouse every 7 days is activated');
+    echo gettext('The update of the Toulouse blacklist every 7 days is activated');
     echo "&nbsp;<span class='glyphicon glyphicon-ok' style='color: green;' aria-hidden='true'></span>";
     echo "</p>";
     echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=Blacklist filtering' method='post'>";
@@ -42,7 +42,7 @@ if ($AUTOUPDATE == "ON")
 else
 {
     echo "<p><br /><br />";
-    echo gettext('The update of the blacklist Toulouse every 7 days is disabled');
+    echo gettext('The update of the Toulouse blacklist every 7 days is disabled');
     echo "&nbsp;<span class='glyphicon glyphicon-remove' style='color: red;' aria-hidden='true'></span>";
     echo "</p>";
     echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=Blacklist filtering' method='post'>";
@@ -55,7 +55,7 @@ echo "</form>";
 if ($PRIVOXYDF == "ON")
 { 
 	echo "<p>";
-    echo gettext('Default filter Pivoxy is activated');
+    echo gettext('Default filter Privoxy is activated');
     echo "&nbsp;<span class='glyphicon glyphicon-ok' style='color: green;' aria-hidden='true'></span>";
     echo "</p>";
     echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=Blacklist filtering' method='post'>";
@@ -65,7 +65,7 @@ if ($PRIVOXYDF == "ON")
 else
 {
 	echo "<p>";
-    echo gettext('Default filter Pivoxy is disabled');
+    echo gettext('Default filter Privoxy is disabled');
     echo "&nbsp;<span class='glyphicon glyphicon-remove' style='color: red;' aria-hidden='true'></span>";
     echo "</p>";
     echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=Blacklist filtering' method='post'>";

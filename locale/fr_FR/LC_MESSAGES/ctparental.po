@@ -758,10 +758,10 @@ msgstr "Configuration de e2guardian"
 msgid "Select the safesearch to be enabled"
 msgstr "Sélectionnez le/les safesearch à activer."
 
-msgid "Default filter Pivoxy is activated"
+msgid "Default filter Privoxy is activated"
 msgstr "Le filtrage par défaut de Privoxy est activé."
 
-msgid "Default filter Pivoxy is disabled"
+msgid "Default filter Privoxy is disabled"
 msgstr "Le filtrage par défaut de Privoxy est désactivé."
 
 msgid "Site related to as pop up advertising or pornography not present in the Toulouse blacklist."

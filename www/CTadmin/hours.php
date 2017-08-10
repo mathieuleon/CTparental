@@ -52,9 +52,9 @@ if ($HOURSCONNECT == "ON")
                     elseif ( $numday == "user") {echo gettext('24/7')." : <input type='checkbox' name='isadmin' >";
                                             if ( intval ($field[2]) == 0 ) { $field[2]="1440"; }
                                             echo "<br /> ";
-                                            echo gettext('time max pc connection')." ".gettext('( minutes for 24 hours )')."<input type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440";
+                                            echo gettext('time max pc connection')." ".gettext('(minutes for 24 hours)')."<input type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440";
                                             echo "<br /> ";
-                                            echo gettext('time max for web surfing')." ".gettext('( minutes for 24 hours )')."<input type=\"text\" size=4 maxlength=4 value=\"$field[3]\"  name=\"tmax2\">/".$field[2];	
+                                            echo gettext('maximum time for web surfing')." ".gettext('(minutes for 24 hours)')."<input type=\"text\" size=4 maxlength=4 value=\"$field[3]\"  name=\"tmax2\">/".$field[2];	
                                             echo "<br /> ";
                                             }
                                             

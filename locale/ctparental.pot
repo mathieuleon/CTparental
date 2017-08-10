@@ -729,10 +729,10 @@ msgstr ""
 msgid "Select the safesearch to be enabled"
 msgstr ""
 
-msgid "Default filter Pivoxy is activated"
+msgid "Default filter Privoxy is activated"
 msgstr ""
 
-msgid "Default filter Pivoxy is disabled"
+msgid "Default filter Privoxy is disabled"
 msgstr ""
 
 msgid "Site related to as pop up advertising or pornography not present in the Toulouse blacklist."
