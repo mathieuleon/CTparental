@@ -93,7 +93,7 @@ echo "<tables>";
 
 echo "<tr>";
 echo "<td>";
-echo "<h3>".gettext('Rehabilitated domain names')."</h3>".gettext('1-Enter here domain names that are blocked by the blacklist and you want to rehabilitate.')." ".gettext('Enter one domain name per row (example : .domain.org)'."<br />" );
+echo "<h3>".gettext('Rehabilitated domain names')."</h3>".gettext('1-Enter here domain names that are blocked by the blacklist and you want to rehabilitate.')." ".gettext('Enter one domain name per row (example : .domain.org)')."<br />" ;
 echo "</td>";
 echo "<td>";
 echo "<textarea name='OSSI_wl_domains' rows=5 cols=40>";
@@ -106,7 +106,7 @@ echo "</tr>";
 
 echo "<tr>";
 echo "<td>";
-echo "<h3>".gettext('Filtered domain names')."</h3>".gettext('Enter one domain name per row (example : .domain.org)'."<br />" );
+echo "<h3>".gettext('Filtered domain names')."</h3>".gettext('Enter one domain name per row (example : .domain.org)')."<br />";
 echo "</td>";
 echo "<td>";
 echo "<textarea name='OSSI_bl_domains' rows=5 cols=40>";
