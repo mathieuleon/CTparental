@@ -169,6 +169,8 @@ IPTABLESsave=${IPTABLESsave:="$CMDSERVICE netfilter-persistent save"}
 IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
 E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE dansguardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
+PING4=${PING4:="ping -4 "}
+PING6=${PING6:="ping -6 "}
 #### LOCALISATION du fichier PID lighttpd par default ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
 
@@ -315,13 +317,13 @@ export DNS2v6=${DNS2v6:=2001:4860:4860::8844} #
 
 networkisoknext() {
 ipv4ok=0
-ping -4 -c1 -w1 "$ipbox_ipv4" 2> /dev/null
+$PING4 -c1 -w1 "$ipbox_ipv4" 2> /dev/null
 if [ $? -eq  0 ];then
 ipv4ok=1
 fi
 
 ipv6ok=0
-ping -6 -c1 -w1 "$ipbox_ipv6" 2> /dev/null
+$PING6 -c1 -w1 "$ipbox_ipv6" 2> /dev/null
 if [ $? -eq  0 ];then
 ipv6ok=1
 fi
