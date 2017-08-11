@@ -19,7 +19,7 @@ export TEXTDOMAIN="ctparental"
 CHEMINCTPARENTLE="$(readlink -f "$0")"
 
 #### UID MINIMUM pour les UTILISATEUR
-UIDMINUSER=${UIDMINUSER:=1000}
+UIDMINUSER=${UIDMINUSER:=500}
 
 if [ ! $UID -lt $UIDMINUSER ]; then # considère comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script sans erreur.
 	gettext 'It root of the need to run this script.'
