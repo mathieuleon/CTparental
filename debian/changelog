@@ -1,3 +1,9 @@
+ctparental (4.20.23-1.0) unstable; urgency=medium
+
+  * Correction du non filtrage de la session invité.
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Fri, 11 Aug 2017 17:12:51 +0200
+ 
 ctparental (4.20.22-1.0) unstable; urgency=medium
 
   * Correction des fautes d'orthographe, typo et certaines formulations.
