@@ -18,6 +18,10 @@ export TEXTDOMAINDIR="$DIRLOCALE"
 export TEXTDOMAIN="ctparental"
 CHEMINCTPARENTLE="$(readlink -f "$0")"
 
+
+## imports du plugin de la distributions si il existe
+if [ -f "${DIR_CONF}/dist.conf" ];then . "${DIR_CONF}/dist.conf"; fi
+
 #### UID MINIMUM pour les UTILISATEUR
 UIDMINUSER=${UIDMINUSER:=500}
 
@@ -122,10 +126,6 @@ EOF
 fi
 FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"
 REDIRECT="$(cat < $FILE_CONF | grep -c "REDIRECT=ON" )"
-
-
-## imports du plugin de la distributions si il existe
-if [ -f "${DIR_CONF}/dist.conf" ];then . "${DIR_CONF}/dist.conf"; fi
 
 tempDIR="/tmp/alcasar"
 tempDIRRamfs="/tmp/alcasarRamfs"
