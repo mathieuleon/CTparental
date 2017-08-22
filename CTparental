@@ -134,8 +134,8 @@ RougeD="\033[1;31m"
 BleuD="\033[1;36m"
 #VertD="\033[1;32m"
 Fcolor="\033[0m"
-COMMONFILEGS="common-auth"
-GESTIONNAIREDESESSIONS=" login gdm lightdm slim kdm xdm lxdm gdm3 "
+COMMONFILEGS=${COMMONFILEGS:="common-auth"}
+GESTIONNAIREDESESSIONS=${GESTIONNAIREDESESSIONS:=" login gdm lightdm slim kdm xdm lxdm gdm3 "}
 FILEPAMTIMECONF="/etc/security/time.conf"
 DIRPAM="/etc/pam.d/"
 DAYS=${DAYS:="$(gettext "Monday") $(gettext "Tuesday") $(gettext "Wednesday") $(gettext "Thursday") $(gettext "Friday") $(gettext "Saturday") $(gettext "Sunday") "}
