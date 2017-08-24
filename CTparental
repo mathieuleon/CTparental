@@ -1844,25 +1844,27 @@ echo "<updatelistgctoff>"
 	if [ ! -f $FILE_GCTOFFCONF ] ; then 
 		echo -n > $FILE_GCTOFFCONF
 	fi
+	$MFILEtmp
+	cp -f "$FILE_GCTOFFCONF" "$FILE_tmp"
 	## on ajoute tous les utilisateurs manquants dans la liste
 	for PCUSER in $(listeusers)
 	do
-		if [ "$(cat < $FILE_GCTOFFCONF | sed -e "s/+//g" | sed -e "s/#//g" | grep -c -E "^$PCUSER$")" -eq 0 ];then
+		if [ "$(cat < $$FILE_tmp | sed -e "s/+//g" | sed -e "s/#//g" | grep -c -E "^$PCUSER$")" -eq 0 ];then
 			result="1"	
 			if [ "$(groups "$PCUSER" | grep -c -E "( root$)|( root )|( sudo$)|( sudo )")" -eq 1 ];then
 				#si l'utilisateur fait parti d'un group d'administration de la machine on l'ajoute sans filtrage par default.
-				echo "+$PCUSER" >> $FILE_GCTOFFCONF
+				echo "+$PCUSER" >> $FILE_tmp
 			else
 				#si non avec filtrage  par default.
-				echo "#$PCUSER" >> $FILE_GCTOFFCONF
+				echo "#$PCUSER" >> $FILE_tmp
 			fi
 		fi
 		
 		if [ "$(groups "$PCUSER" | grep -c -E "( root$)|( root )|( sudo$)|( sudo )")" -eq 0 ];then
-			$SED "s/^+${PCUSER}$/#$PCUSER/g" "$FILE_GCTOFFCONF"	
+			$SED "s/^+${PCUSER}$/#$PCUSER/g" "$FILE_tmp"	
 		else
-			$SED "s/^#${PCUSER}$/+$PCUSER/g" "$FILE_GCTOFFCONF"
-			$SED "s/^$${PCUSER}$/+$PCUSER/g" "$FILE_GCTOFFCONF"	
+			$SED "s/^#${PCUSER}$/+$PCUSER/g" "$FILE_tmp"
+			$SED "s/^$${PCUSER}$/+$PCUSER/g" "$FILE_tmp"	
 		fi
 		
 		
@@ -1873,12 +1875,14 @@ echo "<updatelistgctoff>"
 		PCUSER=${PCUSER//#/} 
 		if [ "$( listeusers | grep -c -E "^$PCUSER$")" -eq 0 ];then
 			result="1"
-			$SED "/^$${PCUSER}$/d" "$FILE_GCTOFFCONF"
-			$SED "/^#${PCUSER}$/d" "$FILE_GCTOFFCONF"
-			$SED "/^+${PCUSER}$/d" "$FILE_GCTOFFCONF"
+			$SED "/^$${PCUSER}$/d" "$FILE_tmp"
+			$SED "/^#${PCUSER}$/d" "$FILE_tmp"
+			$SED "/^+${PCUSER}$/d" "$FILE_tmp"
 		fi
-	done < $FILE_GCTOFFCONF
+	done < $FILE_tmp
 	echo $result
+	cp -f "$FILE_tmp" "$FILE_GCTOFFCONF"
+	$UMFILEtmp
 echo "</updatelistgctoff>"
 	
 }
