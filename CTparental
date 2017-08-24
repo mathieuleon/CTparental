@@ -33,9 +33,13 @@ fi
 ## On ne fait rien si ctparental et déja en cour de traitement.
 PIDFILE="/var/run/CTparental.pid"
 if [ -f $PIDFILE ];then 
-	gettext 'Already in process'
-	echo ""
-	exit
+	if [ $(ps -A | grep -c CTparental ) -eq 0 ];then
+	rm -rf $PIDFILE
+	else
+		gettext 'Already in process'
+		echo ""
+		exit
+	fi
 fi
 echo $$ > $PIDFILE
 
@@ -2706,16 +2710,13 @@ arg1=${1}
 case $arg1 in
    -\? | -h* | --h*)
       echo "$usage"
-      exit 0
       ;;
    -i )
       networkisoknext
       install
-      exit 0
       ;;
    -u )
 	  uninstall
-      exit 0
       ;;
    -dl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2726,7 +2727,6 @@ case $arg1 in
 		  dnsmasqon
 		  $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=$(date +%d-%m-%Y\ %T)?g" $FILE_CONF
       fi
-      exit 0
       ;;
    -ubl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2734,14 +2734,11 @@ case $arg1 in
 		  adapt
 		  catChoice
 		  dnsmasqon
-      fi
-       
-      exit 0
+      fi 
       ;;
    -uhtml )
       networkisoknext
       FoncHTTPDCONF
-      exit 0
       ;;
    -rl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2749,7 +2746,6 @@ case $arg1 in
          catChoice
          dnsmasqon
       fi 
-      exit 0
       ;;
    -on )
       networkisoknext
@@ -2759,7 +2755,6 @@ case $arg1 in
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
 	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
 	  activegourpectoff
-      exit 0
       ;;
    -off )
       rm -f /etc/cron.d/CTparental*
@@ -2768,14 +2763,12 @@ case $arg1 in
       dnsmasqoff
       FILTRAGEISOFF=1
       iptablesreload
-      exit 0
       ;;
    -wlo )
 	  if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	      networkisoknext
 		  dnsmasqwhitelistonly
       fi
-      exit 0
       ;;
    -cble )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2784,7 +2777,6 @@ case $arg1 in
 		  catChoice
 		  dnsmasqon
       fi
-      exit 0
       ;;
     -dble )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2793,40 +2785,32 @@ case $arg1 in
 		  catChoice
 		  dnsmasqon
       fi
-      exit 0
       ;;
     -tlo )
       activetimelogin
-      exit 0
       ;;
     -tlu )
       desactivetimelogin
-      exit 0
       ;;
     -trf )
       readTimeFILECONF
-      exit 0
       ;;
     -aupon )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
          autoupdateon
       fi
-      exit 0
       ;;
     -aupoff )
       autoupdateoff
-      exit 0
       ;;
     -aup )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
          networkisoknext
 		 autoupdate
       fi
-      exit 0
       ;;
     -listusers )
       listeusers
-      exit 0
       ;;
     -gcton )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2834,12 +2818,10 @@ case $arg1 in
 		  activegourpectoff
 		  iptablesreload
 	  fi
-	  exit 0
       ;;
     -gctoff )
       desactivegourpectoff
 	  iptablesreload
-	  exit 0
       ;;
     -gctulist )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2847,7 +2829,6 @@ case $arg1 in
 		  updatelistgctoff
 		  iptablesreload
 	  fi
-	  exit 0
       ;;
     -gctalist )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2860,7 +2841,6 @@ case $arg1 in
 		  applistegctoff
 		  iptablesreload
 	  fi
-	  exit 0
       ;;
     -ipton )
       networkisoknext
@@ -2869,22 +2849,18 @@ case $arg1 in
       echo -e "$RougeD $(eval_gettext "to add custom rules edit the file 
 \$FILEIPTABLES 
 then run the command CTparental -ipton") $Fcolor"
-      exit 0
       ;;
     -iptoff )
       $SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
       iptablesreload
-      exit 0
       ;;
     -nomade )
 	 # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
 	  nomade
-	  exit 0
       ;;  
     -uctl )
 	 # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
 	  updatetimelogin
-	  exit 0
       ;;  
     -ucto )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2899,28 +2875,22 @@ then run the command CTparental -ipton") $Fcolor"
 		  fi
 		  unset test
 	  fi
-	  exit 0
       ;;  
     -dgreload )
       $E2GUARDIANrestart     
-      exit 0
       ;;  
     -grubPon )
       confgrub2
-      exit 0
       ;;  
     -grubPoff )
       rm -rf /etc/grub.d/99_password
       update-grub2
-      exit 0
       ;;
     -pfoff )
 	  privoxydefaultfilteroff
-      exit 0
       ;;
     -pfon )
 	  privoxydefaultfilteron
-      exit 0
       ;;
     -ron )	
 	  #$SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
@@ -2932,7 +2902,6 @@ then run the command CTparental -ipton") $Fcolor"
 	  echo $E2GUARDIANrestart
 	  $E2GUARDIANrestart
 	  iptablesreload
-	  exit 0
       ;;
     -roff )
 	  #$SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
@@ -2943,7 +2912,6 @@ then run the command CTparental -ipton") $Fcolor"
 	  chown -R root:"$GROUPHTTPD" "$DIRHTML"
 	  $E2GUARDIANrestart
 	  iptablesreload
-      exit 0
       ;;
     -logqueryon )
       {
@@ -2951,21 +2919,17 @@ then run the command CTparental -ipton") $Fcolor"
       echo "log-facility=/var/log/dnsmasq.query.log"
 	  } > "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
 	  resolvconffixon
-      exit 0
       ;;
     -logqueryoff )
 	  rm -f "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
 	  resolvconffixon
 	  rm -f /var/log/dnsmasq.query.log
-      exit 0
       ;;
 	-exp )
 	  exportconf
-      exit 0
       ;;
 	-imp )
 	  importconf
-      exit 0
       ;;
       
    *)
@@ -2974,6 +2938,8 @@ then run the command CTparental -ipton") $Fcolor"
       exit 1
       ;;
 esac
+
 rm -rf $PIDFILE
+
 exit 0
 
