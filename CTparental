@@ -8,11 +8,6 @@
 
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/etc/CTparental"
-if [ ! $(ps -A | grep -c CTparental) -eq 1 ];then # On ne fait rien si ctparental et déja en cour de traitement.
-	gettext 'Already in process'
-	echo ""
-	exit
-fi
 DIR_SHARE="/usr/share/CTparental"
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
@@ -35,7 +30,14 @@ if [ ! $UID -lt $UIDMINUSER ]; then # considère comme root tous les utilisateur
 	echo ""
 	exit 1
 fi
-
+## On ne fait rien si ctparental et déja en cour de traitement.
+PIDFILE="/var/run/CTparental.pid"
+if [ -f pidfile ];then 
+	gettext 'Already in process'
+	echo ""
+	exit
+fi
+echo $$ > $PIDFILE
 
 noinstalldep="0"
 nomanuel="0"
@@ -2970,5 +2972,6 @@ then run the command CTparental -ipton") $Fcolor"
       exit 1
       ;;
 esac
+rm -rf $PIDFILE
 exit 0
 
