@@ -33,12 +33,12 @@ fi
 ## On ne fait rien si ctparental et déja en cour de traitement.
 PIDFILE="/var/run/CTparental.pid"
 if [ -f $PIDFILE ];then 
-	if [ $(ps -A | grep -c CTparental ) -eq 0 ];then
-	rm -rf $PIDFILE
+	if [ $( ps -A | grep -c "$(cat $PIDFILE)") -eq 0 ] ; then
+	rm -f $PIDFILE
 	else
-		gettext 'Already in process'
-		echo ""
-		exit
+			gettext 'Already in process'
+			echo ""
+			exit
 	fi
 fi
 echo $$ > $PIDFILE
