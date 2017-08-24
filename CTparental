@@ -8,12 +8,10 @@
 
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/etc/CTparental"
-PIDFILE="/var/run/ctparental.pid"
-if [ -f "$PIDFILE" ];then # On ne fait rien si ctparental et déja en cour de traitement.
+if [ $(ps -A | grep -c CTparental) -ge 1 ];then # On ne fait rien si ctparental et déja en cour de traitement.
 	gettext 'Already in process'
 	exit
 fi
-echo -n "$$" > "$PIDFILE"
 DIR_SHARE="/usr/share/CTparental"
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
@@ -2971,6 +2969,5 @@ then run the command CTparental -ipton") $Fcolor"
       exit 1
       ;;
 esac
-rm -f "$PIDFILE"
-exit
+exit 0
 
