@@ -9,6 +9,10 @@
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/etc/CTparental"
 PIDFILE="/var/run/ctparental.pid"
+if [ -f "$PIDFILE" ];then # on ne fait rien si une instance tourne déja
+	gettext 'already in process'
+	exit
+fi
 echo -n "$$" > "$PIDFILE"
 DIR_SHARE="/usr/share/CTparental"
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
