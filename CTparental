@@ -10,6 +10,7 @@
 DIR_CONF="/etc/CTparental"
 if [ $(ps -A | grep -c CTparental) -ge 2 ];then # On ne fait rien si ctparental et déja en cour de traitement.
 	gettext 'Already in process'
+	echo ""
 	exit
 fi
 DIR_SHARE="/usr/share/CTparental"
