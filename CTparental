@@ -1789,8 +1789,8 @@ $NETWORKINGrestart
       $ENE2GUARDIAN
       $ENPRIVOXY
       $ENNETWORK
-      { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
-	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
+      { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalcron
+	  echo "*/1 * * * * root /usr/bin/CTparental -cron" >> /etc/cron.d/CTparentalcron
 	  
     
 }
@@ -1919,8 +1919,6 @@ echo "<activegourpectoff>"
    GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
    chown root:"$GROUPHTTPD" "$FILE_GCTOFFCONF"
    chmod 660 "$FILE_GCTOFFCONF"
-   echo "PATH=$PATH"  > /etc/cron.d/CTparentalupdateuser
-   echo "*/1 * * * * root /usr/bin/CTparental -ucto" >> /etc/cron.d/CTparentalupdateuser
    $CRONrestart
 echo "</activegourpectoff>"
 }
@@ -2143,6 +2141,7 @@ MAlert=$((MinTotalAlert - $(( Halert *60 )) ))
 echo "$MAlert $Halert * * ${DAYSCRON[$D]}"
 }
 updatetimelogin () {
+	
 	USERSCONECT=$(who | awk '//{print $1}' | sort -u)
    	if [ "$(cat < $FILE_HCOMPT | grep -c "$(date +%D)")" -eq 1 ] ; then
 			# on incrémente le compteur de temps de connection. pour chaque utilisateur connecté
@@ -2404,8 +2403,6 @@ X ( 1 a \$timesession )= "
       echo >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
    done
    echo >> $FILE_HCONF
-{ echo "PATH=$PATH" ; echo "LANG=$LANG" ; }   > /etc/cron.d/CTparentalmaxtimelogin
-echo "*/1 * * * * root /usr/bin/CTparental -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=ON?g" $FILE_CONF
 $CRONrestart
 }
@@ -2423,7 +2420,6 @@ for NumDAY in 0 1 2 3 4 5 6
 do
    rm -f /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 done
-rm -f /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=OFF?g" $FILE_CONF 
 for PCUSER in $(listeusers)
 do
@@ -2524,8 +2520,6 @@ readTimeFILECONF () {
 		passwd -u "$PCUSER"
 	fi
    done
-{ echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalmaxtimelogin  
-echo "*/1 * * * * root /usr/bin/CTparental -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=ON?g" $FILE_CONF
 $CRONrestart
 }
@@ -2868,28 +2862,26 @@ then run the command CTparental -ipton") $Fcolor"
       $SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
       iptablesreload
       ;;
-    -nomade )
-	 # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
+    -cron )
+	  # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
 	  nomade
-      ;;  
-    -uctl )
-	 # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
-	  updatetimelogin
-      ;;  
-    -ucto )
-      if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-         networkisoknext
-		 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
-		 
-		  if [ "$(updatelistgctoff)" -eq 1 ];then
-			applistegctoff
-			updatecauser
-			#setproxy
-			iptablesreload
-		  fi
-		  unset test
+	  # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
+	  if [ $(cat  < $FILE_CONF | grep -c "HOURSCONNECT=ON") -eq 1 ];then
+		  updatetimelogin
 	  fi
-      ;;  
+	  if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			 networkisoknext
+			 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
+			 
+			  if [ "$(updatelistgctoff)" -eq 1 ];then
+				applistegctoff
+				updatecauser
+				#setproxy
+				iptablesreload
+			  fi
+			  unset test
+	   fi
+      ;;   
     -dgreload )
       $E2GUARDIANrestart     
       ;;  
