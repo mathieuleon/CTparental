@@ -8,6 +8,8 @@
 
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/etc/CTparental"
+PIDFILE="/var/run/ctparental.pid"
+echo -n "$$" > "$PIDFILE"
 DIR_SHARE="/usr/share/CTparental"
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
@@ -2965,5 +2967,6 @@ then run the command CTparental -ipton") $Fcolor"
       exit 1
       ;;
 esac
-
+rm -f "$PIDFILE"
+exit
 
