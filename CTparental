@@ -8,7 +8,7 @@
 
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/etc/CTparental"
-if [ $(ps -A | grep -c CTparental) -ge 1 ];then # On ne fait rien si ctparental et déja en cour de traitement.
+if [ $(ps -A | grep -c CTparental) -ge 2 ];then # On ne fait rien si ctparental et déja en cour de traitement.
 	gettext 'Already in process'
 	exit
 fi
