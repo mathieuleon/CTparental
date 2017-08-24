@@ -2876,7 +2876,6 @@ then run the command CTparental -ipton") $Fcolor"
 			  if [ "$(updatelistgctoff)" -eq 1 ];then
 				applistegctoff
 				updatecauser
-				#setproxy
 				iptablesreload
 			  fi
 			  unset test
@@ -2899,8 +2898,6 @@ then run the command CTparental -ipton") $Fcolor"
 	  privoxydefaultfilteron
       ;;
     -ron )	
-	  #$SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
-	  #REDIRECT=1
 	  cp -f "$DIR_SHARE"/www/CTparental/index.php "$DIRHTML"/index.php
 	  cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
 	  cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
@@ -2910,8 +2907,6 @@ then run the command CTparental -ipton") $Fcolor"
 	  iptablesreload
       ;;
     -roff )
-	  #$SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
-	  #REDIRECT=0
 	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRHTML"/index.php
 	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
 	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
