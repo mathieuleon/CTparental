@@ -1880,6 +1880,12 @@ updatelistgctoff () {
 			$SED "/^#${PCUSER}$/d" "$FILE_tmp"
 			$SED "/^+${PCUSER}$/d" "$FILE_tmp"
 		fi
+		if [ ! -d $(getent passwd $PCUSER | cut -d":" -f6) ]; then
+			result="1"
+			$SED "/^$${PCUSER}$/d" "$FILE_tmp"
+			$SED "/^#${PCUSER}$/d" "$FILE_tmp"
+			$SED "/^+${PCUSER}$/d" "$FILE_tmp"
+		fi
 	done < $FILE_tmp
 	echo $result
 	cp -f "$FILE_tmp" "$FILE_GCTOFFCONF"
@@ -2435,11 +2441,13 @@ echo "</desactivetimelogin>"
 
 listeusers () {
 
-for LIGNES in $(getent passwd | cut -d":" -f1,3)
+for LIGNES in $(getent passwd | cut -d":" -f1,3,6)
 do
 #echo $(echo $LIGNES | cut -d":" -f2)
 if [ "$(echo "$LIGNES" | cut -d":" -f2)" -ge "$UIDMINUSER" ] ;then
-	echo "$LIGNES" | cut -d":" -f1
+	if [ -d "$( echo "$LIGNES" | cut -d":" -f3 )" ] ;then 
+		echo "$LIGNES" | cut -d":" -f1
+	fi
 fi
 done
 
