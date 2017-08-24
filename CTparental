@@ -1915,7 +1915,6 @@ desactivegourpectoff () {
 }
 
 uninstall () {
-$CRONstop
    # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
    if [ $nomanuel -eq 0 ]; then 
 	   muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
