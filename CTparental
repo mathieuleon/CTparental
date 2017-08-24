@@ -32,7 +32,7 @@ if [ ! $UID -lt $UIDMINUSER ]; then # considère comme root tous les utilisateur
 fi
 ## On ne fait rien si ctparental et déja en cour de traitement.
 PIDFILE="/var/run/CTparental.pid"
-if [ -f pidfile ];then 
+if [ -f $PIDFILE ];then 
 	gettext 'Already in process'
 	echo ""
 	exit
@@ -1835,6 +1835,7 @@ fi
 }
 
 updatelistgctoff () {
+echo "<updatelistgctoff>"
 	result="0"
 	if [ ! -f $FILE_GCTOFFCONF ] ; then 
 		echo -n > $FILE_GCTOFFCONF
@@ -1874,9 +1875,11 @@ updatelistgctoff () {
 		fi
 	done < $FILE_GCTOFFCONF
 	echo $result
+echo "</updatelistgctoff>"
 	
 }
 applistegctoff () {
+echo "<applistegctoff>"
 		$ADDUSERTOGROUP root ctoff 2> /dev/null
 		while read PCUSER
 		do
@@ -1887,7 +1890,7 @@ applistegctoff () {
 			fi
 		done < "$FILE_GCTOFFCONF"
 	
-
+echo "</applistegctoff>"
 }
 
 activegourpectoff () {
