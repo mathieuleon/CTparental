@@ -1839,7 +1839,6 @@ fi
 }
 
 updatelistgctoff () {
-echo "<updatelistgctoff>"
 	result="0"
 	if [ ! -f $FILE_GCTOFFCONF ] ; then 
 		echo -n > $FILE_GCTOFFCONF
@@ -1849,7 +1848,7 @@ echo "<updatelistgctoff>"
 	## on ajoute tous les utilisateurs manquants dans la liste
 	for PCUSER in $(listeusers)
 	do
-		if [ "$(cat < $$FILE_tmp | sed -e "s/+//g" | sed -e "s/#//g" | grep -c -E "^$PCUSER$")" -eq 0 ];then
+		if [ "$(cat < $FILE_tmp | sed -e "s/+//g" | sed -e "s/#//g" | grep -c -E "^$PCUSER$")" -eq 0 ];then
 			result="1"	
 			if [ "$(groups "$PCUSER" | grep -c -E "( root$)|( root )|( sudo$)|( sudo )")" -eq 1 ];then
 				#si l'utilisateur fait parti d'un group d'administration de la machine on l'ajoute sans filtrage par default.
@@ -1872,8 +1871,10 @@ echo "<updatelistgctoff>"
 	## on supprime tout ceux qui n'existent plus sur le pc.
 	while read PCUSER
 	do
-		PCUSER=${PCUSER//#/} 
-		if [ "$( listeusers | grep -c -E "^$PCUSER$")" -eq 0 ];then
+		PCUSER=${PCUSER//#/}
+		PCUSER=${PCUSER//+/}  
+		groups $PCUSER > /dev/null
+		if [ $? -eq 1 ];then
 			result="1"
 			$SED "/^$${PCUSER}$/d" "$FILE_tmp"
 			$SED "/^#${PCUSER}$/d" "$FILE_tmp"
@@ -1882,8 +1883,9 @@ echo "<updatelistgctoff>"
 	done < $FILE_tmp
 	echo $result
 	cp -f "$FILE_tmp" "$FILE_GCTOFFCONF"
+	rm -f $FILE_tmp
 	$UMFILEtmp
-echo "</updatelistgctoff>"
+
 	
 }
 applistegctoff () {
