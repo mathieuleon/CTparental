@@ -2760,14 +2760,11 @@ case $arg1 in
 	  FILTRAGEISOFF=0
       dnsmasqon
       iptablesreload
-      { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
-	  echo "*/1 * * * * root /usr/bin/CTparental -cron" >> /etc/cron.d/CTparentalnomade
 	  activegourpectoff
       ;;
    -off )
-      rm -f /etc/cron.d/CTparental*
-  	  desactivegourpectoff
-  	  autoupdateoff 
+      desactivegourpectoff
+      autoupdateoff 
       dnsmasqoff
       FILTRAGEISOFF=1
       iptablesreload
@@ -2862,22 +2859,20 @@ then run the command CTparental -ipton") $Fcolor"
       iptablesreload
       ;;
     -cron )
-	  # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
-	  nomade
 	  # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
 	  if [ $(cat  < $FILE_CONF | grep -c "HOURSCONNECT=ON") -eq 1 ];then
 		  updatetimelogin
 	  fi
 	  if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			 # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
+			 nomade
 			 networkisoknext
-			 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
-			 
+			 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé . 
 			  if [ "$(updatelistgctoff)" -eq 1 ];then
 				applistegctoff
 				updatecauser
 				iptablesreload
 			  fi
-			  unset test
 	   fi
       ;;   
     -dgreload )
