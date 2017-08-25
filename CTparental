@@ -2761,7 +2761,7 @@ case $arg1 in
       dnsmasqon
       iptablesreload
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
-	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
+	  echo "*/1 * * * * root /usr/bin/CTparental -cron" >> /etc/cron.d/CTparentalnomade
 	  activegourpectoff
       ;;
    -off )
