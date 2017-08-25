@@ -2843,7 +2843,6 @@ case $arg1 in
           networkisoknext
 		  if [ "$(updatelistgctoff)" -eq 1 ];then
 			updatecauser
-			#setproxy
 		  fi
 		  unset test
 		  applistegctoff
