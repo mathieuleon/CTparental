@@ -1,3 +1,10 @@
+ctparental (4.20.24-1.0) unstable; urgency=medium
+
+  * meilleur gestion des utilisateurs des postes intégrés a un domaine.
+  * limitation a une seul exécution du scripte a la foie.
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Thu, 24 Aug 2017 21:36:20 +0200
+ 
 ctparental (4.20.23-1.0) unstable; urgency=medium
 
   * Correction du non filtrage de la session invité.
