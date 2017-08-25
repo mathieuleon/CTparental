@@ -18,6 +18,10 @@ export TEXTDOMAINDIR="$DIRLOCALE"
 export TEXTDOMAIN="ctparental"
 CHEMINCTPARENTLE="$(readlink -f "$0")"
 
+
+## imports du plugin de la distributions si il existe
+if [ -f "${DIR_CONF}/dist.conf" ];then . "${DIR_CONF}/dist.conf"; fi
+
 #### UID MINIMUM pour les UTILISATEUR
 UIDMINUSER=${UIDMINUSER:=500}
 
@@ -26,7 +30,18 @@ if [ ! $UID -lt $UIDMINUSER ]; then # considère comme root tous les utilisateur
 	echo ""
 	exit 1
 fi
-
+## On ne fait rien si ctparental et déja en cour de traitement.
+PIDFILE="/var/run/CTparental.pid"
+if [ -f $PIDFILE ];then 
+	if [ $( ps -A | grep -c "$(cat $PIDFILE)") -eq 0 ] ; then
+	rm -f $PIDFILE
+	else
+			gettext 'Already in process'
+			echo ""
+			exit
+	fi
+fi
+echo $$ > $PIDFILE
 
 noinstalldep="0"
 nomanuel="0"
@@ -123,10 +138,6 @@ fi
 FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"
 REDIRECT="$(cat < $FILE_CONF | grep -c "REDIRECT=ON" )"
 
-
-## imports du plugin de la distributions si il existe
-if [ -f "${DIR_CONF}/dist.conf" ];then . "${DIR_CONF}/dist.conf"; fi
-
 tempDIR="/tmp/alcasar"
 tempDIRRamfs="/tmp/alcasarRamfs"
 if [ ! -d $tempDIRRamfs ]; then mkdir "${tempDIRRamfs}"; fi
@@ -134,8 +145,8 @@ RougeD="\033[1;31m"
 BleuD="\033[1;36m"
 #VertD="\033[1;32m"
 Fcolor="\033[0m"
-COMMONFILEGS="common-auth"
-GESTIONNAIREDESESSIONS=" login gdm lightdm slim kdm xdm lxdm gdm3 "
+COMMONFILEGS=${COMMONFILEGS:="common-auth"}
+GESTIONNAIREDESESSIONS=${GESTIONNAIREDESESSIONS:=" login gdm lightdm slim kdm xdm lxdm gdm3 "}
 FILEPAMTIMECONF="/etc/security/time.conf"
 DIRPAM="/etc/pam.d/"
 DAYS=${DAYS:="$(gettext "Monday") $(gettext "Tuesday") $(gettext "Wednesday") $(gettext "Thursday") $(gettext "Friday") $(gettext "Saturday") $(gettext "Sunday") "}
@@ -1777,8 +1788,8 @@ $NETWORKINGrestart
       $ENE2GUARDIAN
       $ENPRIVOXY
       $ENNETWORK
-      { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
-	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
+      { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalcron
+	  echo "*/1 * * * * root /usr/bin/CTparental -cron" >> /etc/cron.d/CTparentalcron
 	  
     
 }
@@ -1831,25 +1842,27 @@ updatelistgctoff () {
 	if [ ! -f $FILE_GCTOFFCONF ] ; then 
 		echo -n > $FILE_GCTOFFCONF
 	fi
+	$MFILEtmp
+	cp -f "$FILE_GCTOFFCONF" "$FILE_tmp"
 	## on ajoute tous les utilisateurs manquants dans la liste
 	for PCUSER in $(listeusers)
 	do
-		if [ "$(cat < $FILE_GCTOFFCONF | sed -e "s/+//g" | sed -e "s/#//g" | grep -c -E "^$PCUSER$")" -eq 0 ];then
+		if [ "$(cat < $FILE_tmp | sed -e "s/+//g" | sed -e "s/#//g" | grep -c -E "^$PCUSER$")" -eq 0 ];then
 			result="1"	
 			if [ "$(groups "$PCUSER" | grep -c -E "( root$)|( root )|( sudo$)|( sudo )")" -eq 1 ];then
 				#si l'utilisateur fait parti d'un group d'administration de la machine on l'ajoute sans filtrage par default.
-				echo "+$PCUSER" >> $FILE_GCTOFFCONF
+				echo "+$PCUSER" >> $FILE_tmp
 			else
 				#si non avec filtrage  par default.
-				echo "#$PCUSER" >> $FILE_GCTOFFCONF
+				echo "#$PCUSER" >> $FILE_tmp
 			fi
 		fi
 		
 		if [ "$(groups "$PCUSER" | grep -c -E "( root$)|( root )|( sudo$)|( sudo )")" -eq 0 ];then
-			$SED "s/^+${PCUSER}$/#$PCUSER/g" "$FILE_GCTOFFCONF"	
+			$SED "s/^+${PCUSER}$/#$PCUSER/g" "$FILE_tmp"	
 		else
-			$SED "s/^#${PCUSER}$/+$PCUSER/g" "$FILE_GCTOFFCONF"
-			$SED "s/^$${PCUSER}$/+$PCUSER/g" "$FILE_GCTOFFCONF"	
+			$SED "s/^#${PCUSER}$/+$PCUSER/g" "$FILE_tmp"
+			$SED "s/^$${PCUSER}$/+$PCUSER/g" "$FILE_tmp"	
 		fi
 		
 		
@@ -1857,18 +1870,31 @@ updatelistgctoff () {
 	## on supprime tout ceux qui n'existent plus sur le pc.
 	while read PCUSER
 	do
-		PCUSER=${PCUSER//#/} 
-		if [ "$( listeusers | grep -c -E "^$PCUSER$")" -eq 0 ];then
+		PCUSER=${PCUSER//#/}
+		PCUSER=${PCUSER//+/}  
+		groups $PCUSER > /dev/null
+		if [ $? -eq 1 ];then
 			result="1"
-			$SED "/^$${PCUSER}$/d" "$FILE_GCTOFFCONF"
-			$SED "/^#${PCUSER}$/d" "$FILE_GCTOFFCONF"
-			$SED "/^+${PCUSER}$/d" "$FILE_GCTOFFCONF"
+			$SED "/^$${PCUSER}$/d" "$FILE_tmp"
+			$SED "/^#${PCUSER}$/d" "$FILE_tmp"
+			$SED "/^+${PCUSER}$/d" "$FILE_tmp"
 		fi
-	done < $FILE_GCTOFFCONF
+		if [ ! -d $(getent passwd $PCUSER | cut -d":" -f6) ]; then
+			result="1"
+			$SED "/^$${PCUSER}$/d" "$FILE_tmp"
+			$SED "/^#${PCUSER}$/d" "$FILE_tmp"
+			$SED "/^+${PCUSER}$/d" "$FILE_tmp"
+		fi
+	done < $FILE_tmp
 	echo $result
+	cp -f "$FILE_tmp" "$FILE_GCTOFFCONF"
+	rm -f $FILE_tmp
+	$UMFILEtmp
+
 	
 }
 applistegctoff () {
+echo "<applistegctoff>"
 		$ADDUSERTOGROUP root ctoff 2> /dev/null
 		while read PCUSER
 		do
@@ -1879,7 +1905,7 @@ applistegctoff () {
 			fi
 		done < "$FILE_GCTOFFCONF"
 	
-
+echo "</applistegctoff>"
 }
 
 activegourpectoff () {
@@ -1892,8 +1918,6 @@ echo "<activegourpectoff>"
    GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
    chown root:"$GROUPHTTPD" "$FILE_GCTOFFCONF"
    chmod 660 "$FILE_GCTOFFCONF"
-   echo "PATH=$PATH"  > /etc/cron.d/CTparentalupdateuser
-   echo "*/1 * * * * root /usr/bin/CTparental -ucto" >> /etc/cron.d/CTparentalupdateuser
    $CRONrestart
 echo "</activegourpectoff>"
 }
@@ -1904,7 +1928,6 @@ desactivegourpectoff () {
 }
 
 uninstall () {
-
    # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
    if [ $nomanuel -eq 0 ]; then 
 	   muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
@@ -2117,6 +2140,7 @@ MAlert=$((MinTotalAlert - $(( Halert *60 )) ))
 echo "$MAlert $Halert * * ${DAYSCRON[$D]}"
 }
 updatetimelogin () {
+	
 	USERSCONECT=$(who | awk '//{print $1}' | sort -u)
    	if [ "$(cat < $FILE_HCOMPT | grep -c "$(date +%D)")" -eq 1 ] ; then
 			# on incrémente le compteur de temps de connection. pour chaque utilisateur connecté
@@ -2378,8 +2402,6 @@ X ( 1 a \$timesession )= "
       echo >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
    done
    echo >> $FILE_HCONF
-{ echo "PATH=$PATH" ; echo "LANG=$LANG" ; }   > /etc/cron.d/CTparentalmaxtimelogin
-echo "*/1 * * * * root /usr/bin/CTparental -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=ON?g" $FILE_CONF
 $CRONrestart
 }
@@ -2397,7 +2419,6 @@ for NumDAY in 0 1 2 3 4 5 6
 do
    rm -f /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 done
-rm -f /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=OFF?g" $FILE_CONF 
 for PCUSER in $(listeusers)
 do
@@ -2415,11 +2436,13 @@ echo "</desactivetimelogin>"
 
 listeusers () {
 
-for LIGNES in $(getent passwd | cut -d":" -f1,3)
+for LIGNES in $(getent passwd | cut -d":" -f1,3,6)
 do
 #echo $(echo $LIGNES | cut -d":" -f2)
 if [ "$(echo "$LIGNES" | cut -d":" -f2)" -ge "$UIDMINUSER" ] ;then
-	echo "$LIGNES" | cut -d":" -f1
+	if [ -d "$( echo "$LIGNES" | cut -d":" -f3 )" ] ;then 
+		echo "$LIGNES" | cut -d":" -f1
+	fi
 fi
 done
 
@@ -2496,8 +2519,6 @@ readTimeFILECONF () {
 		passwd -u "$PCUSER"
 	fi
    done
-{ echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalmaxtimelogin  
-echo "*/1 * * * * root /usr/bin/CTparental -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=ON?g" $FILE_CONF
 $CRONrestart
 }
@@ -2696,16 +2717,13 @@ arg1=${1}
 case $arg1 in
    -\? | -h* | --h*)
       echo "$usage"
-      exit 0
       ;;
    -i )
       networkisoknext
       install
-      exit 0
       ;;
    -u )
 	  uninstall
-      exit 0
       ;;
    -dl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2716,7 +2734,6 @@ case $arg1 in
 		  dnsmasqon
 		  $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=$(date +%d-%m-%Y\ %T)?g" $FILE_CONF
       fi
-      exit 0
       ;;
    -ubl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2724,14 +2741,11 @@ case $arg1 in
 		  adapt
 		  catChoice
 		  dnsmasqon
-      fi
-       
-      exit 0
+      fi 
       ;;
    -uhtml )
       networkisoknext
       FoncHTTPDCONF
-      exit 0
       ;;
    -rl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2739,7 +2753,6 @@ case $arg1 in
          catChoice
          dnsmasqon
       fi 
-      exit 0
       ;;
    -on )
       networkisoknext
@@ -2747,9 +2760,8 @@ case $arg1 in
       dnsmasqon
       iptablesreload
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
-	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
+	  echo "*/1 * * * * root /usr/bin/CTparental -cron" >> /etc/cron.d/CTparentalnomade
 	  activegourpectoff
-      exit 0
       ;;
    -off )
       rm -f /etc/cron.d/CTparental*
@@ -2758,14 +2770,12 @@ case $arg1 in
       dnsmasqoff
       FILTRAGEISOFF=1
       iptablesreload
-      exit 0
       ;;
    -wlo )
 	  if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	      networkisoknext
 		  dnsmasqwhitelistonly
       fi
-      exit 0
       ;;
    -cble )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2774,7 +2784,6 @@ case $arg1 in
 		  catChoice
 		  dnsmasqon
       fi
-      exit 0
       ;;
     -dble )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2783,40 +2792,32 @@ case $arg1 in
 		  catChoice
 		  dnsmasqon
       fi
-      exit 0
       ;;
     -tlo )
       activetimelogin
-      exit 0
       ;;
     -tlu )
       desactivetimelogin
-      exit 0
       ;;
     -trf )
       readTimeFILECONF
-      exit 0
       ;;
     -aupon )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
          autoupdateon
       fi
-      exit 0
       ;;
     -aupoff )
       autoupdateoff
-      exit 0
       ;;
     -aup )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
          networkisoknext
 		 autoupdate
       fi
-      exit 0
       ;;
     -listusers )
       listeusers
-      exit 0
       ;;
     -gcton )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2824,12 +2825,10 @@ case $arg1 in
 		  activegourpectoff
 		  iptablesreload
 	  fi
-	  exit 0
       ;;
     -gctoff )
       desactivegourpectoff
 	  iptablesreload
-	  exit 0
       ;;
     -gctulist )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -2837,20 +2836,17 @@ case $arg1 in
 		  updatelistgctoff
 		  iptablesreload
 	  fi
-	  exit 0
       ;;
     -gctalist )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
           networkisoknext
 		  if [ "$(updatelistgctoff)" -eq 1 ];then
 			updatecauser
-			#setproxy
 		  fi
 		  unset test
 		  applistegctoff
 		  iptablesreload
 	  fi
-	  exit 0
       ;;
     -ipton )
       networkisoknext
@@ -2859,62 +2855,47 @@ case $arg1 in
       echo -e "$RougeD $(eval_gettext "to add custom rules edit the file 
 \$FILEIPTABLES 
 then run the command CTparental -ipton") $Fcolor"
-      exit 0
       ;;
     -iptoff )
       $SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
       iptablesreload
-      exit 0
       ;;
-    -nomade )
-	 # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
+    -cron )
+	  # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
 	  nomade
-	  exit 0
-      ;;  
-    -uctl )
-	 # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
-	  updatetimelogin
-	  exit 0
-      ;;  
-    -ucto )
-      if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-         networkisoknext
-		 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
-		 
-		  if [ "$(updatelistgctoff)" -eq 1 ];then
-			applistegctoff
-			updatecauser
-			#setproxy
-			iptablesreload
-		  fi
-		  unset test
+	  # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
+	  if [ $(cat  < $FILE_CONF | grep -c "HOURSCONNECT=ON") -eq 1 ];then
+		  updatetimelogin
 	  fi
-	  exit 0
-      ;;  
+	  if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			 networkisoknext
+			 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
+			 
+			  if [ "$(updatelistgctoff)" -eq 1 ];then
+				applistegctoff
+				updatecauser
+				iptablesreload
+			  fi
+			  unset test
+	   fi
+      ;;   
     -dgreload )
       $E2GUARDIANrestart     
-      exit 0
       ;;  
     -grubPon )
       confgrub2
-      exit 0
       ;;  
     -grubPoff )
       rm -rf /etc/grub.d/99_password
       update-grub2
-      exit 0
       ;;
     -pfoff )
 	  privoxydefaultfilteroff
-      exit 0
       ;;
     -pfon )
 	  privoxydefaultfilteron
-      exit 0
       ;;
     -ron )	
-	  #$SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
-	  #REDIRECT=1
 	  cp -f "$DIR_SHARE"/www/CTparental/index.php "$DIRHTML"/index.php
 	  cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
 	  cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
@@ -2922,18 +2903,14 @@ then run the command CTparental -ipton") $Fcolor"
 	  echo $E2GUARDIANrestart
 	  $E2GUARDIANrestart
 	  iptablesreload
-	  exit 0
       ;;
     -roff )
-	  #$SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
-	  #REDIRECT=0
 	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRHTML"/index.php
 	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
 	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
 	  chown -R root:"$GROUPHTTPD" "$DIRHTML"
 	  $E2GUARDIANrestart
 	  iptablesreload
-      exit 0
       ;;
     -logqueryon )
       {
@@ -2941,21 +2918,17 @@ then run the command CTparental -ipton") $Fcolor"
       echo "log-facility=/var/log/dnsmasq.query.log"
 	  } > "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
 	  resolvconffixon
-      exit 0
       ;;
     -logqueryoff )
 	  rm -f "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
 	  resolvconffixon
 	  rm -f /var/log/dnsmasq.query.log
-      exit 0
       ;;
 	-exp )
 	  exportconf
-      exit 0
       ;;
 	-imp )
 	  importconf
-      exit 0
       ;;
       
    *)
@@ -2965,4 +2938,7 @@ then run the command CTparental -ipton") $Fcolor"
       ;;
 esac
 
+rm -rf $PIDFILE
+
+exit 0
 
