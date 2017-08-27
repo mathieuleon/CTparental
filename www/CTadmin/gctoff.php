@@ -29,7 +29,8 @@ if ($GCTOFF == "ON")
     //echo gettext('Username');
     
     // Read the "CTOFF.conf" file
-    exec ("sudo /usr/local/bin/CTparental.sh -gctulist");
+    WaitForTheFileToDisappear ($pidfilecmdCT);
+    exec ($cmdCT."-gctulist");
     $tab = file($conf_ctoff_file);
     if ($tab)  # the file isn't empty
     {

@@ -38,6 +38,13 @@ $wl_domains            = $dirconf."domaine-rehabiliter.conf";
 $bl_domains            = $dirconf."blacklist-local.conf";
 
 $cmdCT = "sudo -h localhost -u root /usr/bin/CTparental ";
+$pidfilecmdCT = "/var/run/CTparental.pid";
+function WaitForTheFileToDisappear ($filewait)
+{
+while ( file_exists ( string $filewait ) ):
+    sleep(5);
+endwhile;
+}
 
 if (is_file ($conf_file))
 {
@@ -132,6 +139,7 @@ case 'change_file1' :
 			}
 		fclose($pointeur);
 		}
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-dgreload");
 	break;
 case 'change_file2' :
@@ -156,6 +164,7 @@ case 'change_file2' :
 			}
 		fclose($pointeur);
 		}
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-dgreload");
 	break;
 case 'change_file3' :
@@ -181,6 +190,7 @@ case 'change_file3' :
 			}
 		fclose($pointeur);
 		}
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-dgreload");
 	break;	
 case 'change_safesearch' :
@@ -214,12 +224,15 @@ case 'change_safesearch' :
 			}
 		fclose($pointeur);
 		}
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-ubl");
 	break;
 case 'gct_Off' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-gctoff");
 	break;
 case 'gct_On' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-gcton");
 	break;
 case 'LogOFF' :
@@ -228,33 +241,43 @@ case 'LogOFF' :
 	exit;
 	break;
 case 'BL_On' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-on");
 	break;
 case 'BL_Off' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-off");
 	break;
 case 'H_On' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-trf");
 	break;
 case 'H_Off' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-tlu");
 	break;
 case 'AUP_On' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-aupon");
 	break;
 case 'AUP_Off' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-aupoff");
 	break;
 case 'INIT_BL' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-dble");
 	break;
 case 'Download_bl' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-dl");
 	break;
 case 'ProxyDF_On' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-pfon");
 	break;
 case 'ProxyDF_Off' :
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-pfoff");
 	break;
 case 'MAJ_cat' :
@@ -278,6 +301,7 @@ case 'MAJ_cat' :
 	fputs($fichier, form_filter($_POST['OSSI_wl_domains']));
 	fclose($fichier);
 	unset($_POST['OSSI_wl_domains']);
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-ubl");
 	break;
 case 'MAJ_H' :
@@ -389,6 +413,7 @@ case 'MAJ_H' :
 	}
 	
 	fclose($pointeur);
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-trf");
 	break;
 	
@@ -428,6 +453,7 @@ case 'change_user' :
 		fclose($pointeur);
 		}
 	else {echo gettext('Error opening the file')." $conf_ctoff_file";}
+	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-gctalist");
 	break;
 }
