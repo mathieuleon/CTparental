@@ -41,9 +41,9 @@ $cmdCT = "sudo -h localhost -u root /usr/bin/CTparental ";
 $pidfilecmdCT = "/var/run/CTparental.pid";
 function WaitForTheFileToDisappear ($filewait)
 {
-while ( file_exists ( string $filewait ) ):
-    sleep(5);
-endwhile;
+	while ( file_exists($filewait) ){
+	sleep(5);
+	}
 }
 
 if (is_file ($conf_file))
