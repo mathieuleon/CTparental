@@ -2719,6 +2719,9 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 -imp$(gettext "	=> Import a configuration.
 	   exemple:
 	           CTparental -imp /home/myhomedir/CTparental.conf.yy.mm.dd.tar.gz")
+-logqueryon$(gettext "	=> For debugging only.
+	   Enabling dnsmasq query log in the /var/log/dnsmasq.query.log file.")
+-logqueryoff$(gettext "	=> To disable dnsmasq query log in /var/log/dnsmasq.query.log .")
 "
 arg1=${1}
 case $arg1 in

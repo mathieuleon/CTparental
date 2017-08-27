@@ -288,6 +288,16 @@ msgstr ""
 "\t           CTparental -imp /home/myhomedir/CTparental.conf.yy.mm.dd.tar.gz"
 
 msgid ""
+"\t=> For debugging only.\n"
+"\t   Enabling dnsmasq query log in the /var/log/dnsmasq.query.log file."
+msgstr ""
+"\t=> Pour débogage exclusivement.\n"
+"\t   Activation du journal des requêtes dnsmasq dans le fichier /var/log/dnsmasq.query.log ."
+
+msgid "\t=> To disable dnsmasq query log in /var/log/dnsmasq.query.log ."
+msgstr "\t=> Pour désactiver le journal des requêtes dnsmasq dans /var/log/dnsmasq.query.log ."
+
+msgid ""
 "to add custom rules edit the file \n"
 "$FILEIPTABLES \n"
 "then run the command CTparental -ipton"
