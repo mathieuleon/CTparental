@@ -29,6 +29,7 @@ sed -i "s/php-cgi,php-xml/php5-cgi/g" debian/control
 /bin/sed -i "s/debian-branch =.*/debian-branch = jessie/g" debian/gbp.conf
 git commit -a
 gbp buildpackage
+git checkout dansguardian
 git branch -D jessie
 
 pour ubuntu 16.04:
@@ -65,5 +66,6 @@ cp ubuntu/dist.conf debian/dist.conf
 /bin/sed -i "s/debian-branch =.*/debian-branch = ubuntu14.04/g" debian/gbp.conf
 git commit -a
 gbp buildpackage
+git checkout dansguardian
 git branch -D ubuntu14.04
 
