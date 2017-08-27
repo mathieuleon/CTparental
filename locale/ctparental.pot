@@ -248,6 +248,26 @@ msgid "\t=> Disable rules of custom firewall."
 msgstr ""
 
 msgid ""
+"\t=> Export configuration.\n"
+"\t   exemple:\n"
+"\t           CTparental -exp /home/myhomedir/"
+msgstr ""
+
+msgid ""
+"\t=> Import a configuration.\n"
+"\t   exemple:\n"
+"\t           CTparental -imp /home/myhomedir/CTparental.conf.yy.mm.dd.tar.gz"
+msgstr ""
+
+msgid ""
+"\t=> For debugging only.\n"
+"\t   Enabling dnsmasq query log in the /var/log/dnsmasq.query.log file."
+msgstr ""
+
+msgid "\t=> To disable dnsmasq query log in /var/log/dnsmasq.query.log ."
+msgstr ""
+
+msgid ""
 "to add custom rules edit the file \n"
 "$FILEIPTABLES \n"
 "then run the command CTparental -ipton"
