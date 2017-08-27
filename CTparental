@@ -38,7 +38,7 @@ if [ -f $PIDFILE ];then
 	else
 			gettext 'Already in process'
 			echo ""
-			exit
+			exit 2
 	fi
 fi
 echo $$ > $PIDFILE

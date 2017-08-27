@@ -1,3 +1,10 @@
+ctparental (4.20.25-1.0) unstable; urgency=medium
+
+  * amélioration de l'interface web pour qu'elle attende la fin de la précédente execution de ctparental pour valider les parramètres. 
+  * ajout des parramètres manquant dans l'aide.
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Sun, 27 Aug 2017 13:21:08 +0200
+ 
 ctparental (4.20.24-1.0) unstable; urgency=medium
 
   * meilleur gestion des utilisateurs des postes intégrés a un domaine.
