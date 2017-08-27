@@ -77,13 +77,13 @@ else
 switch ($dg_confswitch)
 {
     case 'extensions to be filtered' :
-        $dg_file_edit="/etc/e2guardian/lists/bannedextensionlist";
+        $dg_file_edit="/etc/dansguardian/lists/bannedextensionlist";
         break;
     case 'mimetype to be filtered' :
-        $dg_file_edit="/etc/e2guardian/lists/bannedmimetypelist";
+        $dg_file_edit="/etc/dansguardian/lists/bannedmimetypelist";
         break;
     case '*ip **ips ...' :
-        $dg_file_edit="/etc/e2guardian/lists/bannedsitelist";
+        $dg_file_edit="/etc/dansguardian/lists/bannedsitelist";
         break;
     case 'WhiteList Filtering' :
         $bl_categories=$dirconf."wl-categories-available";
