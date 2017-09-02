@@ -1113,7 +1113,8 @@ iptablesreload () {
    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
    $IPTABLES6 -F
    $IPTABLES6 -X
-   $IPTABLES6 -t nat -F  
+   $IPTABLES6 -t nat -F
+   $IPTABLES6 -t mangle -F    
    $IPTABLES6 -t nat -X  
    $IPTABLES6 -t nat -N ctparental
    $IPTABLES6 -P INPUT ACCEPT
@@ -1121,7 +1122,8 @@ iptablesreload () {
    $IPTABLES6 -P FORWARD ACCEPT 
    $IPTABLES -F
    $IPTABLES -X
-   $IPTABLES -t nat -F  
+   $IPTABLES -t nat -F 
+   $IPTABLES -t mangle -F   
    $IPTABLES -t nat -X  
    $IPTABLES -t nat -N ctparental
    $IPTABLES -P INPUT ACCEPT
