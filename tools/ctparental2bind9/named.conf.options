@@ -1,0 +1,9 @@
+options {
+	forward only;
+	forwarders {
+		8.8.8.8;
+		8.4.4.4;
+	};
+	auth-nxdomain no;
+	listen-on-v6 { any; };
+};
