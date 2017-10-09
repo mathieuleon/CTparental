@@ -1,0 +1,399 @@
+#!/bin/sh
+#exporter la configuration ctparental en exécutant CTparental -exp ./
+# puis utilisez ce script pour générer le fichier de zone pour bind9.
+# CTparental_bind9 CTparental.conf.yy.mm.dd.tar.gz
+# bind9 fonctione très bien mais et extrèmement gourment en ram  ( 3,2 G 
+# sous windows 10 amd64)
+SED="/bin/sed -i"
+DIR_CONF="$(dirname "$(readlink -f "$0")")"
+SAFE_CONF="$DIR_CONF/CTsafe.conf"
+FILE_CONF="$DIR_CONF/CTparental.conf"
+bindzonefile="$DIR_CONF/named.conf.ctparental-zone"
+unboundzonefile="$DIR_CONF/ubound.ctparental-zone"
+dnsmasqzonefile="$DIR_CONF/dnsmasq.ctparental-zone"
+rm -f $bindzonefile
+rm -f $unboundzonefile
+rm -f $dnsmasqzonefile
+
+cat << EOF > $dnsmasqzonefile
+# Configuration file for "dnsmasq with blackhole"
+# Inclusion de la blacklist <domains> de Toulouse dans la configuration
+# conf-dir=
+# conf-file=
+interface=lo
+listen-address=127.0.0.1
+port=53
+#no-dhcp-interface=\$i_WAN_ipv4
+#no-dhcp-interface=\$i_WAN_ipv6
+no-dhcp-interface=lo
+bind-interfaces
+cache-size=1024
+domain-needed
+expand-hosts
+bogus-priv
+server=8.8.8.8
+server=8.8.4.4
+#server=2001:4860:4860::8888
+#server=2001:4860:4860::8844
+
+EOF
+
+cat << EOF > $unboundzonefile
+# Configuration file for "unbound with blackhole"
+# Inclusion de la blacklist <domains> de Toulouse dans la configuration
+server:
+# verbosity level 0-4 of logging
+verbosity: 0
+# if you want to log to a file use
+#logfile: "C:\unbound.log"
+
+# more outgoing connections
+# depends on number of cores: 1024/cores - 50
+num-threads: 2
+outgoing-range: 450  # when thread = 2
+outgoing-num-tcp: 35
+incoming-num-tcp: 35
+num-queries-per-thread: 225  # when thread = 2
+interface: 127.0.0.1
+access-control: 127.0.0.0/8 allow
+port: 53
+do-ip4: yes
+do-ip6: no
+do-udp: yes
+do-tcp: yes
+hide-identity: yes
+hide-version: yes
+forward-zone:
+name: "."
+forward-addr: 8.8.8.8 # DNS googles peut ètre remplacé par les DNS fai ou autres DNS accesible de votre réseaux
+#forward-addr: 8.8.8.8 # DNS2
+server:
+EOF
+
+if [ ! -f $FILE_CONF ] ; then
+cat << EOF > $FILE_CONF
+LASTUPDATE=0
+DNSMASQ=BLACK
+AUTOUPDATE=OFF
+HOURSCONNECT=OFF
+GCTOFF=OFF
+PRIVOXYDF=ON
+REDIRECT=ON
+# Parfeux minimal.
+IPRULES=OFF
+MD5DREAB=
+I_WAN_IPV4= 
+I_WAN_IPV6= 
+IP_BOX_IPV4= 
+IP_BOX_IPV6= 
+IP_IWAN_IPV4= 
+IP_IWAN_IPV6=
+DNS1v4= 
+DNS2v4= 
+DNS1v6= 
+DNS2v6= 
+EOF
+fi
+if [ ! -f $SAFE_CONF ] ; then
+cat << EOF > $SAFE_CONF
+SAFEGOOGLE
+SAFEYOUTUBE
+SAFEBING
+SAFEDUCK
+EOF
+fi
+tempDIR="$DIR_CONF/tmp/alcasar"
+tempDIRRamfs="$DIR_CONF"
+FILE_tmp=${FILE_tmp:="$tempDIRRamfs/filetmp.txt"}
+if [ ! -d $tempDIRRamfs ]; then mkdir "${tempDIRRamfs}"; fi
+BL_SERVER="dsi.ut-capitole.fr"
+CATEGORIES_ENABLED="$DIR_CONF/categories-enabled.conf"
+BL_CATEGORIES_AVAILABLE="$DIR_CONF/bl-categories-available"
+WL_CATEGORIES_AVAILABLE="$DIR_CONF/wl-categories-available"
+DIR_DNS_FILTER_AVAILABLE="$DIR_CONF/dnsfilter-available"
+DIR_DNS_BLACKLIST_ENABLED="$DIR_CONF/blacklist-enabled"
+DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
+DNS_FILTER_OSSI="$DIR_CONF/blacklist-local.conf"
+DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
+if [ ! -f $CATEGORIES_ENABLED ] ; then
+cat << EOF > $CATEGORIES_ENABLED
+adult
+agressif
+ctparental
+dangerous_material
+dating
+drogue
+gambling
+hacking
+malware
+marketingware
+mixed_adult
+phishing
+redirector
+publicite
+ddos
+sect
+strict_redirector
+strong_redirector
+tricheur
+warez
+ossi   
+EOF
+fi
+download() {
+   rm -rf $tempDIR
+   mkdir $tempDIR
+   # on attend que la connection remonte suite au redemarage de networkmanager
+   gettext 'Waiting to connect to Toulouse server:'
+   i=1
+   while [ "$(ping -c 1 $BL_SERVER 2> /dev/null | grep -c "1 received"  )" -eq 0 ]
+   do
+   echo -n .
+   sleep 1
+   i=$(( i + 1 ))
+   if [ $i -ge 40 ];then # si au bout de 40 secondes on a toujours pas de connection on considaire qu'il y a une erreur
+		gettext 'Connection to Toulouse server is impossible.'
+		set -e
+		exit 1
+   fi
+   done
+   echo
+   gettext 'connection established:'
+   
+   wget -P $tempDIR http://$BL_SERVER/blacklists/download/blacklists.tar.gz 2>&1 | cat
+   if [ ! $? -eq 0 ]; then
+      gettext 'error when downloading, interrupted process'
+      rm -rf $tempDIR
+      set -e
+      exit 1
+   fi
+   tar -xzf $tempDIR/blacklists.tar.gz -C $tempDIR
+   if [ ! $? -eq 0 ]; then
+      gettext 'archive extraction error, interrupted process'
+      set -e
+      exit 1
+   fi
+   # on télécharge aussi la blackliste personalisé de ctparental
+   wget -P $tempDIR https://github.com/marsat/bl_ctparental/raw/master/blacklist.tar.gz 2>&1 | cat
+   if [ ! $? -eq 0 ]; then
+      gettext 'error when downloading, interrupted process'
+      rm -rf $tempDIR
+      set -e
+      exit 1
+   fi
+   tar -xzf $tempDIR/blacklist.tar.gz -C $tempDIR
+   if [ ! $? -eq 0 ]; then
+      gettext 'archive extraction error , interrupted process'
+      set -e
+      exit 1
+   fi
+   rm -rf ${DIR_DNS_FILTER_AVAILABLE:?}/
+   mkdir $DIR_DNS_FILTER_AVAILABLE
+   $SED "s?^MD5DREAB.*?MD5DREAB=?g" $FILE_CONF
+}
+
+adapt_available() {
+echo "adapt_available"
+date +%H:%M:%S
+
+
+if [ ! -f $DNS_FILTER_OSSI ] ; then
+	echo > $DNS_FILTER_OSSI
+fi
+if [ -d $tempDIR  ] ; then
+	CATEGORIES_AVAILABLE="$tempDIR"/categories_available
+	echo -n > $CATEGORIES_AVAILABLE
+	echo -n > $WL_CATEGORIES_AVAILABLE
+	echo -n > $BL_CATEGORIES_AVAILABLE
+	if [ ! -f $DIR_DNS_FILTER_AVAILABLE/ossi.conf ] ; then
+		echo > $DIR_DNS_FILTER_AVAILABLE/ossi.conf
+	fi
+	gettext 'Toulouse Blacklist and WhiteList migration process. Please wait.'
+	cd "$tempDIR"/blacklists
+	find . -type l -exec rm -f {} \; # suppessiondes liens symbolique
+	for categorie in *
+	do
+		if [ -d "$categorie" ] ; then
+			if [ ! -L "$categorie" ] ; then 
+				echo "$categorie" >> $CATEGORIES_AVAILABLE
+				echo -n "."
+				cp -f "$tempDIR"/blacklists/"$categorie"/domains "$FILE_tmp"
+				if [ $categorie = "adult" ] ; then
+				$SED "/.*blogspot\..*/d" "$FILE_tmp" # on suprime les 1313541 entrée xx.blogspot.xx dans la categorie adult qui son gérai par une liste beaucoup plus courte dans la catégorie ctparental
+				fi
+				$SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' "$FILE_tmp"
+				$SED "/[äâëêïîöôüû]/d" "$FILE_tmp"
+				$SED "/^#.*/d" "$FILE_tmp"
+				$SED "/^$/d" "$FILE_tmp"
+				$SED "s/\.\{2,10\}/\./g" "$FILE_tmp"
+				if [ -e "$tempDIR"/blacklists/"$categorie"/usage ] ; then
+					if [ "$(grep -c "white" "$tempDIR"/blacklists/"$categorie"/usage)" -ge 1 ] ;then
+						echo "$categorie" >> $WL_CATEGORIES_AVAILABLE
+						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
+					else
+						echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
+						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
+					fi				
+				else
+					echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
+					mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
+				fi
+			fi
+		fi
+	done
+	echo -n "."
+	# suppression des @IP, de caractères acccentués et des lignes commentées ou vides
+	cp -f $DNS_FILTER_OSSI "$FILE_tmp"
+	$SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' "$FILE_tmp"
+	$SED "/[äâëêïîöôüû]/d" "$FILE_tmp" 
+	$SED "/^#.*/d" "$FILE_tmp" 
+	$SED "/^$/d" "$FILE_tmp" 
+	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp" # supprime les suite de "." exemple: address=/fucking-big-tits..com/127.0.0.10 devient address=/fucking-big-tits.com/127.0.0.10
+	mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/ossi.conf
+
+else
+	mkdir   $tempDIR
+	echo -n "."
+	# suppression des @IP, de caractères acccentués et des lignes commentées ou vides
+	cp -f $DNS_FILTER_OSSI "$FILE_tmp"
+	$SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' "$FILE_tmp"
+	$SED "/[äâëêïîöôüû]/d" "$FILE_tmp" 
+	$SED "/^#.*/d" "$FILE_tmp" 
+	$SED "/^$/d" "$FILE_tmp" 
+	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp" # supprime les suite de "." exemple: address=/fucking-big-tits..com/127.0.0.10 devient address=/fucking-big-tits.com/127.0.0.10
+	mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/ossi.conf
+fi     
+echo
+cd "$(dirname "$(readlink -f "$0")")"
+
+date +%H:%M:%S
+}
+
+catChoice() {
+echo "<catChoice>"
+md5old=$(grep MD5DREAB= "$FILE_CONF" | cut -d"=" -f2)
+md5new="$({
+cat "$DREAB" "$CATEGORIES_ENABLED"
+md5sum $DIR_DNS_FILTER_AVAILABLE/* | grep -v ossi.conf
+} | md5sum )"
+## évite de lancer la moulinette de réabilitation des domaines quant aucun changements
+## ne le nécécite.
+if [ ! "$md5old" = "$md5new" ]; then
+	rm -rf ${DIR_DNS_BLACKLIST_ENABLED:?}/
+	mkdir $DIR_DNS_BLACKLIST_ENABLED
+	rm -rf  ${DIR_DNS_WHITELIST_ENABLED:?}/
+	mkdir  $DIR_DNS_WHITELIST_ENABLED  
+	while read CATEGORIE
+	do
+		if [ "$(grep -c "$CATEGORIE" "$BL_CATEGORIES_AVAILABLE")" -ge "1" ] ; then
+			cp $DIR_DNS_FILTER_AVAILABLE/"$CATEGORIE".conf $DIR_DNS_BLACKLIST_ENABLED/
+		else
+			cp $DIR_DNS_FILTER_AVAILABLE/"$CATEGORIE".conf $DIR_DNS_WHITELIST_ENABLED/
+		fi     
+	done < $CATEGORIES_ENABLED
+	reabdomaine
+	$SED "s?^MD5DREAB.*?MD5DREAB=$md5new?g" $FILE_CONF
+
+fi
+
+
+
+cp $DIR_DNS_FILTER_AVAILABLE/ossi.conf $DIR_DNS_BLACKLIST_ENABLED/
+echo "</catChoice>"
+}
+
+reabdomaine () {
+echo "<reabdomaine>"
+date +%H:%M:%S
+
+if [ ! -f $DREAB ] ; then
+cat << EOF > $DREAB
+EOF
+fi
+$SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' "$DREAB"
+$SED "/[äâëêïîöôüû]/d" "$DREAB" 
+$SED "/^#.*/d" "$DREAB" 
+$SED "/^$/d" "$DREAB" 
+$SED "s/\.\{2,10\}/\./g" "$DREAB"
+if [ ! -f $DIR_DNS_BLACKLIST_ENABLED/ossi.conf ] ; then
+	echo > $DIR_DNS_BLACKLIST_ENABLED/ossi.conf
+fi
+echo
+gettext 'Application whitelisting (restored area):'
+while read CATEGORIE
+do 
+	if [ "$(grep -c "$CATEGORIE" "$BL_CATEGORIES_AVAILABLE" )" -ge "1" ] ; then
+		echo -n "."
+		while read DOMAINE
+		do
+		    cp -f $DIR_DNS_BLACKLIST_ENABLED/"$CATEGORIE".conf "$FILE_tmp"
+		    $SED "/$DOMAINE/d" "$FILE_tmp"
+            cp -f "$FILE_tmp" $DIR_DNS_BLACKLIST_ENABLED/"$CATEGORIE".conf
+		done < $DREAB		
+    fi
+done < $CATEGORIES_ENABLED
+
+
+
+
+date +%H:%M:%S
+
+}
+
+adapt_enabled () {
+cd $DIR_DNS_BLACKLIST_ENABLED/
+cat * | sed -e "s/^\.\{1,10\}//g" | sort -u > "$FILE_tmp"
+cd $(dirname "$(readlink -f "$0")")
+$SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A 127.0.0.10\"?g" "$FILE_tmp" # mise en forme unbound
+cat  "$FILE_tmp" >> $unboundzonefile 
+cd $DIR_DNS_BLACKLIST_ENABLED/
+cat * | sed -e "s/^\.\{1,10\}//g" | sort -u > "$FILE_tmp"
+cd $(dirname "$(readlink -f "$0")")
+$SED "s?.*?zone \"&\" {\n  type master;\n  file \"/etc/bind/db.ctparental\";\n};?g" "$FILE_tmp" # mise en forme bind9
+cat  "$FILE_tmp" >> $bindzonefile 	
+cd $DIR_DNS_BLACKLIST_ENABLED/
+cat * | sort -u > "$FILE_tmp"
+cd $(dirname "$(readlink -f "$0")")
+$SED "s?.*?address=/&/127.0.0.10?g" "$FILE_tmp"  # Mise en forme dnsmasq
+cat  "$FILE_tmp" >> $dnsmasqzonefile 	
+{
+## on force a passer par forcesafesearch.google.com de maninière transparente
+forcesafesearchgoogle=$(host -ta forcesafesearch.google.com|cut -d" " -f4)	# retrieve forcesafesearch.google.com ip
+echo -n > "$FILE_tmp"
+if [ "$(cat < $SAFE_CONF | grep -c "^SAFEGOOGLE" )" -eq 1 ];then
+	echo "# forcesafesearch redirect server for google" 
+	for subdomaingoogle in $(wget http://www.google.com/supported_domains -O - 2> /dev/null )  # pour chaque sous domain de google
+	do 
+	echo "www$subdomaingoogle" 	
+	done
+fi
+
+if [ "$(cat < $SAFE_CONF | grep -c "^SAFEYOUTUBE" )" -eq 1 ];then
+	echo "www.youtube.com"
+fi
+} > $DIR_DNS_BLACKLIST_ENABLED/google.conf
+cd $DIR_DNS_BLACKLIST_ENABLED/
+cat google.conf  | sed -e "s/^\.\{1,10\}//g" | sort -u > "$FILE_tmp"
+cd $(dirname "$(readlink -f "$0")")
+$SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A $forcesafesearchgoogle\"?g" "$FILE_tmp" # mise en forme unbound
+cat  "$FILE_tmp" >> $unboundzonefile 
+cd $DIR_DNS_BLACKLIST_ENABLED/
+cat google.conf | sed -e "s/^\.\{1,10\}//g" | sort -u > "$FILE_tmp"
+cd $(dirname "$(readlink -f "$0")")
+$SED "s?.*?zone \"&\" {\n  type master;\n  file \"/etc/bind/db.gooble\";\n};?g" "$FILE_tmp" # mise en forme bind9
+cat  "$FILE_tmp" >> $bindzonefile 	
+cd $DIR_DNS_BLACKLIST_ENABLED/
+cat google.conf  | sort -u > "$FILE_tmp"
+cd $(dirname "$(readlink -f "$0")")
+$SED "s?.*?address=/&/$forcesafesearchgoogle?g" "$FILE_tmp"  # Mise en forme dnsmasq
+cat  "$FILE_tmp" >> $dnsmasqzonefile 
+}
+
+
+echo "</reabdomaine>"
+
+
+download
+adapt_available
+catChoice
+adapt_enabled
