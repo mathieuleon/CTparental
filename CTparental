@@ -2155,7 +2155,8 @@ updatetimelogin () {
 					echo "$PCUSER=1=1" >> $FILE_HCOMPT
 			   else
 					var=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f2) + 1 ))
-					if [ "$(netstat -e | grep "$PCUSER" | grep -c ESTABLISHED)" -ge 1 ];then
+					$uidpcuser=$(id -u $PCUSER)
+					if [ "$(ss -t -e -o state established | grep -c uid:$uidpcuser)" -ge 1 ];then
 						varweb=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) + 1 ))
 					else
 						varweb=$(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) 
