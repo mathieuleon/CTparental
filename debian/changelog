@@ -1,3 +1,9 @@
+ctparental (4.20.26-1.0) unstable; urgency=medium
+
+  * remplacement de l'utilisation de netstat devenus obsolaite par ss
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Sat, 25 Nov 2017 11:54:15 +0100
+ 
 ctparental (4.20.25-1.0) unstable; urgency=medium
 
   * amélioration de l'interface web pour qu'elle attende la fin de la précédente execution de ctparental pour valider les parramètres. 
