@@ -1112,7 +1112,8 @@ iptablesreload () {
    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
    $IPTABLES6 -F
    $IPTABLES6 -X
-   $IPTABLES6 -t nat -F  
+   $IPTABLES6 -t nat -F
+   $IPTABLES6 -t mangle -F    
    $IPTABLES6 -t nat -X  
    $IPTABLES6 -t nat -N ctparental
    $IPTABLES6 -P INPUT ACCEPT
@@ -1120,7 +1121,8 @@ iptablesreload () {
    $IPTABLES6 -P FORWARD ACCEPT 
    $IPTABLES -F
    $IPTABLES -X
-   $IPTABLES -t nat -F  
+   $IPTABLES -t nat -F 
+   $IPTABLES -t mangle -F   
    $IPTABLES -t nat -X  
    $IPTABLES -t nat -N ctparental
    $IPTABLES -P INPUT ACCEPT
@@ -2152,7 +2154,8 @@ updatetimelogin () {
 					echo "$PCUSER=1=1" >> $FILE_HCOMPT
 			   else
 					var=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f2) + 1 ))
-					if [ "$(netstat -e | grep "$PCUSER" | grep -c ESTABLISHED)" -ge 1 ];then
+					$uidpcuser=$(id -u $PCUSER)
+					if [ "$(ss -t -e -o state established | grep -c uid:$uidpcuser)" -ge 1 ];then
 						varweb=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) + 1 ))
 					else
 						varweb=$(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) 
