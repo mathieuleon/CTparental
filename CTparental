@@ -227,7 +227,6 @@ ETCPRIVOXY=${ETCPRIVOXY:="/etc/privoxy"}
 PRIVOXYCONF=${PRIVOXYCONF:="$ETCPRIVOXY/config"}
 PRIVOXYUSERA=${PRIVOXYUSERA:="$ETCPRIVOXY/user.action"}
 PRIVOXYCTA=${PRIVOXYCTA:="$ETCPRIVOXY/ctparental.action"}
-CTFILEPROXY=${CTFILEPROXY:="$DIR_CONF/CT-proxy.sh"}
 XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
 DOMAINEDEPOTS=${DOMAINEDEPOTS:=$(cat /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null | grep "^deb" | cut -d"/" -f3 | sort -u | sed -e "s/^www././g" )}
@@ -543,10 +542,7 @@ http://localhost.*
 
               
 EOF
-#if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
-#	mv "$ETCPRIVOXY"/templates/connect-failed "$ETCPRIVOXY"/templates/connect-failed.old
-#fi
-#echo -n > "$ETCPRIVOXY"/templates/connect-failed # privoxy ne retour aucun code html en cas de refus (erreur 503)
+
 $PRIVOXYrestart
 echo "</confprivoxy>"
 }
@@ -1797,7 +1793,7 @@ $NETWORKINGrestart
     
 }
 nomade () {
-#### si il y a un changement dan la conf réseaux ####
+#### si il y a un changement dans la conf réseaux ####
 if [ "$DNS1v4" != "$(cat < $FILE_CONF | grep DNS1v4 | cut -d"=" -f2)"  -o \
  "$DNS2v4" != "$(cat < $FILE_CONF | grep DNS2v4 | cut -d"=" -f2)"  -o \
  "$DNS1v6" != "$(cat < $FILE_CONF | grep DNS1v6 | cut -d"=" -f2)"  -o \
@@ -2619,7 +2615,7 @@ FILEexpconf=$(echo "$DIRexpconf"/CTparental.conf."$date".tar.gz | sed -e "s|\/\{
 tar -cvzf "$FILEexpconf" "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
 "$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
 "$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
-"$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYCTA" \
+"$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
 "$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
 "$FILEIPTABLES" 
 
