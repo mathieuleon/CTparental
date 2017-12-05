@@ -1,6 +1,8 @@
 ctparental (4.20.26-1.0) unstable; urgency=medium
 
   * remplacement de l'utilisation de netstat devenus obsolaite par ss
+  * http://127.0.0.1/CTadmin devient http://127.0.0.11/CTadmin pour
+  permètre une installation d'apache2 en parallel.
     
  -- Guillaume marsat <CTparental1@laposte.net>  Sat, 25 Nov 2017 11:54:15 +0100
  

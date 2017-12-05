@@ -14,10 +14,10 @@ Package: ctparental
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends}
 Depends: ${misc:Depends},debconf,dnsmasq,lighttpd,lighttpd-mod-magnet,perl,sudo,wget,php-cgi,php-xml,libnotify-bin,notification-daemon,iptables-persistent,rsyslog,e2guardian,privoxy,openssl,libnss3-tools,console-data
-Conflicts: dansguardian,mini-httpd,apache2,firewalld
+Conflicts: dansguardian,firewalld
 Description: Controle parental.
  Filtrage web basé sur dnsmasq, lighttpd et cron,
  une gestion des horaires de connection est aussi intégrée et
- une interface web (http://127.0.0.1/CTadmin) permettant de paramétrer tous ça.
+ une interface web (http://127.0.0.11/CTadmin) permettant de paramétrer tous ça.
  Le couple login mot de passe doit être saisi à l'install, mais peut être
  modifié par la suite grâce à la commande CTparental.sh -uhtml.

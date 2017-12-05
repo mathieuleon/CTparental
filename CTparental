@@ -375,8 +375,10 @@ echo "</resolvconffixoff>"
 }
 
 
-PRIVATE_IP="127.0.0.10"
+PRIVATE_IP4="127.0.0.10"
 PRIVATE_IP6="fc00::127:10"
+ADMIN_IP4="127.0.0.11"
+ADMIN_IP6="fc00::127:11"
 
 
 FILE_tmp=${FILE_tmp:="$tempDIRRamfs/filetmp.txt"}
@@ -677,12 +679,12 @@ if [ -d $tempDIR  ] ; then
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 					else
 						echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-						$SED "s?.*?address=/&/$PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
+						$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 					fi				
 				else
 					echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-					$SED "s?.*?address=/&/$PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
+					$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
 					mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 				fi
 			fi
@@ -696,7 +698,7 @@ if [ -d $tempDIR  ] ; then
 	$SED "/^#.*/d" "$FILE_tmp" 
 	$SED "/^$/d" "$FILE_tmp" 
 	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp" # supprime les suite de "." exemple: address=/fucking-big-tits..com/127.0.0.10 devient address=/fucking-big-tits.com/127.0.0.10
-	$SED "s?.*?address=/&/$PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme dnsmasq
+	$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"  # Mise en forme dnsmasq
 	mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/ossi.conf
 
 else
@@ -709,7 +711,7 @@ else
 	$SED "/^#.*/d" "$FILE_tmp" 
 	$SED "/^$/d" "$FILE_tmp" 
 	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp" # supprime les suite de "." exemple: address=/fucking-big-tits..com/127.0.0.10 devient address=/fucking-big-tits.com/127.0.0.10
-	$SED "s?.*?address=/&/$PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme dnsmasq
+	$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"  # Mise en forme dnsmasq
 	mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/ossi.conf
 fi     
 echo
@@ -790,6 +792,8 @@ done < $CATEGORIES_ENABLED
 { 
 echo 'localhost' 
 echo '127.0.0.1' 
+echo "$PRIVATE_IP4"
+echo "$ADMIN_IP4"
 echo "$BL_SERVER" 
 for domain in $DOMAINEDEPOTS 
 do 
@@ -837,7 +841,7 @@ if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
 	echo "address=/safe.duckduckgo.com/$(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
 	
 	## les requette sur http(s)://duckduckgo.com sont rediriger vers lighttpd qui les renvois vers safe.duckduckgo.com
-	echo "address=/duckduckgo.com/127.0.0.1" 
+	echo "address=/duckduckgo.com/$ADMIN_IP4" 
 fi
 
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
@@ -855,7 +859,7 @@ echo "address=/.dailymotion.com/$(host -ta dailymotion.com|cut -d" " -f4 | grep 
 #echo "address=/search.yahoo.com/127.0.0.1" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 
 # on bloque les moteurs de recherche pas asser sur
-echo "address=/search.yahoo.com/127.0.0.10"
+echo "address=/search.yahoo.com/$PRIVATE_IP4"
 } > $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 
 
@@ -955,6 +959,7 @@ ipglobal () {
     $IPTABLES -A OUTPUT -o lo -j ACCEPT
     $IPTABLES6 -A INPUT  -i lo -j ACCEPT
     $IPTABLES6 -A OUTPUT -o lo -j ACCEPT
+
     ### accepte en entrée les connexions déjà établies (en gros cela permet d'accepter 
     ### les connexions initiées par sont propre PC)
     $IPTABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
@@ -1129,18 +1134,7 @@ iptablesreload () {
 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
      $IPTABLES -t nat -A OUTPUT -j ctparental
      $IPTABLES6 -t nat -A OUTPUT -j ctparental
-     
-#      if [ ! "$REDIRECT" -eq 1 ];then
-			  # on rejet les connection a la page de redirection pour PROXYuser.
-			  # ce qui procoque l'afichage du templates pricoxy connect-failed que l'on a vider , donc ne retourne plus aucune page d'interdiction!
-			  # le visuel des pages visitées sen retrouve améliorée.
-			
-#			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
-#			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
-#			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
-#			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
-#	  fi
-
+ 
       # Force privoxy a utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 	  $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
@@ -1166,7 +1160,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
 			 # e2guardian ne gérent pas encore ipv6 on ce contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
-			 $IPTABLES6 -t nat -A ctparental ! -d ::1/128 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
+			 $IPTABLES6 -t nat -A ctparental -d 2000::/3 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
 			 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
 				  # on interdit l'accès a bing en https .
 				  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
@@ -1254,7 +1248,7 @@ server=$DNS2v4
 server=$DNS1v6
 server=$DNS2v6
 address=/localhost/127.0.0.1
-address=/#/$PRIVATE_IP #redirige vers $PRIVATE_IP pour tout ce qui n'a pas été resolu dans les listes blanches
+address=/#/$PRIVATE_IP4 #redirige vers $PRIVATE_IP4 pour tout ce qui n'a pas été resolu dans les listes blanches
 EOF
 
 $DNSMASQrestart
@@ -1300,7 +1294,7 @@ server.pid-file = "$LIGHTTPpidfile"
 server.username = "$USERHTTPD"
 server.groupname = "$GROUPHTTPD"
 server.port = 80
-server.bind = "127.0.0.1"
+server.bind = "$ADMIN_IP4"
 
 index-file.names = ( "index.php", "index.html" )
 url.access-deny = ( "~", ".inc" )
@@ -1392,6 +1386,7 @@ fi
 mkdir /run/lighttpd/ 2> /dev/null
 chmod 770 /run/lighttpd/
 chown root:"$GROUPHTTPD" /run/lighttpd/
+
 cat << EOF > "$CTPARENTALCONFHTTPD"
 
 fastcgi.server = (
@@ -1422,10 +1417,15 @@ fastcgi.server = (
                  )
 
 }
-
+\$HTTP["host"] =~ "$ADMIN_IP4" {
+	\$SERVER["socket"] == "$ADMIN_IP4:443" {
+	ssl.engine = "enable"
+	ssl.pemfile = "$PEMSRVDIR/ADMIN_IP4.pem" 
+	}
+}
 
 \$HTTP["host"] =~ "search.yahoo.com" {
-	\$SERVER["socket"] == ":443" {
+	\$SERVER["socket"] == "$ADMIN_IP4:443" {
 	ssl.engine = "enable"
 	ssl.pemfile = "$PEMSRVDIR/search.yahoo.com.pem" 
 	server.document-root = "$DIRHTML"
@@ -1433,50 +1433,67 @@ fastcgi.server = (
 	}
 }
 
-\$HTTP["host"] =~ "localhost" {
-	\$SERVER["socket"] == ":443" {
-	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/localhost.pem" 	
-	}
-}
+
 \$HTTP["host"] =~ "duckduckgo.com" {
-	\$SERVER["socket"] == ":443" {
+	\$SERVER["socket"] == "$ADMIN_IP4:443" {
 	ssl.engine = "enable"
 	ssl.pemfile = "$PEMSRVDIR/duckduckgo.pem" 
 	url.redirect  = (".*" => "https://safe.duckduckgo.com\$0" )
 	}
-	\$SERVER["socket"] == "127.0.0.1:80" {
+	\$SERVER["socket"] == "$ADMIN_IP4:80" {
 	url.redirect  = (".*" => "https://safe.duckduckgo.com\$0" )
 	}
 }
 
-\$SERVER["socket"] == "$PRIVATE_IP:80" {
+\$SERVER["socket"] == "$PRIVATE_IP4:80" {
 server.document-root = "$DIRHTML"
-url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
+	\$HTTP["host"] != "$PRIVATE_IP4" {
+		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
+	}
 }
 
-\$SERVER["socket"] == "[$PRIVATE_IP6]:80" {
-	
+\$SERVER["socket"] == "$PRIVATE_IP4:443" {
+ssl.engine = "enable"
+ssl.pemfile = "$PEMSRVDIR/PRIVATE_IP4.pem" 
 server.document-root = "$DIRHTML"
-server.error-handler-404 ="err404.php"
+	\$HTTP["host"] != "$PRIVATE_IP4" {
+		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
+	}
+}
+
+
+
+\$SERVER["socket"] == "[$PRIVATE_IP6]:80" {
+server.document-root = "$DIRHTML"
+	\$HTTP["host"] != "[$PRIVATE_IP6]" {
+		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
+	}
 }
 
 \$SERVER["socket"] == "[$PRIVATE_IP6]:443" {
-ssl.engine = "enable"
-ssl.pemfile = "$PEMSRVDIR/localhost.pem" 
-server.document-root = "$DIRHTML"
-server.error-handler-404 ="err404.php"
+	ssl.engine = "enable"
+	ssl.pemfile = "$PEMSRVDIR/PRIVATE_IP6.pem" 
+	server.document-root = "$DIRHTML"
+	\$HTTP["host"] != "[$PRIVATE_IP6]" {
+		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
+	}
 }
 
-\$SERVER["socket"] == "[::1]:80" {
+\$SERVER["socket"] == "[$ADMIN_IP6]:80" {
 }
 
-\$SERVER["socket"] == "[::1]:443" {
-ssl.engine = "enable"
-ssl.pemfile = "$PEMSRVDIR/localhost.pem" 
+\$HTTP["host"] =~ "$ADMIN_IP6" {
+	\$SERVER["socket"] == "[$ADMIN_IP6]:443" {
+	ssl.engine = "enable"
+	ssl.pemfile = "$PEMSRVDIR/ADMIN_IP6.pem" 
+	}
 }
+
+
+
 
 EOF
+
 if [ -e "$DIRHTML/index.php" ] ;  then
 	ln -s "$DIRHTML"/index.php "$DIRHTML"/err404.php
 else
@@ -1597,6 +1614,26 @@ openssl genrsa 1024 > "$DIR_TMP"/localhost.key 2> /dev/null
 openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=localhost" -key "$DIR_TMP"/localhost.key > "$DIR_TMP"/localhost.csr 
 openssl x509 -req -in "$DIR_TMP"/localhost.csr -out "$DIR_TMP"/localhost.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
 
+## création certificat $ADMIN_IP4 et signature par la ca
+openssl genrsa 1024 > "$DIR_TMP/ADMIN_IP4".key 2> /dev/null
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=$ADMIN_IP4" -key "$DIR_TMP/ADMIN_IP4".key > "$DIR_TMP/ADMIN_IP4".csr 
+openssl x509 -req -in "$DIR_TMP/ADMIN_IP4".csr -out "$DIR_TMP/ADMIN_IP4".crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
+
+## création certificat $PRIVATE_IP4 et signature par la ca
+openssl genrsa 1024 > "$DIR_TMP/PRIVATE_IP4".key 2> /dev/null
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=$PRIVATE_IP4" -key "$DIR_TMP/PRIVATE_IP4".key > "$DIR_TMP/PRIVATE_IP4".csr 
+openssl x509 -req -in "$DIR_TMP/PRIVATE_IP4".csr -out "$DIR_TMP/PRIVATE_IP4".crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
+
+## création certificat $ADMIN_IP6 et signature par la ca
+openssl genrsa 1024 > "$DIR_TMP/ADMIN_IP6".key 2> /dev/null
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=$ADMIN_IP6" -key "$DIR_TMP/ADMIN_IP6".key > "$DIR_TMP/ADMIN_IP6".csr 
+openssl x509 -req -in "$DIR_TMP/ADMIN_IP6".csr -out "$DIR_TMP/ADMIN_IP6".crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
+
+## création certificat $PRIVATE_IP6 et signature par la ca
+openssl genrsa 1024 > "$DIR_TMP/PRIVATE_IP6".key 2> /dev/null
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=$PRIVATE_IP6" -key "$DIR_TMP/PRIVATE_IP6".key > "$DIR_TMP/PRIVATE_IP6".csr 
+openssl x509 -req -in "$DIR_TMP/PRIVATE_IP6".csr -out "$DIR_TMP/PRIVATE_IP6".crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
+
 ## création du certificat duckduckgo pour redirection vers safe.duckduckgo.com
 openssl genrsa 1024 > "$DIR_TMP"/duckduckgo.key 2> /dev/null
 openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key "$DIR_TMP"/duckduckgo.key > "$DIR_TMP"/duckduckgo.csr 
@@ -1612,6 +1649,10 @@ cp -f "$DIR_TMP"/cactparental.crt "$CADIR"/
 cp -f "$DIR_TMP"/cactparental.crt "$DIRHTML"
 cp -f "$DIR_TMP"/cactparental.crt "$REPCAMOZ"
 ## instalation des certificats serveur
+cat "$DIR_TMP/PRIVATE_IP4".key "$DIR_TMP/PRIVATE_IP4".crt > "$PEMSRVDIR/PRIVATE_IP4".pem
+cat "$DIR_TMP/ADMIN_IP4".key "$DIR_TMP/ADMIN_IP4".crt > "$PEMSRVDIR/ADMIN_IP4".pem
+cat "$DIR_TMP/PRIVATE_IP6".key "$DIR_TMP/PRIVATE_IP6".crt > "$PEMSRVDIR/PRIVATE_IP6".pem
+cat "$DIR_TMP/ADMIN_IP6".key "$DIR_TMP/ADMIN_IP6".crt > "$PEMSRVDIR/ADMIN_IP6".pem
 cat "$DIR_TMP"/localhost.key "$DIR_TMP"/localhost.crt > "$PEMSRVDIR"/localhost.pem
 cat "$DIR_TMP"/duckduckgo.key "$DIR_TMP"/duckduckgo.crt > "$PEMSRVDIR"/duckduckgo.pem
 cat "$DIR_TMP"/search.yahoo.com.key "$DIR_TMP"/search.yahoo.com.crt > "$PEMSRVDIR"/search.yahoo.com.pem
@@ -1637,24 +1678,38 @@ sysctl -p "$FILESYSCTL"
 ######################
 FILTRAGEISOFF=1
 if [ -f /etc/sysconfig/network-scripts/ifcfg-lo ] ;then
-cat << EOF > /etc/sysconfig/network-scripts/ifcfg-lo
-DEVICE=lo
-IPADDR=127.0.0.1
-NETMASK=255.0.0.0
-NETWORK=127.0.0.0
-BROADCAST=127.255.255.255
+{
+echo "
+DEVICE=lo:1
 ONBOOT=yes
 NAME=loopback
 IPV6ADDR=$PRIVATE_IP6/128
-EOF
+"
+} > /etc/sysconfig/network-scripts/ifcfg-lo:1
+
+{
+echo "
+DEVICE=lo:2
+ONBOOT=yes
+NAME=loopback
+IPV6ADDR=$ADMIN_IP6/128
+"
+} > /etc/sysconfig/network-scripts/ifcfg-lo:2
+
 fi
 if [ -f /etc/network/interfaces ];then
 mkdir /etc/network/interfaces.d 2&> /dev/null
-cat << EOF > /etc/network/interfaces.d/ctparentallo
+{
+echo "
 auto lo:1
 iface lo:1 inet loopback
 up ip addr add $PRIVATE_IP6/128 dev lo:1
-EOF
+
+auto lo:2
+iface lo:2 inet loopback
+up ip addr add $ADMIN_IP6/128 dev lo:2
+"
+} > /etc/network/interfaces.d/ctparentallo
 
 	if [ $(cat < /etc/network/interfaces | grep -c "source.*/etc/network/interfaces.d/*") -eq 0 ];then
 		echo "source /etc/network/interfaces.d/*" >> /etc/network/interfaces
