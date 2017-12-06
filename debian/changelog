@@ -1,9 +1,11 @@
 ctparental (4.20.26-1.0) unstable; urgency=medium
 
   * remplacement de l'utilisation de netstat devenus obsolaite par ss
-  * http://127.0.0.1/CTadmin devient http://127.0.0.11/CTadmin pour
-  permètre une installation d'apache2 si celui si n'écoute pas sur les ip 127.0.0.10,127.0.0.11,
-  [fc00::127:11],[fc00::127:10] déja utilisé par CTparental (lighttpd).
+  * http://127.0.0.1/CTadmin devient http://admin.ct.localhost 
+  * lighttpd n'écoute plus sur le 127.0.0.1 ni sur ::1 pour faciliter le
+  permètrage d'une installation apache2 ou autre serveur web suplémentaire.
+  * correction bug de certifiat https de l'interface les pages d'intercéption 
+  continuant a générer des erreurs , non résolvable sans fair du Man-in-the-middle.
     
  -- Guillaume marsat <CTparental1@laposte.net>  Wed, 06 Dec 2017 00:38:54 +0100
  

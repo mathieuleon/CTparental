@@ -1405,16 +1405,6 @@ fastcgi.server = (
                                ".phps" => ".php",
                                ".phtml" => ".php" )
 
-\$HTTP["url"] =~ ".*CTadmin.*" {
-  auth.require = ( "" =>
-                   (
-                     "method"  => "digest",
-                     "realm"   => "$REALMADMINHTTPD",
-                     "require" => "user=$USERADMINHTTPD" 
-                   )
-                 )
-
-}
 
 \$HTTP["host"] =~ "search.yahoo.com" {
 	\$SERVER["socket"] == "$ADMIN_IP4:443" {
@@ -1472,6 +1462,13 @@ server.document-root = "$DIRHTML"
 
 
 \$HTTP["host"] =~ "admin.ct.localhost" {
+	auth.require = ( "" =>
+                   (
+                     "method"  => "digest",
+                     "realm"   => "$REALMADMINHTTPD",
+                     "require" => "user=$USERADMINHTTPD" 
+                   )
+                 )
 	server.document-root = "$DIRadminHTML"
 	\$SERVER["socket"] == "$ADMIN_IP4:80" {
 		url.redirect  = (".*" => "https://admin.ct.localhost\$0" )
