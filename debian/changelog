@@ -6,8 +6,8 @@ ctparental (4.20.26-1.0) unstable; urgency=medium
   permètrage d'une installation apache2 ou autre serveur web suplémentaire.
   * correction bug de certifiat https de l'interface les pages d'intercéption 
   continuant a générer des erreurs , non résolvable sans fair du Man-in-the-middle.
-  * Ajout locale es_ES
-    
+  * Ajout du suport locale es_ES .
+
  -- Guillaume marsat <CTparental1@laposte.net>  Wed, 06 Dec 2017 00:38:54 +0100
  
 ctparental (4.20.25-1.0) unstable; urgency=medium
