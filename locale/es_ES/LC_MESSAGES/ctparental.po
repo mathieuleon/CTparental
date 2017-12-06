@@ -10,7 +10,7 @@ msgstr ""
 "X-Generator: Poedit 2.0.4\n"
 "Last-Translator: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"Language: fr\n"
+"Language: es\n"
 
 # Copyright: © 2013-2016 Guillaume Marsat <guillaume.marsat@laposte.net>
 # License: GPL-3+
