@@ -1484,6 +1484,14 @@ server.document-root = "$DIRHTML"
 	ssl.pemfile = "$PEMSRVDIR/admin.ct.localhost.pem" 
 	}
 }
+	
+\$HTTP["host"] =~ "$ADMIN_IP6" {
+url.redirect  = (".*" => "https://admin.ct.localhost" )
+}
+\$HTTP["host"] =~ "$ADMIN_IP4" {
+url.redirect  = (".*" => "https://admin.ct.localhost" )
+}
+
 
 
 
