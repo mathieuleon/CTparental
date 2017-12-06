@@ -8,16 +8,16 @@ Homepage: https://github.com/marsat/CTparental.git
 Vcs-Browser: https://github.com/marsat/CTparental.git
 Vcs-Git: https://github.com/marsat/CTparental.git
 Build-Depends: debhelper (>=9.2)
-Standards-Version:4.20.25
+Standards-Version:4.20.26
 
 Package: ctparental
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${misc:Depends},debconf,dnsmasq,lighttpd,lighttpd-mod-magnet,perl,sudo,wget,php-cgi,php-xml,libnotify-bin,notification-daemon,iptables-persistent,rsyslog,dansguardian,privoxy,openssl,libnss3-tools,console-data
-Conflicts: e2guardian,mini-httpd,apache2,firewalld
+Depends: ${misc:Depends},debconf,dnsmasq,lighttpd,lighttpd-mod-magnet,perl,sudo,wget,php-cgi,php-xml,libnotify-bin,notification-daemon,iptables-persistent,rsyslog,e2guardian,privoxy,openssl,libnss3-tools,console-data
+Conflicts: dansguardian,firewalld
 Description: Controle parental.
  Filtrage web basé sur dnsmasq, lighttpd et cron,
  une gestion des horaires de connection est aussi intégrée et
- une interface web (http://127.0.0.1/CTadmin) permettant de paramétrer tous ça.
+ une interface web (http://admin.ct.localhost) permettant de paramétrer tous ça.
  Le couple login mot de passe doit être saisi à l'install, mais peut être
  modifié par la suite grâce à la commande CTparental.sh -uhtml.
