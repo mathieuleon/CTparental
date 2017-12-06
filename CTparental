@@ -819,9 +819,7 @@ rm -f "$FILE_tmp"
 date +%H:%M:%S
 
 
-
 {
-
 
 ## on force a passer par forcesafesearch.google.com de maninière transparente
 forcesafesearchgoogle=$(host -ta forcesafesearch.google.com|cut -d" " -f4)	# retrieve forcesafesearch.google.com ip
@@ -1417,12 +1415,6 @@ fastcgi.server = (
                  )
 
 }
-\$HTTP["host"] =~ "$ADMIN_IP4" {
-	\$SERVER["socket"] == "$ADMIN_IP4:443" {
-	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/ADMIN_IP4.pem" 
-	}
-}
 
 \$HTTP["host"] =~ "search.yahoo.com" {
 	\$SERVER["socket"] == "$ADMIN_IP4:443" {
@@ -1447,45 +1439,53 @@ fastcgi.server = (
 
 \$SERVER["socket"] == "$PRIVATE_IP4:80" {
 server.document-root = "$DIRHTML"
-	\$HTTP["host"] != "$PRIVATE_IP4" {
+	\$HTTP["host"] != "privet.ct.localhost" {
 		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 	}
 }
 
 \$SERVER["socket"] == "$PRIVATE_IP4:443" {
 ssl.engine = "enable"
-ssl.pemfile = "$PEMSRVDIR/PRIVATE_IP4.pem" 
+ssl.pemfile = "$PEMSRVDIR/privet.ct.localhost.pem" 
 server.document-root = "$DIRHTML"
-	\$HTTP["host"] != "$PRIVATE_IP4" {
+	\$HTTP["host"] != "privet.ct.localhost" {
 		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 	}
 }
 
 
-
 \$SERVER["socket"] == "[$PRIVATE_IP6]:80" {
 server.document-root = "$DIRHTML"
-	\$HTTP["host"] != "[$PRIVATE_IP6]" {
+	\$HTTP["host"] != "privet.ct.localhost" {
 		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 	}
 }
 
 \$SERVER["socket"] == "[$PRIVATE_IP6]:443" {
 	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/PRIVATE_IP6.pem" 
+	ssl.pemfile = "$PEMSRVDIR/privet.ct.localhost.pem" 
 	server.document-root = "$DIRHTML"
-	\$HTTP["host"] != "[$PRIVATE_IP6]" {
+	\$HTTP["host"] != "privet.ct.localhost" {
 		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 	}
 }
 
-\$SERVER["socket"] == "[$ADMIN_IP6]:80" {
-}
 
-\$HTTP["host"] =~ "$ADMIN_IP6" {
+\$HTTP["host"] =~ "admin.ct.localhost" {
+	server.document-root = "$DIRadminHTML"
+	\$SERVER["socket"] == "$ADMIN_IP4:80" {
+		url.redirect  = (".*" => "https://admin.ct.localhost\$0" )
+	}
+	\$SERVER["socket"] == "$ADMIN_IP4:443" {
+	ssl.engine = "enable"
+	ssl.pemfile = "$PEMSRVDIR/admin.ct.localhost.pem" 
+	}
+	\$SERVER["socket"] == "[$ADMIN_IP6]:80" {
+		url.redirect  = (".*" => "https://admin.ct.localhost\$0" )
+	}
 	\$SERVER["socket"] == "[$ADMIN_IP6]:443" {
 	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/ADMIN_IP6.pem" 
+	ssl.pemfile = "$PEMSRVDIR/admin.ct.localhost.pem" 
 	}
 }
 
@@ -1608,31 +1608,15 @@ mkdir "$CADIR" 2> /dev/null
 openssl genrsa  1024 > "$DIR_TMP"/cactparental.key 2> /dev/null
 openssl req -new -x509 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 10000 -key "$DIR_TMP"/cactparental.key > "$DIR_TMP"/cactparental.crt 
 
-## création de la clef privée serveur localhost
-openssl genrsa 1024 > "$DIR_TMP"/localhost.key 2> /dev/null
-## création certificat localhost et signature par la ca
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=localhost" -key "$DIR_TMP"/localhost.key > "$DIR_TMP"/localhost.csr 
-openssl x509 -req -in "$DIR_TMP"/localhost.csr -out "$DIR_TMP"/localhost.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
+## création clef et certificat admin.ct.localhost et signature par la ca
+openssl genrsa 1024 > "$DIR_TMP"/admin.ct.localhost.key 2> /dev/null
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=admin.ct.localhost" -key "$DIR_TMP"/admin.ct.localhost.key > "$DIR_TMP"/admin.ct.localhost.csr 
+openssl x509 -req -in "$DIR_TMP"/admin.ct.localhost.csr -out "$DIR_TMP"/admin.ct.localhost.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
 
-## création certificat $ADMIN_IP4 et signature par la ca
-openssl genrsa 1024 > "$DIR_TMP/ADMIN_IP4".key 2> /dev/null
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=$ADMIN_IP4" -key "$DIR_TMP/ADMIN_IP4".key > "$DIR_TMP/ADMIN_IP4".csr 
-openssl x509 -req -in "$DIR_TMP/ADMIN_IP4".csr -out "$DIR_TMP/ADMIN_IP4".crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
-
-## création certificat $PRIVATE_IP4 et signature par la ca
-openssl genrsa 1024 > "$DIR_TMP/PRIVATE_IP4".key 2> /dev/null
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=$PRIVATE_IP4" -key "$DIR_TMP/PRIVATE_IP4".key > "$DIR_TMP/PRIVATE_IP4".csr 
-openssl x509 -req -in "$DIR_TMP/PRIVATE_IP4".csr -out "$DIR_TMP/PRIVATE_IP4".crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
-
-## création certificat $ADMIN_IP6 et signature par la ca
-openssl genrsa 1024 > "$DIR_TMP/ADMIN_IP6".key 2> /dev/null
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=$ADMIN_IP6" -key "$DIR_TMP/ADMIN_IP6".key > "$DIR_TMP/ADMIN_IP6".csr 
-openssl x509 -req -in "$DIR_TMP/ADMIN_IP6".csr -out "$DIR_TMP/ADMIN_IP6".crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
-
-## création certificat $PRIVATE_IP6 et signature par la ca
-openssl genrsa 1024 > "$DIR_TMP/PRIVATE_IP6".key 2> /dev/null
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=$PRIVATE_IP6" -key "$DIR_TMP/PRIVATE_IP6".key > "$DIR_TMP/PRIVATE_IP6".csr 
-openssl x509 -req -in "$DIR_TMP/PRIVATE_IP6".csr -out "$DIR_TMP/PRIVATE_IP6".crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
+## création clef et certificat privet.ct.localhost et signature par la ca
+openssl genrsa 1024 > "$DIR_TMP"/privet.ct.localhost.key 2> /dev/null
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=privet.ct.localhost" -key "$DIR_TMP"/privet.ct.localhost.key > "$DIR_TMP"/privet.ct.localhost.csr 
+openssl x509 -req -in "$DIR_TMP"/privet.ct.localhost.csr -out "$DIR_TMP"/privet.ct.localhost.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
 
 ## création du certificat duckduckgo pour redirection vers safe.duckduckgo.com
 openssl genrsa 1024 > "$DIR_TMP"/duckduckgo.key 2> /dev/null
@@ -1649,11 +1633,8 @@ cp -f "$DIR_TMP"/cactparental.crt "$CADIR"/
 cp -f "$DIR_TMP"/cactparental.crt "$DIRHTML"
 cp -f "$DIR_TMP"/cactparental.crt "$REPCAMOZ"
 ## instalation des certificats serveur
-cat "$DIR_TMP/PRIVATE_IP4".key "$DIR_TMP/PRIVATE_IP4".crt > "$PEMSRVDIR/PRIVATE_IP4".pem
-cat "$DIR_TMP/ADMIN_IP4".key "$DIR_TMP/ADMIN_IP4".crt > "$PEMSRVDIR/ADMIN_IP4".pem
-cat "$DIR_TMP/PRIVATE_IP6".key "$DIR_TMP/PRIVATE_IP6".crt > "$PEMSRVDIR/PRIVATE_IP6".pem
-cat "$DIR_TMP/ADMIN_IP6".key "$DIR_TMP/ADMIN_IP6".crt > "$PEMSRVDIR/ADMIN_IP6".pem
-cat "$DIR_TMP"/localhost.key "$DIR_TMP"/localhost.crt > "$PEMSRVDIR"/localhost.pem
+cat "$DIR_TMP"/privet.ct.localhost.key "$DIR_TMP"/privet.ct.localhost.crt > "$PEMSRVDIR"/privet.ct.localhost.pem
+cat "$DIR_TMP"/admin.ct.localhost.key "$DIR_TMP"/admin.ct.localhost.crt > "$PEMSRVDIR"/admin.ct.localhost.pem
 cat "$DIR_TMP"/duckduckgo.key "$DIR_TMP"/duckduckgo.crt > "$PEMSRVDIR"/duckduckgo.pem
 cat "$DIR_TMP"/search.yahoo.com.key "$DIR_TMP"/search.yahoo.com.crt > "$PEMSRVDIR"/search.yahoo.com.pem
 rm -rf "$DIR_TMP"
@@ -1664,6 +1645,13 @@ echo "</CActparental>"
 
 
 install () {
+
+{
+echo "$ADMIN_IPV4 admin.ct.localhost "
+echo "$ADMIN_IPV6 admin.ct.localhost " 	
+echo "$PRIVATE_IP4 privet.ct.localhost " 
+echo "$PRIVATE_IP6 privet.ct.localhost " 
+} >> /etc/hosts
 # on reactive l'ipv6 si besoins.
 if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
 			$SED "s?^net.ipv6.conf.all.disable_ipv6=.*?net.ipv6.conf.all.disable_ipv6=0?g" "$FILESYSCTL"
@@ -1982,6 +1970,9 @@ desactivegourpectoff () {
 }
 
 uninstall () {
+	
+$SED "/.ct.localhost/d" /etc/hosts
+
    # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
    if [ $nomanuel -eq 0 ]; then 
 	   muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
