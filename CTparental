@@ -1647,8 +1647,8 @@ echo "</CActparental>"
 install () {
 
 {
-echo "$ADMIN_IPV4 admin.ct.localhost "
-echo "$ADMIN_IPV6 admin.ct.localhost " 	
+echo "$ADMIN_IP4 admin.ct.localhost "
+echo "$ADMIN_IP6 admin.ct.localhost " 	
 echo "$PRIVATE_IP4 privet.ct.localhost " 
 echo "$PRIVATE_IP6 privet.ct.localhost " 
 } >> /etc/hosts
@@ -1987,17 +1987,14 @@ $SED "/.ct.localhost/d" /etc/hosts
 			exit 0
 	   fi
    fi
-if [ -f /etc/sysconfig/network-scripts/ifcfg-lo ] ;then
-cat << EOF > /etc/sysconfig/network-scripts/ifcfg-lo
-DEVICE=lo
-IPADDR=127.0.0.1
-NETMASK=255.0.0.0
-NETWORK=127.0.0.0
-BROADCAST=127.255.255.255
-ONBOOT=yes
-NAME=loopback
-EOF
+if [ -f /etc/sysconfig/network-scripts/ifcfg-lo:1 ] ;then
+rm -f /etc/sysconfig/network-scripts/ifcfg-lo:1
 fi
+
+if [ -f /etc/sysconfig/network-scripts/ifcfg-lo:2 ] ;then
+rm -f /etc/sysconfig/network-scripts/ifcfg-lo:2
+fi
+
 if [ -f /etc/network/interfaces.d/ctparentallo ];then
 rm -f /etc/network/interfaces.d/ctparentallo
 fi
