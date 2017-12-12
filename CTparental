@@ -521,7 +521,8 @@ myfilters   = +filter{html-annoyances} +filter{js-annoyances} +filter{all-popups
               +filter{webbugs} +filter{banners-by-size}
 allow-ads   = -block -filter{banners-by-size} -filter{banners-by-link}
 { fragile }
-http://127.0.0.10.*
+http://admin.ct.localhost.*
+http://privet.ct.localhost.*
 http://localhost.*
 # BING Add &adlt=strict
 {+redirect{s@$@&adlt=strict@}}
@@ -536,10 +537,10 @@ http://localhost.*
  .dailymotion.*/.*enable=(?!true)
              
 
-{+redirect{s@http://.*/images/close.*.png@http://127.0.0.1/CTparental/images/X32px.png@}}
+{+redirect{s@http://.*/images/close.*.png@http://privet.ct.localhost/images/X32px.png@}}
 .*
 
-{+redirect{s@http://.*/close.*.png@http://127.0.0.1/CTparental/images/X32px.png@}}
+{+redirect{s@http://.*/close.*.png@http://privet.ct.localhost/images/X32px.png@}}
 .*
 
               
