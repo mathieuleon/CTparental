@@ -9,6 +9,10 @@
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/etc/CTparental"
 DIR_SHARE="/usr/share/CTparental"
+FILE_CONF="$DIR_CONF/CTparental.conf"
+if [ -f "$DIR_CONF/CTparental.conf" ];then
+export LANG=$(cat < $FILE_CONF | grep "^LANG" | cut -d "=" -f2 )
+fi
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
 set -a
@@ -94,7 +98,6 @@ pause () {   # fonction pause pour debugage
       done
 }
 SED="/bin/sed -i"
-FILE_CONF="$DIR_CONF/CTparental.conf"
 SAFE_CONF="$DIR_CONF/CTsafe.conf"
 FILE_GCTOFFCONF="$DIR_CONF/GCToff.conf"
 FILE_HCOMPT="$DIR_CONF/CThourscompteur"
@@ -104,6 +107,7 @@ mkdir -p $DIR_CONF
 mkdir -p "$DIR_SHARE"/
 cat << EOF > $FILE_CONF
 LASTUPDATE=0
+LANG=$LANG
 DNSMASQ=BLACK
 AUTOUPDATE=OFF
 HOURSCONNECT=OFF
