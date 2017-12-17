@@ -1683,7 +1683,7 @@ ONBOOT=yes
 NAME=loopback
 IPV6ADDR=$PRIVATE_IP6/128
 "
-} > /etc/sysconfig/network-scripts/ifcfg-lo:1
+} > /etc/sysconfig/network-scripts/ifcfg-lo1
 
 {
 echo "
@@ -1692,7 +1692,7 @@ ONBOOT=yes
 NAME=loopback
 IPV6ADDR=$ADMIN_IP6/128
 "
-} > /etc/sysconfig/network-scripts/ifcfg-lo:2
+} > /etc/sysconfig/network-scripts/ifcfg-lo2
 
 fi
 if [ -f /etc/network/interfaces ];then
@@ -1997,12 +1997,12 @@ $SED "/.ct.localhost/d" /etc/hosts
 			exit 0
 	   fi
    fi
-if [ -f /etc/sysconfig/network-scripts/ifcfg-lo:1 ] ;then
-rm -f /etc/sysconfig/network-scripts/ifcfg-lo:1
+if [ -f /etc/sysconfig/network-scripts/ifcfg-lo1 ] ;then
+rm -f /etc/sysconfig/network-scripts/ifcfg-lo1
 fi
 
-if [ -f /etc/sysconfig/network-scripts/ifcfg-lo:2 ] ;then
-rm -f /etc/sysconfig/network-scripts/ifcfg-lo:2
+if [ -f /etc/sysconfig/network-scripts/ifcfg-lo2 ] ;then
+rm -f /etc/sysconfig/network-scripts/ifcfg-lo2
 fi
 
 if [ -f /etc/network/interfaces.d/ctparentallo ];then
