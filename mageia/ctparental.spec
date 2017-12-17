@@ -103,6 +103,7 @@ exit 0
 /usr/share/CTparental/www/CTparental/js/npm.js
 /usr/share/CTparental/www/CTparental/locale.php
 /usr/share/locale/fr_FR/LC_MESSAGES/ctparental.mo
+/usr/share/locale/es_ES/LC_MESSAGES/ctparental.mo
 /usr/share/man/man1/CTparental.1.gz
 
 
