@@ -63,7 +63,7 @@ git checkout dansguardian
 git branch ubuntu14.04
 git checkout ubuntu14.04
 sed -i "s/php-cgi,php-xml/php5-cgi/g" debian/control
-cp ubuntu/dist.conf debian/dist.conf
+cp ubuntu14.04/dist.conf debian/dist.conf
 /bin/sed -i "s/debian-branch =.*/debian-branch = ubuntu14.04/g" debian/gbp.conf
 git commit -a
 gbp buildpackage
