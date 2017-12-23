@@ -1,0 +1,20 @@
+#!/bin/bash
+
+
+
+if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
+  
+		ping -c3 www.google.fr > /dev/null
+		test="$?"
+		if [ "$test" -eq 0 ];then
+			CTparental -i -nodep -nomanuel
+		fi
+	
+else
+	
+    echo "postinst called with unknown argument '$1'" 1>&2
+    exit 0
+fi
+
+
+exit 0
