@@ -3,6 +3,7 @@ ctparental (4.20.27-1.0) unstable; urgency=medium
   * ajout du Safesearch  pour qwant.com qui redirige automatiquement vers qwantjunior.com
   * ajour du suport de l'espagnol durant l'installation et sur les pages d'interception
   e2guardian/dansguardian.
+  * Ajout du Safesearch bing en https.
     
  -- Guillaume marsat <CTparental1@laposte.net>  Sat, 23 Dec 2017 08:47:48 +0100
  
