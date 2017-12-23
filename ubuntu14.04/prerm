@@ -1,0 +1,5 @@
+#!/bin/bash
+CTparental -u -nodep -nomanuel
+exit 0
+
+
