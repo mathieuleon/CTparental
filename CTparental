@@ -839,6 +839,12 @@ fi
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEYOUTUBE" )" -eq 1 ];then
 	echo "address=/www.youtube.com/$forcesafesearchgoogle" 
 fi
+## on force a passer par strict.bing.com de maninière transparente
+if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
+	echo "address=/.bing.com/$(host -ta strict.bing.com |cut -d" " -f4 | grep -v alias | sed '1q;d')"
+fi
+
+
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
 	echo "# on force a passer par safe.duckduckgo.com" 
 	echo "address=/safe.duckduckgo.com/$(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
@@ -852,13 +858,6 @@ if [ "$(cat < $SAFE_CONF | grep -c "^SAFEQWANT" )" -eq 1 ];then
 	echo "address=/www.qwantjunior.com/$(host -ta www.qwantjunior.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
 	## les requette sur http(s)://www.qwant.com sont rediriger vers lighttpd qui les renvois vers www.qwantjunior.com
 	echo "address=/www.qwant.com/$ADMIN_IP4" 
-fi
-
-if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
-	## on attribut une seul ip pour les recherches sur bing de manière a pouvoir bloquer sont acces en https dans iptables.
-	## et ainci forcer le safesearch via privoxy.
-	## tous les sous domaines type fr.bing.com ... retourneront l'ip de www.bing.com
-	echo "address=/.bing.com/$(host -ta bing.com|cut -d" " -f4 | grep -v alias | sed '1q;d')"
 fi
 
 echo "address=/.dailymotion.com/$(host -ta dailymotion.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
@@ -1148,12 +1147,6 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
       # Force privoxy a utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 	  $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
-	  if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
-		  # on interdit l'accès a bing en https .
-		  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
-		  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
-	  fi
-	  
 
 	    ipdailymotion=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.dailymotion.com/" | cut -d "/" -f3)
 		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
