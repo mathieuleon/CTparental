@@ -136,6 +136,7 @@ SAFEGOOGLE
 SAFEYOUTUBE
 SAFEBING
 SAFEDUCK
+SAFEQWANT
 EOF
 
 fi
@@ -840,11 +841,17 @@ if [ "$(cat < $SAFE_CONF | grep -c "^SAFEYOUTUBE" )" -eq 1 ];then
 fi
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
 	echo "# on force a passer par safe.duckduckgo.com" 
-	#ipsafeduckduckgo=$(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias | sed '1q;d')
 	echo "address=/safe.duckduckgo.com/$(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
 	
 	## les requette sur http(s)://duckduckgo.com sont rediriger vers lighttpd qui les renvois vers safe.duckduckgo.com
 	echo "address=/duckduckgo.com/$ADMIN_IP4" 
+fi
+
+if [ "$(cat < $SAFE_CONF | grep -c "^SAFEQWANT" )" -eq 1 ];then
+	echo "# on force a passer par www.qwantjunior.com" 
+	echo "address=/www.qwantjunior.com/$(host -ta www.qwantjunior.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
+	## les requette sur http(s)://www.qwant.com sont rediriger vers lighttpd qui les renvois vers www.qwantjunior.com
+	echo "address=/www.qwant.com/$ADMIN_IP4" 
 fi
 
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
@@ -1432,6 +1439,17 @@ fastcgi.server = (
 	}
 }
 
+\$HTTP["host"] =~ "www.qwant.com" {
+	\$SERVER["socket"] == "$ADMIN_IP4:443" {
+	ssl.engine = "enable"
+	ssl.pemfile = "$PEMSRVDIR/qwant.pem" 
+	url.redirect  = (".*" => "https://www.qwantjunior.com\$0" )
+	}
+	\$SERVER["socket"] == "$ADMIN_IP4:80" {
+	url.redirect  = (".*" => "https://www.qwantjunior.com\$0" )
+	}
+}
+
 \$SERVER["socket"] == "$PRIVATE_IP4:80" {
 server.document-root = "$DIRHTML"
 	\$HTTP["host"] != "privet.ct.localhost" {
@@ -1633,6 +1651,11 @@ openssl genrsa 1024 > "$DIR_TMP"/duckduckgo.key 2> /dev/null
 openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key "$DIR_TMP"/duckduckgo.key > "$DIR_TMP"/duckduckgo.csr 
 openssl x509 -req -in "$DIR_TMP"/duckduckgo.csr -out "$DIR_TMP"/duckduckgo.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl 
 
+## création du certificat www.qwant.com pour redirection vers www.qwantjunior.com
+openssl genrsa 1024 > "$DIR_TMP"/qwant.key 2> /dev/null
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=www.qwant.com" -key "$DIR_TMP"/qwant.key > "$DIR_TMP"/qwant.csr 
+openssl x509 -req -in "$DIR_TMP"/qwant.csr -out "$DIR_TMP"/qwant.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl 
+
 ## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
 openssl genrsa 1024 > "$DIR_TMP"/search.yahoo.com.key 2> /dev/null
 openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key "$DIR_TMP"/search.yahoo.com.key > "$DIR_TMP"/search.yahoo.com.csr 
@@ -1646,6 +1669,7 @@ cp -f "$DIR_TMP"/cactparental.crt "$REPCAMOZ"
 cat "$DIR_TMP"/privet.ct.localhost.key "$DIR_TMP"/privet.ct.localhost.crt > "$PEMSRVDIR"/privet.ct.localhost.pem
 cat "$DIR_TMP"/admin.ct.localhost.key "$DIR_TMP"/admin.ct.localhost.crt > "$PEMSRVDIR"/admin.ct.localhost.pem
 cat "$DIR_TMP"/duckduckgo.key "$DIR_TMP"/duckduckgo.crt > "$PEMSRVDIR"/duckduckgo.pem
+cat "$DIR_TMP"/qwant.key "$DIR_TMP"/qwant.crt > "$PEMSRVDIR"/qwant.pem
 cat "$DIR_TMP"/search.yahoo.com.key "$DIR_TMP"/search.yahoo.com.crt > "$PEMSRVDIR"/search.yahoo.com.pem
 rm -rf "$DIR_TMP"
 
@@ -2062,11 +2086,12 @@ $NETWORKINGrestart
 	modprobe -r ip_conntrack_ftp	
 	$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" "$FILEMODULESLOAD"
 	###
-
-   rm -f "$PEMSRVDIR"/localhost.pem
-   rm -f "$PEMSRVDIR"/duckduckgo.pem
-   rm -f "$CADIR"/cactparental.crt
-   rm -f "$REPCAMOZ"/cactparental.crt
+	rm -f "$PEMSRVDIR"/privet.ct.localhost.pem
+	rm -f "$PEMSRVDIR"/admin.ct.localhost.pem
+	rm -f "$PEMSRVDIR"/duckduckgo.pem
+	rm -f "$PEMSRVDIR"/qwant.pem
+	rm -f "$PEMSRVDIR"/search.yahoo.com.pem
+  
    for user in $(listeusers) ; do	
 		HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
 		if [ -d "$HOMEPCUSER" ];then
