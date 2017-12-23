@@ -1,5 +1,5 @@
 %define	name ctparental
-%define version	4.20.26e
+%define version	4.20.27e
 %define release	1
 
 Summary: Parental Controls
@@ -54,6 +54,7 @@ exit 0
 /etc/CTparental/dist.conf
 /usr/bin/CTparental
 /usr/bin/CTparental-bl-infos
+/usr/share/CTparental/confe2guardian/template-es.html
 /usr/share/CTparental/confe2guardian/template-fr.html
 /usr/share/CTparental/confe2guardian/template.html
 /usr/share/CTparental/www/CTadmin/bl_categories_help.php
