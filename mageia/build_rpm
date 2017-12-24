@@ -25,7 +25,7 @@ echo '%_topdir                %(echo $HOME)/rpmbuild
 # If you want your packages to have your own distsuffix instead of mdv, add it
 # here like this
 #%distsuffix             foo
-' > .rpmmacros
+' > $HOME/.rpmmacros
 
 cd ..
 
