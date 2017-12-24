@@ -27,6 +27,8 @@ echo '%_topdir                %(echo $HOME)/rpmbuild
 #%distsuffix             foo
 ' > .rpmmacros
 
+cd ..
+
 cp -rf CTparental/* $HOME/rpmbuild/BUILD/
 cp -f CTparental/mageia/ctparental.spec $HOME/rpmbuild/SPECS/
 
