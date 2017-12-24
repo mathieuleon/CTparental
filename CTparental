@@ -1163,11 +1163,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
 			 # e2guardian ne gérent pas encore ipv6 on ce contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
 			 $IPTABLES6 -t nat -A ctparental -d 2000::/3 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
-			 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
-				  # on interdit l'accès a bing en https .
-				  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
-				  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
-			 fi
+
 			 $IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
 
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"

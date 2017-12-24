@@ -1,6 +1,6 @@
 %define	name ctparental
 %define version	4.20.27e
-%define release	1
+%define release	2
 
 Summary: Parental Controls
 Name: %{name}
