@@ -1551,9 +1551,9 @@ echo "Defaults:$USERHTTPD     !requiretty" >> /etc/sudoers
 
 if [ "$(grep -c "^$USERHTTPD " /etc/sudoers )" -ge "1" ] ; then
 	$SED "/^$USERHTTPD /d" /etc/sudoers
- #   $SED "s?^$USERHTTPD.*?$USERHTTPD local=(root) NOPASSWD:/usr/bin/CTparental *?g" /etc/sudoers
+ #   $SED "s?^$USERHTTPD.*?$USERHTTPD localhost=(root) NOPASSWD:/usr/bin/CTparental *?g" /etc/sudoers
 fi
-echo "$USERHTTPD local=(root) NOPASSWD:/usr/bin/CTparental *" >> /etc/sudoers
+echo "$USERHTTPD localhost=(root) NOPASSWD:/usr/bin/CTparental *" >> /etc/sudoers
 
 	
 unset sudotest
