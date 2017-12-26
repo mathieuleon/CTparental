@@ -1544,14 +1544,12 @@ chmod 664 "${DIRE2G}lists/bannedsitelist"
 
 if [ "$(grep -c Defaults:"$USERHTTPD" /etc/sudoers )" -ge "1" ] ; then
 	$SED "/^Defaults:$USERHTTPD/d" /etc/sudoers
- #   $SED "s?^Defaults:$USERHTTPD.*requiretty.*?Defaults:$USERHTTPD     \!requiretty?g" /etc/sudoers
 fi
-echo "Defaults:$USERHTTPD     !requiretty" >> /etc/sudoers
+echo "Defaults:$USERHTTPD !requiretty" >> /etc/sudoers
 
 
 if [ "$(grep -c "^$USERHTTPD " /etc/sudoers )" -ge "1" ] ; then
 	$SED "/^$USERHTTPD /d" /etc/sudoers
- #   $SED "s?^$USERHTTPD.*?$USERHTTPD localhost=(root) NOPASSWD:/usr/bin/CTparental *?g" /etc/sudoers
 fi
 echo "$USERHTTPD localhost=(root) NOPASSWD:/usr/bin/CTparental *" >> /etc/sudoers
 
