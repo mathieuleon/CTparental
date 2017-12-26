@@ -848,7 +848,6 @@ fi
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
 	echo "# on force a passer par safe.duckduckgo.com" 
 	echo "address=/safe.duckduckgo.com/$(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
-	
 	## les requette sur http(s)://duckduckgo.com sont rediriger vers lighttpd qui les renvois vers safe.duckduckgo.com
 	echo "address=/duckduckgo.com/$ADMIN_IP4" 
 fi
@@ -861,11 +860,6 @@ if [ "$(cat < $SAFE_CONF | grep -c "^SAFEQWANT" )" -eq 1 ];then
 fi
 
 echo "address=/.dailymotion.com/$(host -ta dailymotion.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
-
-## on force a passer par search.yahoo.com pour redirection url par lighttpd
-#ipsearchyahoo=`host -ta search.yahoo.com|cut -d" " -f4 | grep [0-9]`
-#echo "address=/safe.search.yahoo.com/$ipsearchyahoo" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
-#echo "address=/search.yahoo.com/127.0.0.1" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 
 # on bloque les moteurs de recherche pas asser sur
 echo "address=/search.yahoo.com/$PRIVATE_IP4"
@@ -1654,7 +1648,7 @@ openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.qwant.com,DNS:qwant.
 
 ## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
 openssl genrsa 1024 > "$DIR_TMP"/search.yahoo.com.key 2> /dev/null
-openssl req -new -sha512 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key "$DIR_TMP"/search.yahoo.com.key > "$DIR_TMP"/search.yahoo.com.csr 
+openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key "$DIR_TMP"/search.yahoo.com.key > "$DIR_TMP"/search.yahoo.com.csr 
 openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.search.yahoo.com,DNS:search.yahoo.com")  -in "$DIR_TMP"/search.yahoo.com.csr -out "$DIR_TMP"/search.yahoo.com.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl 
 
 ## instalation de la CA dans les ca de confiance.
