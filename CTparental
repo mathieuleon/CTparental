@@ -2957,10 +2957,10 @@ then run the command CTparental -ipton") $Fcolor"
 			 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé . 
 			  if [ "$(updatelistgctoff)" -eq 1 ];then
 				applistegctoff
-				updatecauser
 				iptablesreload
 			  fi
 	   fi
+	   updatecauser
       ;;   
     -dgreload )
       $E2GUARDIANrestart     
