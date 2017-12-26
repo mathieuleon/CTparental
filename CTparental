@@ -2094,22 +2094,33 @@ $NETWORKINGrestart
     $UPDATECASYSTEM
    for user in $(listeusers) ; do	
 		HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-		if [ -d "$HOMEPCUSER" ];then
-			#on desinstall le certificat dans tous les prifiles firefoxe utilisateur existant 
-			listprofile=$(cat < "$HOMEPCUSER"/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2)
-			for profilefirefox in $listprofile ; do
-				# on supprime tous les anciens certificats firefox iceweachel
-				while true
-				do
-					certutil -D -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -n"CActparental - ctparental" 2&> /dev/null
-					if [ ! $? -eq 0 ];then 
-						break
-					fi
-				done
+		#on install le cacertificat dans tous les profile firfoxe  
+		for cert8db in $(find $HOMEPCUSER/ -name "cert8.db"  | grep -v Trash )
+		do
+			cert8dbdir=$(dirname ${cert8db});
+			# on supprime tous les anciens certificats
+			while true
+			do
+				certutil -D -d "$cert8dbdir"/ -n"CActparental - ctparental" 2&> /dev/null
+				if [ ! $? -eq 0 ];then 
+					break
+				fi
 			done
-			# on supprime tous les anciens certificats chrome chromium
-			certutil -D -d sql:"$HOMEPCUSER"/.pki/nssdb/  -n"CActparental - ctparental" 2&> /dev/null
-		fi
+		done
+		
+		#on install le cacertificat dans tous les profile chrome chromium  
+		for cert9db in $(find $HOMEPCUSER/ -name "cert9.db" | grep -v Trash)
+		do
+			cert9dbdir=$(dirname ${cert9db});
+			# on supprime tous les anciens certificats
+			while true
+			do
+				certutil -D -d sql:"$cert9dbdir"/ -n"CActparental - ctparental" 2&> /dev/null
+				if [ ! $? -eq 0 ];then 
+					break
+				fi
+			done
+		done
    done
    #unsetproxy
    # on réouvre l'ipv6
