@@ -1205,27 +1205,37 @@ updatecauser () {
 echo "<updatecauser>"
 for user in $(listeusers) ; do	
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-	if [ -f "$HOMEPCUSER"/.mozilla/firefox/profiles.ini ] ;then
-			#on install le certificat dans tous les prifile firefoxe utilisateur existant 
-		profileliste=$(cat < "$HOMEPCUSER"/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2)
-		for profilefirefox in $profileliste ; do
-			if [ -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ ];then
-				# on supprime tous les anciens certificats
-				while true
-				do
-					certutil -D -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -n"CActparental - ctparental" 2&> /dev/null
-					if [ ! $? -eq 0 ];then 
-						break
-					fi
-				done
-				# on ajoute le nouveau certificat
-				certutil -A -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
+	
+	#on install le cacertificat dans tous les profile firfoxe  
+	for cert8db in $(find $HOMEPCUSER/ -name "cert8.db"  | grep -v Trash )
+	do
+		cert8dbdir=$(dirname ${cert8db});
+		# on supprime tous les anciens certificats
+		while true
+		do
+			certutil -D -d "$cert8dbdir"/ -n"CActparental - ctparental" 2&> /dev/null
+			if [ ! $? -eq 0 ];then 
+				break
 			fi
 		done
-		#pour chrome et chromium
-		certutil -D -d sql:"$HOMEPCUSER"/.pki/nssdb/  -n"CActparental - ctparental" 2&> /dev/null
-		certutil -A -d sql:"$HOMEPCUSER"/.pki/nssdb/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
-	fi
+		# on ajoute le nouveau certificat
+		certutil -A -d "$cert8dbdir"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
+	done
+	
+    #on install le cacertificat dans tous les profile chrome chromium  
+	for cert9db in $(find $HOMEPCUSER/ -name "cert9.db" | grep -v Trash)
+	do
+		cert9dbdir=$(dirname ${cert9db});
+		# on supprime tous les anciens certificats
+		while true
+		do
+			certutil -D -d sql:"$cert9dbdir"/ -n"CActparental - ctparental" 2&> /dev/null
+			if [ ! $? -eq 0 ];then 
+				break
+			fi
+		done
+		certutil -A -d sql:"$cert9dbdir"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
+	done
 done
 echo "</updatecauser>"
 }
@@ -3002,6 +3012,9 @@ then run the command CTparental -ipton") $Fcolor"
       ;;
 	-imp )
 	  importconf
+      ;;
+    -cainstall )
+      updatecauser
       ;;
       
    *)
