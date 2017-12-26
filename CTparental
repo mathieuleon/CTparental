@@ -222,6 +222,7 @@ DIRadminHTML=${DIRadminHTML:="/var/www/CTadmin"}
 PASSWORDFILEHTTPD=${PASSWORDFILEHTTPD:="/etc/lighttpd/lighttpd-htdigest.user"}
 REALMADMINHTTPD=${REALMADMINHTTPD:="interface admin"}
 CADIR=${CADIR:="/usr/share/ca-certificates/ctparental"}
+UPDATECASYSTEM=${UPDATECASYSTEM:="update-ca-certificates"}
 PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
 CMDINSTALL=""
 IPTABLES=${IPTABLES:="/sbin/iptables"}
@@ -1659,7 +1660,7 @@ cat "$DIR_TMP"/duckduckgo.key "$DIR_TMP"/duckduckgo.crt > "$PEMSRVDIR"/duckduckg
 cat "$DIR_TMP"/qwant.key "$DIR_TMP"/qwant.crt > "$PEMSRVDIR"/qwant.pem
 cat "$DIR_TMP"/search.yahoo.com.key "$DIR_TMP"/search.yahoo.com.crt > "$PEMSRVDIR"/search.yahoo.com.pem
 rm -rf "$DIR_TMP"
-
+$UPDATECASYSTEM
 updatecauser
 echo "</CActparental>"
 }
