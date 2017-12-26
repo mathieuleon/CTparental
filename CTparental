@@ -2078,15 +2078,17 @@ $NETWORKINGrestart
 	rm -f "$PEMSRVDIR"/duckduckgo.pem
 	rm -f "$PEMSRVDIR"/qwant.pem
 	rm -f "$PEMSRVDIR"/search.yahoo.com.pem
-  
+	rm -f "$CADIR"/cactparental.crt
+    rm -f "$DIRHTML"/cactparental.crt
+	rm -f "$REPCAMOZ"/cactparental.crt
+    $UPDATECASYSTEM
    for user in $(listeusers) ; do	
 		HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
 		if [ -d "$HOMEPCUSER" ];then
 			#on desinstall le certificat dans tous les prifiles firefoxe utilisateur existant 
 			listprofile=$(cat < "$HOMEPCUSER"/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2)
 			for profilefirefox in $listprofile ; do
-				#firefox iceweachel
-				# on supprime tous les anciens certificats
+				# on supprime tous les anciens certificats firefox iceweachel
 				while true
 				do
 					certutil -D -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -n"CActparental - ctparental" 2&> /dev/null
@@ -2095,6 +2097,8 @@ $NETWORKINGrestart
 					fi
 				done
 			done
+			# on supprime tous les anciens certificats chrome chromium
+			certutil -D -d sql:"$HOMEPCUSER"/.pki/nssdb/  -n"CActparental - ctparental" 2&> /dev/null
 		fi
    done
    #unsetproxy
