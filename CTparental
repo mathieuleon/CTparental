@@ -2083,7 +2083,7 @@ $NETWORKINGrestart
 	fi
 	modprobe -r ip_conntrack_ftp	
 	$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" "$FILEMODULESLOAD"
-	###
+
 	rm -f "$PEMSRVDIR"/ct.local.pem
 	rm -f "$PEMSRVDIR"/duckduckgo.pem
 	rm -f "$PEMSRVDIR"/qwant.pem
@@ -2094,7 +2094,6 @@ $NETWORKINGrestart
     $UPDATECASYSTEM
    for user in $(listeusers) ; do	
 		HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-		#on install le cacertificat dans tous les profile firfoxe  
 		for cert8db in $(find $HOMEPCUSER/ -name "cert8.db"  | grep -v Trash )
 		do
 			cert8dbdir=$(dirname ${cert8db});
@@ -2107,8 +2106,6 @@ $NETWORKINGrestart
 				fi
 			done
 		done
-		
-		#on install le cacertificat dans tous les profile chrome chromium  
 		for cert9db in $(find $HOMEPCUSER/ -name "cert9.db" | grep -v Trash)
 		do
 			cert9dbdir=$(dirname ${cert9db});
