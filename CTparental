@@ -525,9 +525,9 @@ myfilters   = +filter{html-annoyances} +filter{js-annoyances} +filter{all-popups
               +filter{webbugs} +filter{banners-by-size}
 allow-ads   = -block -filter{banners-by-size} -filter{banners-by-link}
 { fragile }
-http://admin.ct.localhost.*
-http://privet.ct.localhost.*
-http://localhost.*
+http://admin.ct.local.*
+http://privet.ct.local.*
+http://local.*
 # BING Add &adlt=strict
 {+redirect{s@$@&adlt=strict@}}
 .bing./.*[&?]q=
@@ -541,10 +541,10 @@ http://localhost.*
  .dailymotion.*/.*enable=(?!true)
              
 
-{+redirect{s@http://.*/images/close.*.png@http://privet.ct.localhost/images/X32px.png@}}
+{+redirect{s@http://.*/images/close.*.png@http://privet.ct.local/images/X32px.png@}}
 .*
 
-{+redirect{s@http://.*/close.*.png@http://privet.ct.localhost/images/X32px.png@}}
+{+redirect{s@http://.*/close.*.png@http://privet.ct.local/images/X32px.png@}}
 .*
 
               
@@ -795,7 +795,7 @@ do
 done < $CATEGORIES_ENABLED
 
 { 
-echo 'localhost' 
+echo 'local' 
 echo '127.0.0.1' 
 echo "$PRIVATE_IP4"
 echo "$ADMIN_IP4"
@@ -868,6 +868,14 @@ echo "address=/.dailymotion.com/$(host -ta dailymotion.com|cut -d" " -f4 | grep 
 
 # on bloque les moteurs de recherche pas asser sur
 echo "address=/search.yahoo.com/$PRIVATE_IP4"
+
+# pour les navigateur ne prenent pas en compte /etc/hosts comme google chrome
+echo "address=/admin.ct.local/$ADMIN_IP4"
+echo "address=/admin.ct.local/$ADMIN_IP6"
+echo "address=/privet.ct.local/$PRIVATE_IP4"
+echo "address=/privet.ct.local/$PRIVATE_IP6"
+
+
 } > $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 
 
@@ -1218,6 +1226,9 @@ for user in $(listeusers) ; do
 				certutil -A -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
 			fi
 		done
+		#pour chrome et chromium
+		certutil -D -d sql:"$HOMEPCUSER"/.pki/nssdb/  -n"CActparental - ctparental" 2&> /dev/null
+		certutil -A -d sql:"$HOMEPCUSER"/.pki/nssdb/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
 	fi
 done
 echo "</updatecauser>"
@@ -1245,7 +1256,7 @@ server=$DNS1v4
 server=$DNS2v4
 server=$DNS1v6
 server=$DNS2v6
-address=/localhost/127.0.0.1
+address=/local/127.0.0.1
 address=/#/$PRIVATE_IP4 #redirige vers $PRIVATE_IP4 pour tout ce qui n'a pas été resolu dans les listes blanches
 EOF
 
@@ -1389,7 +1400,7 @@ cat << EOF > "$CTPARENTALCONFHTTPD"
 
 fastcgi.server = (
     ".php" => (
-      "localhost" => ( 
+      "local" => ( 
         "bin-path" => "/usr/bin/php-cgi",
         "socket" => "/run/lighttpd/php-fastcgi.sock",
         "max-procs" => 4, # default value
@@ -1440,16 +1451,16 @@ fastcgi.server = (
 
 \$SERVER["socket"] == "$PRIVATE_IP4:80" {
 server.document-root = "$DIRHTML"
-	\$HTTP["host"] != "privet.ct.localhost" {
+	\$HTTP["host"] != "privet.ct.local" {
 		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 	}
 }
 
 \$SERVER["socket"] == "$PRIVATE_IP4:443" {
 ssl.engine = "enable"
-ssl.pemfile = "$PEMSRVDIR/privet.ct.localhost.pem" 
+ssl.pemfile = "$PEMSRVDIR/ct.local.pem" 
 server.document-root = "$DIRHTML"
-	\$HTTP["host"] != "privet.ct.localhost" {
+	\$HTTP["host"] != "privet.ct.local" {
 		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 	}
 }
@@ -1457,22 +1468,22 @@ server.document-root = "$DIRHTML"
 
 \$SERVER["socket"] == "[$PRIVATE_IP6]:80" {
 server.document-root = "$DIRHTML"
-	\$HTTP["host"] != "privet.ct.localhost" {
+	\$HTTP["host"] != "privet.ct.local" {
 		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 	}
 }
 
 \$SERVER["socket"] == "[$PRIVATE_IP6]:443" {
 	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/privet.ct.localhost.pem" 
+	ssl.pemfile = "$PEMSRVDIR/ct.local.pem" 
 	server.document-root = "$DIRHTML"
-	\$HTTP["host"] != "privet.ct.localhost" {
+	\$HTTP["host"] != "privet.ct.local" {
 		url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 	}
 }
 
 
-\$HTTP["host"] =~ "admin.ct.localhost" {
+\$HTTP["host"] =~ "admin.ct.local" {
 	auth.require = ( "" =>
                    (
                      "method"  => "digest",
@@ -1482,26 +1493,26 @@ server.document-root = "$DIRHTML"
                  )
 	server.document-root = "$DIRadminHTML"
 	\$SERVER["socket"] == "$ADMIN_IP4:80" {
-		url.redirect  = (".*" => "https://admin.ct.localhost\$0" )
+		url.redirect  = (".*" => "https://admin.ct.local\$0" )
 	}
 	\$SERVER["socket"] == "$ADMIN_IP4:443" {
 	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/admin.ct.localhost.pem" 
+	ssl.pemfile = "$PEMSRVDIR/ct.local.pem" 
 	}
 	\$SERVER["socket"] == "[$ADMIN_IP6]:80" {
-		url.redirect  = (".*" => "https://admin.ct.localhost\$0" )
+		url.redirect  = (".*" => "https://admin.ct.local\$0" )
 	}
 	\$SERVER["socket"] == "[$ADMIN_IP6]:443" {
 	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/admin.ct.localhost.pem" 
+	ssl.pemfile = "$PEMSRVDIR/ct.local.pem" 
 	}
 }
 	
 \$HTTP["host"] =~ "$ADMIN_IP6" {
-url.redirect  = (".*" => "https://admin.ct.localhost" )
+url.redirect  = (".*" => "https://admin.ct.local" )
 }
 \$HTTP["host"] =~ "$ADMIN_IP4" {
-url.redirect  = (".*" => "https://admin.ct.localhost" )
+url.redirect  = (".*" => "https://admin.ct.local" )
 }
 
 
@@ -1545,9 +1556,9 @@ echo "Defaults:$USERHTTPD     !requiretty" >> /etc/sudoers
 
 if [ "$(grep -c "^$USERHTTPD " /etc/sudoers )" -ge "1" ] ; then
 	$SED "/^$USERHTTPD /d" /etc/sudoers
- #   $SED "s?^$USERHTTPD.*?$USERHTTPD localhost=(root) NOPASSWD:/usr/bin/CTparental *?g" /etc/sudoers
+ #   $SED "s?^$USERHTTPD.*?$USERHTTPD local=(root) NOPASSWD:/usr/bin/CTparental *?g" /etc/sudoers
 fi
-echo "$USERHTTPD localhost=(root) NOPASSWD:/usr/bin/CTparental *" >> /etc/sudoers
+echo "$USERHTTPD local=(root) NOPASSWD:/usr/bin/CTparental *" >> /etc/sudoers
 
 	
 unset sudotest
@@ -1622,40 +1633,35 @@ mkdir "$CADIR" 2> /dev/null
 
 ## création de la clef priver ca et du certificat ca
 openssl genrsa  1024 > "$DIR_TMP"/cactparental.key 2> /dev/null
-openssl req -new -x509 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 10000 -key "$DIR_TMP"/cactparental.key > "$DIR_TMP"/cactparental.crt 
+openssl req -new -x509 -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 5000 -key "$DIR_TMP"/cactparental.key > "$DIR_TMP"/cactparental.crt 
 
-## création clef et certificat admin.ct.localhost et signature par la ca
-openssl genrsa 1024 > "$DIR_TMP"/admin.ct.localhost.key 2> /dev/null
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=admin.ct.localhost" -key "$DIR_TMP"/admin.ct.localhost.key > "$DIR_TMP"/admin.ct.localhost.csr 
-openssl x509 -req -in "$DIR_TMP"/admin.ct.localhost.csr -out "$DIR_TMP"/admin.ct.localhost.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
+## création clef et certificat *.ct.local et signature par la ca
 
-## création clef et certificat privet.ct.localhost et signature par la ca
-openssl genrsa 1024 > "$DIR_TMP"/privet.ct.localhost.key 2> /dev/null
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=privet.ct.localhost" -key "$DIR_TMP"/privet.ct.localhost.key > "$DIR_TMP"/privet.ct.localhost.csr 
-openssl x509 -req -in "$DIR_TMP"/privet.ct.localhost.csr -out "$DIR_TMP"/privet.ct.localhost.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl  
+openssl genrsa 1024 > "$DIR_TMP"/ct.local.key 2> /dev/null
+openssl req -new -sha256  -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=*.ct.local" -key "$DIR_TMP"/ct.local.key > "$DIR_TMP"/ct.local.csr 
+openssl x509 -req -extfile <(printf "subjectAltName=DNS:admin.ct.local,DNS:privet.ct.local") -in "$DIR_TMP"/ct.local.csr -out "$DIR_TMP"/ct.local.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl 
 
 ## création du certificat duckduckgo pour redirection vers safe.duckduckgo.com
 openssl genrsa 1024 > "$DIR_TMP"/duckduckgo.key 2> /dev/null
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key "$DIR_TMP"/duckduckgo.key > "$DIR_TMP"/duckduckgo.csr 
-openssl x509 -req -in "$DIR_TMP"/duckduckgo.csr -out "$DIR_TMP"/duckduckgo.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl 
+openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key "$DIR_TMP"/duckduckgo.key > "$DIR_TMP"/duckduckgo.csr 
+openssl x509 -req  -extfile <(printf "subjectAltName=DNS:duckduckgo.com,DNS:www.duckduckgo.com") -in "$DIR_TMP"/duckduckgo.csr -out "$DIR_TMP"/duckduckgo.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl 
 
 ## création du certificat www.qwant.com pour redirection vers www.qwantjunior.com
 openssl genrsa 1024 > "$DIR_TMP"/qwant.key 2> /dev/null
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=www.qwant.com" -key "$DIR_TMP"/qwant.key > "$DIR_TMP"/qwant.csr 
-openssl x509 -req -in "$DIR_TMP"/qwant.csr -out "$DIR_TMP"/qwant.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl 
+openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=www.qwant.com" -key "$DIR_TMP"/qwant.key > "$DIR_TMP"/qwant.csr 
+openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.qwant.com,DNS:qwant.com") -in "$DIR_TMP"/qwant.csr -out "$DIR_TMP"/qwant.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl 
 
 ## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
 openssl genrsa 1024 > "$DIR_TMP"/search.yahoo.com.key 2> /dev/null
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key "$DIR_TMP"/search.yahoo.com.key > "$DIR_TMP"/search.yahoo.com.csr 
-openssl x509 -req -in "$DIR_TMP"/search.yahoo.com.csr -out "$DIR_TMP"/search.yahoo.com.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl 
+openssl req -new -sha512 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key "$DIR_TMP"/search.yahoo.com.key > "$DIR_TMP"/search.yahoo.com.csr 
+openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.search.yahoo.com,DNS:search.yahoo.com")  -in "$DIR_TMP"/search.yahoo.com.csr -out "$DIR_TMP"/search.yahoo.com.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl 
 
 ## instalation de la CA dans les ca de confiance.
 cp -f "$DIR_TMP"/cactparental.crt "$CADIR"/
 cp -f "$DIR_TMP"/cactparental.crt "$DIRHTML"
 cp -f "$DIR_TMP"/cactparental.crt "$REPCAMOZ"
 ## instalation des certificats serveur
-cat "$DIR_TMP"/privet.ct.localhost.key "$DIR_TMP"/privet.ct.localhost.crt > "$PEMSRVDIR"/privet.ct.localhost.pem
-cat "$DIR_TMP"/admin.ct.localhost.key "$DIR_TMP"/admin.ct.localhost.crt > "$PEMSRVDIR"/admin.ct.localhost.pem
+cat "$DIR_TMP"/ct.local.key "$DIR_TMP"/ct.local.crt > "$PEMSRVDIR"/ct.local.pem
 cat "$DIR_TMP"/duckduckgo.key "$DIR_TMP"/duckduckgo.crt > "$PEMSRVDIR"/duckduckgo.pem
 cat "$DIR_TMP"/qwant.key "$DIR_TMP"/qwant.crt > "$PEMSRVDIR"/qwant.pem
 cat "$DIR_TMP"/search.yahoo.com.key "$DIR_TMP"/search.yahoo.com.crt > "$PEMSRVDIR"/search.yahoo.com.pem
@@ -1669,10 +1675,10 @@ echo "</CActparental>"
 install () {
 
 {
-echo "$ADMIN_IP4 admin.ct.localhost "
-echo "$ADMIN_IP6 admin.ct.localhost " 	
-echo "$PRIVATE_IP4 privet.ct.localhost " 
-echo "$PRIVATE_IP6 privet.ct.localhost " 
+echo "$ADMIN_IP4 admin.ct.local "
+echo "$ADMIN_IP6 admin.ct.local " 	
+echo "$PRIVATE_IP4 privet.ct.local " 
+echo "$PRIVATE_IP6 privet.ct.local " 
 } >> /etc/hosts
 # on reactive l'ipv6 si besoins.
 if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
@@ -1993,7 +1999,7 @@ desactivegourpectoff () {
 
 uninstall () {
 	
-$SED "/.ct.localhost/d" /etc/hosts
+$SED "/.ct.local/d" /etc/hosts
 
    # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
    if [ $nomanuel -eq 0 ]; then 
@@ -2074,8 +2080,7 @@ $NETWORKINGrestart
 	modprobe -r ip_conntrack_ftp	
 	$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" "$FILEMODULESLOAD"
 	###
-	rm -f "$PEMSRVDIR"/privet.ct.localhost.pem
-	rm -f "$PEMSRVDIR"/admin.ct.localhost.pem
+	rm -f "$PEMSRVDIR"/ct.local.pem
 	rm -f "$PEMSRVDIR"/duckduckgo.pem
 	rm -f "$PEMSRVDIR"/qwant.pem
 	rm -f "$PEMSRVDIR"/search.yahoo.com.pem
