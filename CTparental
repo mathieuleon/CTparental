@@ -222,6 +222,7 @@ DIRadminHTML=${DIRadminHTML:="/var/www/CTadmin"}
 PASSWORDFILEHTTPD=${PASSWORDFILEHTTPD:="/etc/lighttpd/lighttpd-htdigest.user"}
 REALMADMINHTTPD=${REALMADMINHTTPD:="interface admin"}
 CADIR=${CADIR:="/usr/share/ca-certificates/ctparental"}
+UPDATECASYSTEM=${UPDATECASYSTEM:="update-ca-certificates"}
 PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
 CMDINSTALL=""
 IPTABLES=${IPTABLES:="/sbin/iptables"}
@@ -1203,27 +1204,37 @@ updatecauser () {
 echo "<updatecauser>"
 for user in $(listeusers) ; do	
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-	if [ -f "$HOMEPCUSER"/.mozilla/firefox/profiles.ini ] ;then
-			#on install le certificat dans tous les prifile firefoxe utilisateur existant 
-		profileliste=$(cat < "$HOMEPCUSER"/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2)
-		for profilefirefox in $profileliste ; do
-			if [ -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ ];then
-				# on supprime tous les anciens certificats
-				while true
-				do
-					certutil -D -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -n"CActparental - ctparental" 2&> /dev/null
-					if [ ! $? -eq 0 ];then 
-						break
-					fi
-				done
-				# on ajoute le nouveau certificat
-				certutil -A -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
+	
+	#on install le cacertificat dans tous les profile firfoxe  
+	for cert8db in $(find $HOMEPCUSER/ -name "cert8.db"  | grep -v Trash )
+	do
+		cert8dbdir=$(dirname ${cert8db});
+		# on supprime tous les anciens certificats
+		while true
+		do
+			certutil -D -d "$cert8dbdir"/ -n"CActparental - ctparental" 2&> /dev/null
+			if [ ! $? -eq 0 ];then 
+				break
 			fi
 		done
-		#pour chrome et chromium
-		certutil -D -d sql:"$HOMEPCUSER"/.pki/nssdb/  -n"CActparental - ctparental" 2&> /dev/null
-		certutil -A -d sql:"$HOMEPCUSER"/.pki/nssdb/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
-	fi
+		# on ajoute le nouveau certificat
+		certutil -A -d "$cert8dbdir"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
+	done
+	
+    #on install le cacertificat dans tous les profile chrome chromium  
+	for cert9db in $(find $HOMEPCUSER/ -name "cert9.db" | grep -v Trash)
+	do
+		cert9dbdir=$(dirname ${cert9db});
+		# on supprime tous les anciens certificats
+		while true
+		do
+			certutil -D -d sql:"$cert9dbdir"/ -n"CActparental - ctparental" 2&> /dev/null
+			if [ ! $? -eq 0 ];then 
+				break
+			fi
+		done
+		certutil -A -d sql:"$cert9dbdir"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
+	done
 done
 echo "</updatecauser>"
 }
@@ -1658,7 +1669,7 @@ cat "$DIR_TMP"/duckduckgo.key "$DIR_TMP"/duckduckgo.crt > "$PEMSRVDIR"/duckduckg
 cat "$DIR_TMP"/qwant.key "$DIR_TMP"/qwant.crt > "$PEMSRVDIR"/qwant.pem
 cat "$DIR_TMP"/search.yahoo.com.key "$DIR_TMP"/search.yahoo.com.crt > "$PEMSRVDIR"/search.yahoo.com.pem
 rm -rf "$DIR_TMP"
-
+$UPDATECASYSTEM
 updatecauser
 echo "</CActparental>"
 }
@@ -2076,15 +2087,17 @@ $NETWORKINGrestart
 	rm -f "$PEMSRVDIR"/duckduckgo.pem
 	rm -f "$PEMSRVDIR"/qwant.pem
 	rm -f "$PEMSRVDIR"/search.yahoo.com.pem
-  
+	rm -f "$CADIR"/cactparental.crt
+    rm -f "$DIRHTML"/cactparental.crt
+	rm -f "$REPCAMOZ"/cactparental.crt
+    $UPDATECASYSTEM
    for user in $(listeusers) ; do	
 		HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
 		if [ -d "$HOMEPCUSER" ];then
 			#on desinstall le certificat dans tous les prifiles firefoxe utilisateur existant 
 			listprofile=$(cat < "$HOMEPCUSER"/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2)
 			for profilefirefox in $listprofile ; do
-				#firefox iceweachel
-				# on supprime tous les anciens certificats
+				# on supprime tous les anciens certificats firefox iceweachel
 				while true
 				do
 					certutil -D -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -n"CActparental - ctparental" 2&> /dev/null
@@ -2093,6 +2106,8 @@ $NETWORKINGrestart
 					fi
 				done
 			done
+			# on supprime tous les anciens certificats chrome chromium
+			certutil -D -d sql:"$HOMEPCUSER"/.pki/nssdb/  -n"CActparental - ctparental" 2&> /dev/null
 		fi
    done
    #unsetproxy
@@ -2941,10 +2956,10 @@ then run the command CTparental -ipton") $Fcolor"
 			 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé . 
 			  if [ "$(updatelistgctoff)" -eq 1 ];then
 				applistegctoff
-				updatecauser
 				iptablesreload
 			  fi
 	   fi
+	   updatecauser
       ;;   
     -dgreload )
       $E2GUARDIANrestart     
@@ -2996,6 +3011,9 @@ then run the command CTparental -ipton") $Fcolor"
       ;;
 	-imp )
 	  importconf
+      ;;
+    -cainstall )
+      updatecauser
       ;;
       
    *)
