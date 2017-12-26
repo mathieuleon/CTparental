@@ -10,11 +10,11 @@ include 'locale.php';
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="https://privet.ct.localhost/css/bootstrap.min.css" type="text/css">
-        <link rel="stylesheet" href="https://privet.ct.localhost/css/main.css" type="text/css">
+        <link rel="stylesheet" href="https://privet.ct.local/css/bootstrap.min.css" type="text/css">
+        <link rel="stylesheet" href="https://privet.ct.local/css/main.css" type="text/css">
         
-        <script src="https://privet.ct.localhost/js/jquery-1.12.3.min.js"></script>
-        <script src="https://privet.ct.localhost/js/bootstrap.min.js"></script>
+        <script src="https://privet.ct.local/js/jquery-1.12.3.min.js"></script>
+        <script src="https://privet.ct.local/js/bootstrap.min.js"></script>
     </head>
 
     <body>
@@ -24,7 +24,7 @@ include 'locale.php';
             </div>
             
             <div class="jumbotron">
-                <img src="https://privet.ct.localhost/images/2518388623_1.png" />
+                <img src="https://privet.ct.local/images/2518388623_1.png" />
 
                 <h1><?php echo gettext("Access to the domain:");?></h1>
                 <h2><?php echo $_SERVER["HTTP_HOST"]; ?></h2>
