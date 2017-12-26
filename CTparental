@@ -1251,7 +1251,7 @@ server=$DNS1v4
 server=$DNS2v4
 server=$DNS1v6
 server=$DNS2v6
-address=/local/127.0.0.1
+address=/localhost/127.0.0.1
 address=/#/$PRIVATE_IP4 #redirige vers $PRIVATE_IP4 pour tout ce qui n'a pas été resolu dans les listes blanches
 EOF
 
@@ -1395,7 +1395,7 @@ cat << EOF > "$CTPARENTALCONFHTTPD"
 
 fastcgi.server = (
     ".php" => (
-      "local" => ( 
+      "localhost" => ( 
         "bin-path" => "/usr/bin/php-cgi",
         "socket" => "/run/lighttpd/php-fastcgi.sock",
         "max-procs" => 4, # default value
