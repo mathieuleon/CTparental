@@ -528,7 +528,7 @@ allow-ads   = -block -filter{banners-by-size} -filter{banners-by-link}
 { fragile }
 http://admin.ct.local.*
 http://privet.ct.local.*
-http://local.*
+http://localhost.*
 # BING Add &adlt=strict
 {+redirect{s@$@&adlt=strict@}}
 .bing./.*[&?]q=
@@ -796,7 +796,7 @@ do
 done < $CATEGORIES_ENABLED
 
 { 
-echo 'local' 
+echo 'localhost' 
 echo '127.0.0.1' 
 echo "$PRIVATE_IP4"
 echo "$ADMIN_IP4"
