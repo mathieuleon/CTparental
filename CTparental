@@ -797,7 +797,7 @@ do
 done < $CATEGORIES_ENABLED
 
 { 
-echo 'local' 
+echo 'localhost' 
 echo '127.0.0.1' 
 echo "$PRIVATE_IP4"
 echo "$ADMIN_IP4"
