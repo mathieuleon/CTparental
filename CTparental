@@ -529,7 +529,7 @@ allow-ads   = -block -filter{banners-by-size} -filter{banners-by-link}
 { fragile }
 http://admin.ct.local.*
 http://privet.ct.local.*
-http://local.*
+http://localhost.*
 # BING Add &adlt=strict
 {+redirect{s@$@&adlt=strict@}}
 .bing./.*[&?]q=
