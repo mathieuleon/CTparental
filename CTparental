@@ -1863,7 +1863,7 @@ $NETWORKINGrestart
       $ENPRIVOXY
       $ENNETWORK
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalcron
-	  echo "*/1 * * * * root /usr/bin/CTparental -cron" >> /etc/cron.d/CTparentalcron
+	  echo "*/1 * * * * root /usr/bin/CTparental -cron > /dev/null" >> /etc/cron.d/CTparentalcron
 	  
     
 }
