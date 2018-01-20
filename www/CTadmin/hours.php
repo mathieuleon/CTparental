@@ -61,16 +61,18 @@ if ($HOURSCONNECT == "ON")
                     if ( $numday == "admin") { echo gettext('24/7')." : <input type='checkbox' name='isadmin' checked>";}
                     elseif ( $numday == "user") {echo gettext('24/7')." : <input type='checkbox' name='isadmin' >";
                                             if ( intval ($field[2]) == 0 ) { $field[2]="1440"; }
+                                            $countConect=0;
+                                            $countWeb=0;
                                             foreach ($tab2 as $line2)
                                             {
 												$field2=explode("=", $line2);
 												if ($field2[0] == $selectuser)
 												{
-													$countConect=$field2[1]
-													$countWeb=$field2[2]
+													$countConect=$field2[1];
+													$countWeb=$field2[2];
 												}
 											}
-                                            echo "<br /> ";
+											echo "<br /> ";
                                             echo gettext('time max pc connection')." ".gettext('(minutes for 24 hours)')."<input type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440 .";
                                             echo "<br /> ";
                                             echo $countConect." ".gettext('are already used');
