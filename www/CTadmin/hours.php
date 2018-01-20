@@ -41,6 +41,15 @@ if ($HOURSCONNECT == "ON")
             $tab=file($hconf_file);
             if ($tab)
             {
+				if (is_file ($hcompteur_file))
+				{
+					$tab2=file($hcompteur_file);
+			    }
+			    else 
+				{
+					echo gettext('Error opening the file')." $hcompteur_file";
+				}
+				
                 foreach ($tab as $line)
                 {
                     $field=explode("=", $line);
@@ -52,10 +61,27 @@ if ($HOURSCONNECT == "ON")
                     if ( $numday == "admin") { echo gettext('24/7')." : <input type='checkbox' name='isadmin' checked>";}
                     elseif ( $numday == "user") {echo gettext('24/7')." : <input type='checkbox' name='isadmin' >";
                                             if ( intval ($field[2]) == 0 ) { $field[2]="1440"; }
+                                            $countConect=0;
+                                            $countWeb=0;
+                                            foreach ($tab2 as $line2)
+                                            {
+												$field2=explode("=", $line2);
+												if ($field2[0] == $selectuser)
+												{
+													$countConect=$field2[1];
+													$countWeb=$field2[2];
+												}
+											}
+											echo "<br /> ";
+                                            echo gettext('time max pc connection')." ".gettext('(minutes for 24 hours)')."<input type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440 .";
                                             echo "<br /> ";
-                                            echo gettext('time max pc connection')." ".gettext('(minutes for 24 hours)')."<input type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440";
+                                            echo $countConect." ".gettext('minutes are already used');
                                             echo "<br /> ";
-                                            echo gettext('maximum time for web surfing')." ".gettext('(minutes for 24 hours)')."<input type=\"text\" size=4 maxlength=4 value=\"$field[3]\"  name=\"tmax2\">/".$field[2];	
+                                            echo "<br /> ";
+                                            echo gettext('maximum time for web surfing')." ".gettext('(minutes for 24 hours)')."<input type=\"text\" size=4 maxlength=4 value=\"$field[3]\"  name=\"tmax2\">/".$field[2].".";
+                                            echo "<br /> ";
+                                            echo $countWeb." ".gettext('minutes are already used');	
+                                            echo "<br /> ";
                                             echo "<br /> ";
                                             }
                                             

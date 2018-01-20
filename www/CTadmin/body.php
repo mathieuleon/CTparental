@@ -34,6 +34,7 @@ $bl_categories_enabled = $dirconf."categories-enabled.conf";
 $conf_file             = $dirconf."CTparental.conf";
 $conf_ctoff_file       = $dirconf."GCToff.conf";
 $hconf_file            = $dirconf."CThours.conf";
+$hcompteur_file        = $dirconf."CThourscompteur";
 $wl_domains            = $dirconf."domaine-rehabiliter.conf";
 $bl_domains            = $dirconf."blacklist-local.conf";
 
