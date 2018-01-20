@@ -75,11 +75,13 @@ if ($HOURSCONNECT == "ON")
 											echo "<br /> ";
                                             echo gettext('time max pc connection')." ".gettext('(minutes for 24 hours)')."<input type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440 .";
                                             echo "<br /> ";
-                                            echo $countConect." ".gettext('are already used');
+                                            echo $countConect." ".gettext('minutes are already used');
                                             echo "<br /> ";
+                                             echo "<br /> ";
                                             echo gettext('maximum time for web surfing')." ".gettext('(minutes for 24 hours)')."<input type=\"text\" size=4 maxlength=4 value=\"$field[3]\"  name=\"tmax2\">/".$field[2].".";
                                             echo "<br /> ";
-                                            echo $countWeb." ".gettext('are already used');	
+                                            echo $countWeb." ".gettext('minutes are already used');	
+                                            echo "<br /> ";
                                             echo "<br /> ";
                                             }
                                             
