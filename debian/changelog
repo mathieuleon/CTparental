@@ -1,3 +1,9 @@
+ctparental (4.21.00-1.0) unstable; urgency=medium
+
+  * ajout du temps de connection et de navigation déja utilisé dans l'interface administration.
+  
+ -- Guillaume marsat <CTparental1@laposte.net>  Sat, 20 Jan 2018 13:34:21 +0100
+
 ctparental (4.20.29-1.0) unstable; urgency=medium
 
   * correction d'un bug dans le gestion du temps de connexion qui n'était pas prit en compte. 
