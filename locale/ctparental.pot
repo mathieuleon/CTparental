@@ -760,3 +760,6 @@ msgstr ""
 
 msgid "Site related to as pop up advertising or pornography not present in the Toulouse blacklist."
 msgstr ""
+
+msgid "minutes are already used"
+msgstr ""
