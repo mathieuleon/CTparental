@@ -1,3 +1,9 @@
+ctparental (4.20.29-1.0) unstable; urgency=medium
+
+  * correction d'un bug dans le gestion du temps de connexion qui n'était pas prit en compte. 
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Sat, 20 Jan 2018 09:33:22 +0100
+ 
 ctparental (4.20.28-1.0) unstable; urgency=medium
 
   * correction bug d'accès a l'interface d'administration quant on utilise chrome.
