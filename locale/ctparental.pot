@@ -743,7 +743,7 @@ msgstr ""
 msgid "Select the mimetype to be filtered"
 msgstr ""
 
-msgid "e2guardian configuration"
+msgid "Dansguardian configuration"
 msgstr ""
 
 msgid "Safesearch configuration"

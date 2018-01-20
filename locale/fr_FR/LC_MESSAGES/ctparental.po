@@ -780,8 +780,8 @@ msgstr "Sélectionnez les extensions à filtrer"
 msgid "Select the mimetype to be filtered"
 msgstr "Sélectionnez le type MIME à filtrer"
 
-msgid "e2guardian configuration"
-msgstr "Configuration de e2guardian"
+msgid "Dansguardian configuration"
+msgstr "Configuration de Dansguardian"
 
 msgid "Safesearch configuration"
 msgstr "Safesearch configuration"
