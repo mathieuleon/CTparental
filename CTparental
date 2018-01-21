@@ -93,7 +93,7 @@ pause() {
     choi=""
     MESSAGE=${MESSAGE:=$(gettext "to continue press a button:")}
     echo  "$MESSAGE"
-    while (true); do
+    while true; do
         read choi
         case $choi in
             * )
@@ -1636,7 +1636,7 @@ EOF
 }
 
 configloginpassword() {
-     while (true)
+     while true
      do
 	loginhttp=$(whiptail --title "$(gettext 'Login')" --nocancel --inputbox "$(gettext 'Enter login to the administration interface')
 $(gettext '	- Only letters or numbers.')
@@ -1646,7 +1646,7 @@ $(gettext '	- 5 characters minimum:')" 10 60 3>&1 1>&2 2>&3)
 	    break
 	fi
      done
-     while (true)
+     while true
      do
 	password=$(whiptail --title "$(gettext 'Password')" --nocancel --passwordbox "$(gettext 'Enter your password and press OK to continue.')" 10 60 3>&1 1>&2 2>&3)
 	password2=$(whiptail --title "$(gettext 'Password')" --nocancel --passwordbox "$(gettext 'Confirm your password and press OK to continue.')" 10 60 3>&1 1>&2 2>&3)
@@ -1806,7 +1806,7 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
 	   cp -f dist.conf "$DIR_SHARE"/dist.conf.orig
 	   cp -f dist.conf $DIR_CONF/
 	fi
-	while (true); do
+	while true; do
 	   $EDIT $DIR_CONF/dist.conf
 	   clear
 	   cat < "$DIR_CONF"/dist.conf | grep -v -E ^# | grep -v ^$
@@ -2168,7 +2168,7 @@ choiblenabled() {
      echo -n > $CATEGORIES_ENABLED
      clear
      gettext 'Do you want to filter by Blacklist or Whitelist B/W:'
-     while (true); do
+     while true; do
          read choiBW
          case $choiBW in
              B | b )
@@ -2189,7 +2189,7 @@ choiblenabled() {
 	echo ""
 	eval_gettext "Do you want to enable this category \$CATEGORIE  O/N:"
 	(
-	    while (true) ; do
+	    while true ; do
 		unset choi
 		read choi
 		case $choi in
@@ -2374,7 +2374,7 @@ activetimelogin() {
 	$SED "/^$PCUSER=/d" $FILE_HCONF
 	eval_gettext "\$PCUSER is allowed to connect 7/7 24/24 O/N?"
 	choi=""
-	while (true); do
+	while true; do
 	    read choi
             case $choi in
 		O | o )
@@ -2387,7 +2387,7 @@ activetimelogin() {
 		    clear
 		    eval_gettext "\$PCUSER is allowed to connect X minutes per day
 X (1 a 1440) = "
-		    while (true); do
+		    while true; do
 			read choi
 			if [ "$choi" -ge 1 ];then
 			    if [ "$choi" -le 1440 ];then
@@ -2401,7 +2401,7 @@ X (1 a 1440) = "
 		    clear
 		    eval_gettext "\$PCUSER is allowed to surf the Internet X minutes per day
 X ( 1 a \$timesession )= "
-		    while (true); do
+		    while true; do
 			read choi
 			if [ "$choi" -ge 1 ];then
 			    if [ "$choi" -le "$timesession" ];then
@@ -2431,7 +2431,7 @@ X ( 1 a \$timesession )= "
             or=$(gettext "or")
             echo "exemple: 00${h}00 $at 23${h}59 $or 08${h}00 $at 12${h}00 $and 14${h}00 $at 16${h}50"
             echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at:")"
-            while (true); do
+            while true; do
 		read choi
 		input=$choi
 		# mise en forme de la variable choi pour pam
@@ -2642,7 +2642,7 @@ confgrub2() {
     - Only letters or numbers.
     - 4 characters minimum.
 Enter login to the superuser of grub2 :'
-    while (true); do
+    while true; do
 	read logingrub
 	if [ "$(expr "$logingrub" : "$PTNlogin")" -gt 4  ];then
             break
