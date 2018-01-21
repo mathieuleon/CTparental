@@ -29,7 +29,10 @@ if [ -f "${DIR_CONF}/dist.conf" ];then . "${DIR_CONF}/dist.conf"; fi
 #### UID MINIMUM pour les UTILISATEUR
 UIDMINUSER=${UIDMINUSER:=500}
 
-if [ ! $UID -lt $UIDMINUSER ]; then # considère comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script sans erreur.
+# considère comme root tous les utilisateurs avec un uid inferieur ou
+# egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script
+# sans erreur.
+if [ ! $UID -lt $UIDMINUSER ]; then
     gettext 'It root of the need to run this script.'
     echo ""
     exit 1
@@ -84,7 +87,8 @@ for arg in $* ; do
     esac
 done
 
-pause() {   # fonction pause pour debugage
+# fonction pause pour debugage
+pause() {
     MESSAGE="$*"
     choi=""
     MESSAGE=${MESSAGE:=$(gettext "to continue press a button:")}
@@ -165,8 +169,10 @@ DAYSCRON=( mon tue wed thu fri sat sun )
 PROXYport=${PROXYport:="8888"}
 E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
+
 #### DEPENDANCES par DEFAULT #####
 DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail dnsutils "}
+
 #### PACKETS EN CONFLI par DEFAULT #####
 CONFLICTS=${CONFLICTS:=" dansguardian mini-httpd apache2 firewalld "}
 
@@ -191,6 +197,7 @@ E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE e2guardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
 PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
+
 #### LOCALISATION du fichier PID lighttpd par default ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
 
@@ -310,8 +317,9 @@ if [ ! "$DNS1v4" =  "" ];then
 fi
 
 #echo "intefaceWAN="$i_WAN_ipv4" ipbox_ipv4="$ipbox_ipv4" ipinterfaceWan="$ip_i_WAN_ipv4" reseau_box_ipv4="$reseau_box_ipv4" broadcast="$ip_broadcast_ipv4" dns1="$DNS1" dns2="$DNS2
-export DNS1v4=${DNS1v4:=8.8.8.8} # on utilise les DNS google en cas de problême de detection de ceux du fai
-export DNS2v4=${DNS2v4:=8.8.4.4} #
+# on utilise les DNS google en cas de problême de detection de ceux du fai
+export DNS1v4=${DNS1v4:=8.8.8.8}
+export DNS2v4=${DNS2v4:=8.8.4.4}
 
 
 i_WAN_ipv6="$(ip -6 route | grep default | awk '{print $5}')" # GW!
@@ -332,8 +340,9 @@ export ipbox_ipv6
 export ip_i_WAN_ipv6
 export reseau_box_ipv6_g
 export reseau_box_ipv6_l
-export DNS1v6=${DNS1v6:=2001:4860:4860::8888} # on utilise les DNS google en cas de problême de detection de ceux du fai
-export DNS2v6=${DNS2v6:=2001:4860:4860::8844} #
+# on utilise les DNS google en cas de problême de detection de ceux du fai
+export DNS1v6=${DNS1v6:=2001:4860:4860::8888}
+export DNS2v6=${DNS2v6:=2001:4860:4860::8844}
 
 networkisoknext() {
     ipv4ok=0
@@ -589,7 +598,8 @@ download() {
 	echo -n .
 	sleep 1
 	i=$(( i + 1 ))
-	if [ $i -ge 40 ];then # si au bout de 40 secondes on a toujours pas de connection on considaire qu'il y a une erreur
+	# si au bout de 40 secondes on a toujours pas de connection on considaire qu'il y a une erreur
+	if [ $i -ge 40 ];then
 	   gettext 'Connection to Toulouse server is impossible.'
 	   set -e
 	   exit 1
@@ -683,7 +693,11 @@ adapt() {
 		    echo -n "."
 		    cp -f "$tempDIR"/blacklists/"$categorie"/domains "$FILE_tmp"
 		    if [ $categorie = "adult" ] ; then
-			$SED "/.*blogspot\..*/d" "$FILE_tmp" # on suprime les 1313541 entrée xx.blogspot.xx dans la categorie adult qui son gérai par une liste beaucoup plus courte dans la catégorie ctparental
+			# on suprime les 1313541 entrée xx.blogspot.xx
+			# dans la categorie adult qui son gérai par
+			# une liste beaucoup plus courte dans la
+			# catégorie ctparental
+			$SED "/.*blogspot\..*/d" "$FILE_tmp"
 		    fi
 		    $SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' "$FILE_tmp"
 		    $SED "/[äâëêïîöôüû]/d" "$FILE_tmp"
@@ -693,16 +707,19 @@ adapt() {
 		    if [ -e "$tempDIR"/blacklists/"$categorie"/usage ] ; then
 			if [ "$(grep -c "white" "$tempDIR"/blacklists/"$categorie"/usage)" -ge 1 ] ;then
 			    echo "$categorie" >> $WL_CATEGORIES_AVAILABLE
-			    $SED "s?.*?server=/&/#?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes blanches
+			    # Mise en forme dnsmasq des listes blanches
+			    $SED "s?.*?server=/&/#?g" "$FILE_tmp"
 			    mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 			else
 			    echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-			    $SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
+			    # Mise en forme dnsmasq des listes noires
+			    $SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"
 			    mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 			fi
 		    else
 			echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-			$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
+			# Mise en forme dnsmasq des listes noires
+			$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"
 			mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 		    fi
 		fi
@@ -715,8 +732,12 @@ adapt() {
 	$SED "/[äâëêïîöôüû]/d" "$FILE_tmp"
 	$SED "/^#.*/d" "$FILE_tmp"
 	$SED "/^$/d" "$FILE_tmp"
-	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp" # supprime les suite de "." exemple: address=/fucking-big-tits..com/127.0.0.10 devient address=/fucking-big-tits.com/127.0.0.10
-	$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"  # Mise en forme dnsmasq
+	# supprime les suite de "." exemple:
+	# address=/fucking-big-tits..com/127.0.0.10 devient
+	# address=/fucking-big-tits.com/127.0.0.10
+	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp"
+	# Mise en forme dnsmasq
+	$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"
 	mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/ossi.conf
 
      else
@@ -728,8 +749,12 @@ adapt() {
 	$SED "/[äâëêïîöôüû]/d" "$FILE_tmp"
 	$SED "/^#.*/d" "$FILE_tmp"
 	$SED "/^$/d" "$FILE_tmp"
-	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp" # supprime les suite de "." exemple: address=/fucking-big-tits..com/127.0.0.10 devient address=/fucking-big-tits.com/127.0.0.10
-	$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"  # Mise en forme dnsmasq
+	# supprime les suite de "." exemple:
+	# address=/fucking-big-tits..com/127.0.0.10 devient
+	# address=/fucking-big-tits.com/127.0.0.10
+	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp"
+	# Mise en forme dnsmasq
+	$SED "s?.*?address=/&/$PRIVATE_IP4?g" "$FILE_tmp"
 	mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/ossi.conf
      fi
      echo
@@ -747,8 +772,8 @@ cat "$DREAB" "$CATEGORIES_ENABLED" "$SAFE_CONF"
 echo "$DOMAINEDEPOTS"
 md5sum $DIR_DNS_FILTER_AVAILABLE/* | grep -v ossi.conf
 } | md5sum )"
-     ## évite de lancer la moulinette de réabilitation des domaines quant aucun changements
-     ## ne le nécécite.
+     ## évite de lancer la moulinette de réabilitation des domaines
+     ## quant aucun changements ne le nécécite.
      if [ ! "$md5old" = "$md5new" ]; then
 	rm -rf ${DIR_DNS_BLACKLIST_ENABLED:?}/
 	mkdir $DIR_DNS_BLACKLIST_ENABLED
@@ -839,11 +864,14 @@ EOF
 
 
      {
-	## on force a passer par forcesafesearch.google.com de maninière transparente
-	forcesafesearchgoogle=$(host -ta forcesafesearch.google.com|cut -d" " -f4)	# retrieve forcesafesearch.google.com ip
+	## on force a passer par forcesafesearch.google.com de
+	## maninière transparente
+	# retrieve forcesafesearch.google.com ip
+	forcesafesearchgoogle=$(host -ta forcesafesearch.google.com|cut -d" " -f4)
 	if [ "$(cat < $SAFE_CONF | grep -c "^SAFEGOOGLE" )" -eq 1 ];then
 	    echo "# forcesafesearch redirect server for google"
-	    for subdomaingoogle in $(wget http://www.google.com/supported_domains -O - 2> /dev/null )  # pour chaque sous domain de google
+	    # pour chaque sous domain de google
+	    for subdomaingoogle in $(wget http://www.google.com/supported_domains -O - 2> /dev/null )
 	    do
 		echo "address=/www$subdomaingoogle/$forcesafesearchgoogle"
 	    done
@@ -859,14 +887,17 @@ EOF
 	if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
 	    echo "# on force a passer par safe.duckduckgo.com"
 	    echo "address=/safe.duckduckgo.com/$(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias | sed '1q;d')"
-	    ## les requette sur http(s)://duckduckgo.com sont rediriger vers lighttpd qui les renvois vers safe.duckduckgo.com
+	    ## les requette sur http(s)://duckduckgo.com sont
+	    ## rediriger vers lighttpd qui les renvois vers
+	    ## safe.duckduckgo.com
 	    echo "address=/duckduckgo.com/$ADMIN_IP4"
 	fi
 
 	if [ "$(cat < $SAFE_CONF | grep -c "^SAFEQWANT" )" -eq 1 ];then
 	    echo "# on force a passer par www.qwantjunior.com"
 	    echo "address=/www.qwantjunior.com/$(host -ta www.qwantjunior.com|cut -d" " -f4 | grep -v alias | sed '1q;d')"
-	    ## les requette sur http(s)://www.qwant.com sont rediriger vers lighttpd qui les renvois vers www.qwantjunior.com
+	    ## les requette sur http(s)://www.qwant.com sont rediriger
+	    ## vers lighttpd qui les renvois vers www.qwantjunior.com
 	    echo "address=/www.qwant.com/$ADMIN_IP4"
 	fi
 
@@ -875,7 +906,8 @@ EOF
 	# on bloque les moteurs de recherche pas asser sur
 	echo "address=/search.yahoo.com/$PRIVATE_IP4"
 
-	# pour les navigateur ne prenent pas en compte /etc/hosts comme google chrome
+	# pour les navigateur ne prenent pas en compte /etc/hosts
+	# comme google chrome
 	echo "address=/admin.ct.local/$ADMIN_IP4"
 	echo "address=/admin.ct.local/$ADMIN_IP6"
 	echo "address=/privet.ct.local/$PRIVATE_IP4"
@@ -891,13 +923,15 @@ dnsmasqon() {
      if [ "$(grep -c "$(sed -n "1 p" $CATEGORIES_ENABLED)" "$BL_CATEGORIES_AVAILABLE" )" -ge "1" ] ; then
 	$SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
 
-	# on créer l'utilisateur dnsmasq si il n'existe pas déja (comme sous mageia par exemple).
-	# pas utiles sous debian et ubuntu, car deja fait par le deb
+	# on créer l'utilisateur dnsmasq si il n'existe pas déja
+	# (comme sous mageia par exemple).  pas utiles sous debian et
+	# ubuntu, car deja fait par le deb
 	if [ -z "$(id -u dnsmasq 2> /dev/null)" ]; then
 	   adduser --system  --home /dev/null --comment "system user for dnsmasq" --no-create-home --shell /bin/false dnsmasq
 	fi
-	# on paramètre le service a ce lancer avec l'utilisateur dnsmasq.
-	# pas utiles sous debian et ubuntu, car deja fait par le deb
+	# on paramètre le service a ce lancer avec l'utilisateur
+	# dnsmasq.  pas utiles sous debian et ubuntu, car deja fait
+	# par le deb
 	if [ -f /etc/sysconfig/dnsmasq ] ; then
 	   $SED "s?^OPTIONS.*?OPTIONS= --user=dnsmasq?g" /etc/sysconfig/dnsmasq
 	fi
@@ -925,7 +959,8 @@ server=$DNS2v6
 
 EOF
 
-	resolvconffixon # redemare dnsmasq en prenent en compte la présence ou non de resolvconf.
+	# redemare dnsmasq en prenent en compte la présence ou non de resolvconf.
+	resolvconffixon
 	$E2GUARDIANrestart
 	$PRIVOXYrestart
     else
@@ -979,8 +1014,8 @@ ipglobal() {
     $IPTABLES6 -A INPUT  -i lo -j ACCEPT
     $IPTABLES6 -A OUTPUT -o lo -j ACCEPT
 
-    ### accepte en entrée les connexions déjà établies (en gros cela permet d'accepter
-    ### les connexions initiées par sont propre PC)
+    ### accepte en entrée les connexions déjà établies (en gros cela
+    ### permet d'accepter les connexions initiées par sont propre PC)
     $IPTABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
     $IPTABLES6 -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
     ### DHCP
@@ -1157,10 +1192,11 @@ iptablesreload() {
 	$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
 
 	ipdailymotion=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.dailymotion.com/" | cut -d "/" -f3)
-	$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
+	# on rejet l'acces https a dailymotion.com
+	$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
 
 	for user in $(listeusers) ; do
-	   if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
+	    if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
 		#on rediriges les requet DNS ipv4 des usagers filtrés sur dnsmasq très importent pour l'https.
 		$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54
 		$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
@@ -1172,10 +1208,13 @@ iptablesreload() {
 		$IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
 		# e2guardian ne gérent pas encore ipv6 on ce contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
 		$IPTABLES6 -t nat -A ctparental -d 2000::/3 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
-		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
+		# on rejet l'acces https a dailymotion.com
+		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT
 		#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
 		#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
-		#le proxy ne faisent que forwarder les flux https forcet le passage par celui ci pour https n'apport pas de sécuritée seul dnsmasq peut bloquer.
+		#le proxy ne faisent que forwarder les flux https
+		#forcet le passage par celui ci pour https n'apport
+		#pas de sécuritée seul dnsmasq peut bloquer.
 		#$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
 		#$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
 		#$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
@@ -1625,7 +1664,6 @@ $(gettext "and one special character among the following") &éè~#{}()ç_@à?.;:
 	    whiptail --title "$(gettext "Password")" --msgbox "$(gettext "The password entered is not identical to the first.")" 14 60
 
 	fi
-
      done
      addadminhttpd "$loginhttp" "$password"
 }
@@ -2216,7 +2254,8 @@ timecronalert() {
 updatetimelogin() {
     USERSCONECT=$(who | awk '//{print $1}' | sort -u)
     if [ "$(cat < $FILE_HCOMPT | grep -c "$(date +%D)")" -eq 1 ] ; then
-	# on incrémente le compteur de temps de connection. pour chaque utilisateur connecté
+	# on incrémente le compteur de temps de connection. pour
+	# chaque utilisateur connecté
 	for PCUSER in $USERSCONECT
 	do
 	    if [ "$(cat < $FILE_HCONF | grep -c "^$PCUSER=user=" )" -eq 1 ] ;then
@@ -2233,12 +2272,16 @@ updatetimelogin() {
 		    $SED "s?^$PCUSER=.*?$PCUSER=$var=$varweb?g" $FILE_HCOMPT
 		    count=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f3 ) - var ))
 		    countweb=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f4 ) - varweb ))
-		    # si le compteur de l'usager dépasse la valeur max autorisée on verrouille le compte et on déconnecte l'utilisateur.
+		    # si le compteur de l'usager dépasse la valeur max
+		    # autorisée on verrouille le compte et on
+		    # déconnecte l'utilisateur.
 		    if [ $count -le 0 ];then
 			/usr/bin/skill -KILL -u"$PCUSER"
 			passwd -l "$PCUSER"
 		    else
-			# On alerte l'usager que son quota temps session arrive à expiration 5-4-3-2-1 minutes avant.
+			# On alerte l'usager que son quota temps
+			# session arrive à expiration 5-4-3-2-1
+			# minutes avant.
 			if [ $count -le "$TIMERALERT" ];then
 			    HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
 			    export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(eval_gettext "Logout in \$count minutes") "
@@ -2260,7 +2303,8 @@ updatetimelogin() {
 			    $SED "/$PCUSER/d" $FILEIPTIMEWEB
 			    iptablesreload
 			fi
-			# On alerte l'usager que son quota temps web arrive à expiration 5-4-3-2-1 minutes avant.
+			# On alerte l'usager que son quota temps web
+			# arrive à expiration 5-4-3-2-1 minutes avant.
 			if [ $countweb -le "$TIMERALERT" ];then
 			    HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
 			    export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(eval_gettext "Your remaining navigation time is \$countweb minutes") "
@@ -2391,7 +2435,8 @@ X ( 1 a \$timesession )= "
             while (true); do
 		read choi
 		input=$choi
-		choi=$(echo "$choi" | sed -e "s/$h//g" | sed -e "s/ //g" | sed -e "s/$at/-/g" | sed -e "s/$and/:/g" ) # mise en forme de la variable choi pour pam
+		# mise en forme de la variable choi pour pam
+		choi=$(echo "$choi" | sed -e "s/$h//g" | sed -e "s/ //g" | sed -e "s/$at/-/g" | sed -e "s/$and/:/g" )
 		if [ "$( echo "$choi" | grep -E -c "^([0-1][0-9]|2[0-3])[0-5][0-9]-([0-1][0-9]|2[0-3])[0-5][0-9]$|^([0-1][0-9]|2[0-3])[0-5][0-9]-([0-1][0-9]|2[0-3])[0-5][0-9]:([0-1][0-9]|2[0-3])[0-5][0-9]-([0-1][0-9]|2[0-3])[0-5][0-9]$" )" -eq 1 ];then
                     int1=$(echo "$choi" | cut -d ":" -f1 | cut -d "-" -f1)
                     int2=$(echo "$choi" | cut -d ":" -f1 | cut -d "-" -f2)
@@ -2584,7 +2629,11 @@ readTimeFILECONF() {
 
 confgrub2() {
     PTNlogin='^[a-zA-Z]*$'
-    ##Passage en keymap us pour le password comme sa quelque soit votre clavier le mot de passe correspond bien ##au touche frappée.ce qui, ce qui évite de ce prendre la tête pour le clavier avec le mot de passe grub.
+    ##Passage en keymap us pour le password comme sa quelque soit
+    ##votre clavier le mot de passe correspond bien au touche
+    ##frappée.ce qui, ce qui évite de ce prendre la tête pour le
+    ##clavier avec le mot de passe grub.
+
     #apt-get install console-data
     layout1="$(cat < /etc/default/keyboard | grep "XKBLAYOUT" | awk -F "\"" '{print $2}' | awk -F "," '{print $1}')"
     setxkbmap us
@@ -2923,15 +2972,19 @@ then run the command CTparental -ipton") $Fcolor"
 	iptablesreload
 	;;
     -cron )
-	# appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
+	# appelé toutes les minutes par cron pour activer désactiver
+	# les usagers ayant des restrictions de temps journalier de
+	# connexion.
 	if [ $(cat  < $FILE_CONF | grep -c "HOURSCONNECT=ON") -eq 1 ];then
 	    updatetimelogin
 	fi
 	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-	    # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
+	    # appelé toutes les minutes par cron pour modifier la
+	    # configuration en cas de changement de réseaux.
 	    nomade
 	    networkisoknext
-	    # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
+	    # appelé toutes les minutes par cron pour activer le
+	    # filtrage sur les usagers nouvelement créé .
 	    if [ "$(updatelistgctoff)" -eq 1 ];then
 		applistegctoff
 		iptablesreload
