@@ -2250,6 +2250,7 @@ timecronalert() {
 }
 
 updatetimelogin() {
+    if [ ! -f $FILEIPTIMEWEB ]; then touch $FILEIPTIMEWEB; fi
     USERSCONECT=$(who | awk '//{print $1}' | sort -u)
     if [ "$(cat < $FILE_HCOMPT | grep -c "$(date +%D)")" -eq 1 ] ; then
 	# on incrémente le compteur de temps de connection. Pour
