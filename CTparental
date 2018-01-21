@@ -33,7 +33,7 @@ UIDMINUSER=${UIDMINUSER:=500}
 # égal à 499,ce qui permet à apt-get,urpmi,yum... de lancer le script
 # sans erreur.
 if [ ! $UID -lt $UIDMINUSER ]; then
-    gettext 'It root of the need to run this script.'
+    gettext 'Root rights needed to run this script.'
     echo ""
     exit 1
 fi
@@ -43,7 +43,7 @@ if [ -f $PIDFILE ];then
     if [ $( ps -A | grep -c "$(cat $PIDFILE)") -eq 0 ] ; then
 	rm -f $PIDFILE
     else
-	gettext 'Already in process'
+	gettext 'Already in progress'
 	echo ""
 	exit 2
     fi
@@ -359,7 +359,7 @@ networkisoknext() {
 
     if [ $ipv4ok -eq 0 ];then
 	if [ $ipv6ok -eq 0 ];then
-	   gettext 'error recovery network settings'
+	   gettext 'error recovering network settings'
 	   echo
 	   exit 0
 	fi
@@ -610,28 +610,28 @@ download() {
 
     wget -P $tempDIR http://$BL_SERVER/blacklists/download/blacklists.tar.gz 2>&1 | cat
     if [ ! $? -eq 0 ]; then
-        gettext 'error when downloading, interrupted process'
+        gettext 'error when downloading, process interrupted'
         rm -rf $tempDIR
         set -e
         exit 1
     fi
     tar -xzf $tempDIR/blacklists.tar.gz -C $tempDIR
     if [ ! $? -eq 0 ]; then
-        gettext 'archive extraction error, interrupted process'
+        gettext 'archive extraction error, process interrupted'
         set -e
         exit 1
     fi
     # on télécharge aussi la blacklist personalisée de ctparental
     wget -P $tempDIR https://github.com/marsat/bl_ctparental/raw/master/blacklist.tar.gz 2>&1 | cat
     if [ ! $? -eq 0 ]; then
-        gettext 'error when downloading, interrupted process'
+        gettext 'error when downloading, process interrupted'
         rm -rf $tempDIR
         set -e
         exit 1
     fi
     tar -xzf $tempDIR/blacklist.tar.gz -C $tempDIR
     if [ ! $? -eq 0 ]; then
-        gettext 'archive extraction error , interrupted process'
+        gettext 'archive extraction error , process interrupted'
         set -e
         exit 1
     fi
@@ -1661,7 +1661,6 @@ $(gettext "and one special character among the following") &éè~#{}()ç_@à?.;:
 	    fi
 	else
 	    whiptail --title "$(gettext "Password")" --msgbox "$(gettext "The password entered is not identical to the first.")" 14 60
-
 	fi
      done
      addadminhttpd "$loginhttp" "$password"
@@ -1871,7 +1870,7 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
     else
 	tar -xzf blacklists.tar.gz -C $tempDIR
 	if [ ! $? -eq 0 ]; then
-            gettext 'archive extraction error , interrupted process'
+            gettext 'archive extraction error , process interrupted'
             uninstall
             set -e
             exit 1
@@ -2295,7 +2294,7 @@ updatetimelogin() {
 			    echo "$IPTABLES -A OUTPUT -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -p tcp --dport $PROXYport -j REJECT" >> "$FILEIPTIMEWEB"
 			    iptablesreload
 			    HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
-			    export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Your surf time as expired!')"
+			    export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Your surf time has expired!')"
 			fi
 		    else
 			if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -ge 1 ];then
@@ -2799,7 +2798,7 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	  CTparental -dirhtml -i /home/toto/html/ -nodep
 	  CTparental -u -nodep")
 -nomanuel$(gettext "	=> used only for the postinst and prerm script.")
--gcton$(eval_gettext "	=> Enable a group of privileged user that will not undergo filtering.
+-gcton$(eval_gettext "	=> Enable a group of privileged users that will not undergo filtering.
 	  exemples:
 	          CTparental -gctulist
 	          Comment all users that you want to filter in \$FILE_GCTOFFCONF
