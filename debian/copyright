@@ -5,28 +5,32 @@ Upstream-Source:
  https://github.com/marsat/CTparental.git
 
 Files: *
-Copyright: 2013-2017 Guillaume Marsat <CTparental1@laposte.net>
+Copyright: 2013-2018 Guillaume Marsat <CTparental1@laposte.net>
 License: GPL-3+
 
 Files: CTparental
-Copyright: 2013-2017 Guillaume Marsat <CTparental1@laposte.net>
+Copyright: 2013-2018 Guillaume Marsat <CTparental1@laposte.net>
  Parts of the code come from the script alcasar-bl.sh by Franck BOUIJOUX
  and Richard REY for project alcasar [1] release 2.6.1.
  [1] http://www.alcasar.net/
+ 2018 christophe-lyon <https://github.com/christophe-lyon>
 License: GPL-3+
 
-Files: CTparental/locale/es_ES/LC_MESSAGES/ctparental.po
-Copyright: 2013-2017 Guillaume Marsat <CTparental@laposte.net>
-           2017	cyberesprit <nachosalgado@> 
+Files: CTparental/locale/*
+Copyright: 2013-2018 Guillaume Marsat <CTparental@laposte.net>
+           2017	cyberesprit <https://github.com/cyberesprit> 
+           2017 nachosalgado <https://github.com/nachosalgado>
+           2018 christophe-lyon <https://github.com/christophe-lyon>
 License: GPL-3+
 
 Files: www
-Copyright: 2013-2017 Guillaume Marsat <CTparental1@laposte.net>
-           2016	cyberesprit <cyberesprit@>
+Copyright: 2013-2018 Guillaume Marsat <CTparental1@laposte.net>
+           2016	cyberesprit <https://github.com/cyberesprit>
+           2018 christophe-lyon <https://github.com/christophe-lyon>
 License: GPL-3+
 
 Files: debian/*
-Copyright: 2013-2017 Guillaume Marsat <CTparental1@laposte.net>
+Copyright: 2013-2018 Guillaume Marsat <CTparental1@laposte.net>
            2014 Gilles Filippini <gilles.filippini@free.fr>
 License: GPL-3+
 
