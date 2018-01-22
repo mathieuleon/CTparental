@@ -1,5 +1,5 @@
 Parental control. web filtering iptables dnsmasq dansguardian privoxy lighttpd cron and the blacklist of the University of Toulouse. 
-a management connection schedule is also integrated a web interface (http://127.0.0.1/CTadmin) for setting all this. 
+a management connection schedule is also integrated a web interface (https://admin.ct.local) for setting all this. 
 The login password pair must be entered to install, but can be changed later with the command CTparental -uhtml.
 
 Blacklist filtering or Whiteliste.
