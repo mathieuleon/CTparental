@@ -15,7 +15,7 @@ msgstr ""
 # Copyright: © 2013-2016 Guillaume Marsat <guillaume.marsat@laposte.net>
 # License: GPL-3+
 # # CTparental
-msgid "It root of the need to run this script."
+msgid "Root rights  needed to run this script."
 msgstr "Necesita privilegios de root para ejecutar este script."
 
 msgid "invalid directory path!"
@@ -60,10 +60,10 @@ msgstr "La conexión al servidor de Toulouse es imposible."
 msgid "connection established:"
 msgstr "Conexión establecida:"
 
-msgid "error when downloading, interrupted process"
+msgid "error when downloading, process interrupted"
 msgstr "error al descargar, proceso interrumpido"
 
-msgid "archive extraction error, interrupted process"
+msgid "archive extraction error, process interrupted"
 msgstr "Error de extracción de archivos, proceso interrumpido"
 
 msgid "Toulouse Blacklist and WhiteList migration process. Please wait."
@@ -239,7 +239,7 @@ msgid "\t=> used only for the postinst and prerm script."
 msgstr "\t=> utilizado solamente para los scripts de postinst y prerm."
 
 msgid ""
-"\t=> Enable a group of privileged user that will not undergo filtering.\n"
+"\t=> Enable a group of privileged users that will not undergo filtering.\n"
 "\t   exemples:\n"
 "\t           CTparental -gctulist\n"
 "\t           Comment all users that you want to filter in $FILE_GCTOFFCONF\n"
@@ -330,7 +330,7 @@ msgstr "Cierre de la sesión en $count minutos"
 msgid "minutes"
 msgstr "minutos"
 
-msgid "Your surf time as expired!"
+msgid "Your surf time has expired!"
 msgstr "Ha expirado su tiempo de navegación !"
 
 msgid "$PCUSER is allowed to connect 7/7 24/24 O/N?"
@@ -349,7 +349,7 @@ msgstr "X debe tener un valor entre 1 y 1440 \n"
 msgid "X must take a value between 1 and $timesession \n"
 msgstr "X debe tener un valor entre 1 y $timesession \n"
 
-msgid "error recovery network settings"
+msgid "error recovering network settings"
 msgstr "Error de recuperación de la configuración de red"
 
 msgid "\t=> Enable the superuser of grub2."
@@ -524,7 +524,7 @@ msgstr "Nombres de dominio añadidos a la lista negra"
 msgid "Save changes"
 msgstr "Guardar cambios"
 
-msgid "Once validated, 30 seconds is necessary to compute your modifications"
+msgid "Once validated, 30 seconds are necessary to compute your modifications"
 msgstr "Una vez validados, se requieren 30 segundos para hacer efectivos los cambios"
 
 msgid "privileged group"
@@ -557,7 +557,7 @@ msgstr "Categorías de la lista negra"
 msgid "Close"
 msgstr "Cerrar"
 
-msgid "This category isn't describe"
+msgid "This category isn't described"
 msgstr "Esta categoría no está descrita"
 
 msgid "Number of filtered domain names :"

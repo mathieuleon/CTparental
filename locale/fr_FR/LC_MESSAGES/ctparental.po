@@ -15,7 +15,7 @@ msgstr ""
 # Copyright: © 2013-2016 Guillaume Marsat <guillaume.marsat@laposte.net>
 # License: GPL-3+
 # # CTparental
-msgid "It root of the need to run this script."
+msgid "Root rights needed to run this script."
 msgstr "Il vous faut des droits root pour lancer ce script."
 
 msgid "invalid directory path!"
@@ -60,10 +60,10 @@ msgstr "Connexion au serveur de Toulouse impossible."
 msgid "connection established:"
 msgstr "connexion établie :"
 
-msgid "error when downloading, interrupted process"
+msgid "error when downloading, process interrupted"
 msgstr "erreur lors du téléchargement, processus interrompu"
 
-msgid "archive extraction error, interrupted process"
+msgid "archive extraction error, process interrupted"
 msgstr "erreur d'extraction de l'archive, processus interrompu"
 
 msgid "Toulouse Blacklist and WhiteList migration process. Please wait."
@@ -239,7 +239,7 @@ msgid "\t=> used only for the postinst and prerm script."
 msgstr "\t=> utilisé uniquement pour les scripts de postinst et prerm."
 
 msgid ""
-"\t=> Enable a group of privileged user that will not undergo filtering.\n"
+"\t=> Enable a group of privileged users that will not undergo filtering.\n"
 "\t   exemples:\n"
 "\t           CTparental -gctulist\n"
 "\t           Comment all users that you want to filter in $FILE_GCTOFFCONF\n"
@@ -330,7 +330,7 @@ msgstr "Fermeture session dans $count minutes"
 msgid "minutes"
 msgstr "minutes"
 
-msgid "Your surf time as expired!"
+msgid "Your surf time has expired!"
 msgstr "Votre temps de navigation a expiré !"
 
 msgid "$PCUSER is allowed to connect 7/7 24/24 O/N?"
@@ -344,7 +344,7 @@ msgstr ""
 "X (1 a 1440) = "
 
 msgid "X must take a value between 1 and 1440 \n"
-msgstr "X doit prendre un valeur entre 1 et 1440 \n"
+msgstr "X doit prendre une valeur entre 1 et 1440 \n"
 
 msgid ""
 "$PCUSER is allowed to surf the Internet X minutes per day \n"
@@ -356,7 +356,7 @@ msgstr ""
 msgid "X must take a value between 1 and $timesession \n"
 msgstr "X doit prendre une valeur entre 1 et $timesession \n"
 
-msgid "error recovery network settings"
+msgid "error recovering network settings"
 msgstr "erreur de récupération des paramètres réseaux"
 
 msgid "\t=> Enable the superuser of grub2."
@@ -427,10 +427,10 @@ msgid "Time surf between 1 to"
 msgstr "Le temps de navigation doit être entre 1 et"
 
 msgid "Connection schedules are currently enabled"
-msgstr "Les horaires de connexion sont actuellement activées"
+msgstr "Les horaires de connexion sont actuellement activés"
 
 msgid "Connection schedules are currently disabled"
-msgstr "Les horaires de connexion sont actuellement désactivées"
+msgstr "Les horaires de connexion sont actuellement désactivés"
 
 msgid "Disable logon hours"
 msgstr "Désactiver les horaires de connexion"
@@ -534,7 +534,7 @@ msgstr "Noms de domaine ajoutés à la liste noire"
 msgid "Save changes"
 msgstr "Enregistrer les modifications"
 
-msgid "Once validated, 30 seconds is necessary to compute your modifications"
+msgid "Once validated, 30 seconds are necessary to compute your modifications"
 msgstr "Une fois validées, 30 secondes sont nécessaires pour traiter vos modifications"
 
 msgid "privileged group"
@@ -567,7 +567,7 @@ msgstr "Catégories de la liste noire"
 msgid "Close"
 msgstr "Fermer"
 
-msgid "This category isn't describe"
+msgid "This category isn't described"
 msgstr "Cette catégorie n'est pas décrite"
 
 msgid "Number of filtered domain names :"
@@ -610,7 +610,7 @@ msgid "Sites related to software update or antiviral"
 msgstr "Sites relatifs à la mise à jour logicielle ou antivirale"
 
 msgid "Sites related to the creation of dangerous goods (explosives, poison, etc.)"
-msgstr "Sites relatifs à la création de produits dangereux (explosif, poison, etc.)"
+msgstr "Sites relatifs à la création de produits dangereux (explosifs, poisons, etc.)"
 
 msgid "Online dating sites"
 msgstr "Sites de rencontres en ligne"
@@ -661,7 +661,7 @@ msgid "Domain names and URLs you add to the blacklist (see below)"
 msgstr "Noms de domaine et URLs que vous ajoutez à la liste noire (voir ci-dessous)"
 
 msgid "Phishing sites (traps banking, redirect, etc..)"
-msgstr "Sites relatifs à l'hammeçonnage (pièges bancaires, redirection, etc.)"
+msgstr "Sites relatifs au hammeçonnage (pièges bancaires, redirection, etc.)"
 
 msgid "News sites"
 msgstr "Sites de presse"
@@ -679,7 +679,7 @@ msgid "redirects, anonymization or bypass sites"
 msgstr "Sites de redirection, d'anonymisation ou de contournement"
 
 msgid "Sites for making remote control"
-msgstr "Sites permettant la prise de controle a distance"
+msgstr "Sites permettant la prise de controle à distance"
 
 msgid "Sectarian sites"
 msgstr "Sites sectaires"
