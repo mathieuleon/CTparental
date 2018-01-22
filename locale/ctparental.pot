@@ -15,7 +15,7 @@ msgstr ""
 # Copyright: © 2013-2016 Guillaume Marsat <guillaume.marsat@laposte.net>
 # License: GPL-3+
 # # CTparental
-msgid "It root of the need to run this script."
+msgid "Root rights needed to run this script."
 msgstr ""
 
 msgid "invalid directory path!"
@@ -60,10 +60,10 @@ msgstr ""
 msgid "connection established:"
 msgstr ""
 
-msgid "error when downloading, interrupted process"
+msgid "error when downloading, process interrupted"
 msgstr ""
 
-msgid "archive extraction error, interrupted process"
+msgid "archive extraction error, process interrupted"
 msgstr ""
 
 msgid "Toulouse Blacklist and WhiteList migration process. Please wait."
@@ -222,7 +222,7 @@ msgid "\t=> used only for the postinst and prerm script."
 msgstr ""
 
 msgid ""
-"\t=> Enable a group of privileged user that will not undergo filtering.\n"
+"\t=> Enable a group of privileged users that will not undergo filtering.\n"
 "\t   exemples:\n"
 "\t           CTparental.sh -gctulist\n"
 "\t           Comment all users that you want to filter in $FILE_GCTOFFCONF\n"
@@ -297,7 +297,7 @@ msgstr ""
 msgid "minutes"
 msgstr ""
 
-msgid "Your surf time as expired!"
+msgid "Your surf time has expired!"
 msgstr ""
 
 msgid "$PCUSER is allowed to connect 7/7 24/24 O/N?"
@@ -319,7 +319,7 @@ msgstr ""
 msgid "X must take a value between 1 and $timesession \n"
 msgstr ""
 
-msgid "error recovery network settings"
+msgid "error recovering network settings"
 msgstr ""
 
 msgid "\t=> Enable the superuser of grub2."
@@ -497,7 +497,7 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-msgid "Once validated, 30 seconds is necessary to compute your modifications"
+msgid "Once validated, 30 seconds are necessary to compute your modifications"
 msgstr ""
 
 msgid "privileged group"
@@ -530,7 +530,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-msgid "This category isn't describe"
+msgid "This category isn't described"
 msgstr ""
 
 msgid "Number of filtered domain names :"

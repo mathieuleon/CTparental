@@ -123,7 +123,7 @@ echo "<button class='btn btn-info'>";
 echo "<span class='glyphicon glyphicon-save' aria-hidden='true'></span>&nbsp;";
 echo gettext('Save changes');
 echo "</button>";
-echo "&nbsp;<span class='text-muted'>".gettext('Once validated, 30 seconds is necessary to compute your modifications')."</span>";
+echo "&nbsp;<span class='text-muted'>".gettext('Once validated, 30 seconds are necessary to compute your modifications')."</span>";
 echo "</form>";
 echo "</div>";
 echo "</div>";
