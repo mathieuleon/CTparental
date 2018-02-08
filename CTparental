@@ -150,8 +150,8 @@ EOF
 
 fi
 
-FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"
-REDIRECT="$(cat < $FILE_CONF | grep -c "REDIRECT=ON" )"
+FILTRAGEISOFF="$( grep -c "DNSMASQ=OFF" $FILE_CONF )"
+REDIRECT="$( grep -c "REDIRECT=ON" $FILE_CONF )"
 
 tempDIR="/tmp/alcasar"
 tempDIRRamfs="/tmp/alcasarRamfs"
@@ -265,8 +265,8 @@ DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
 DNS_FILTER_OSSI="$DIR_CONF/blacklist-local.conf"
 THISDAYS=$(( $(date +%Y) * 365 + $(date +%j | sed -e "s/^0*//g") ))
 MAXDAYSFORUPDATE="7" # update tous les 7 jours
-USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
-GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
+USERHTTPD=$( grep /var/www /etc/passwd  | cut -d":" -f1)
+GROUPHTTPD=$( grep "$USERHTTPD" /etc/group | cut -d":" -f1)
 
 
 if [ "$(yum help 2> /dev/null | wc -l )" -ge 50 ] ; then
@@ -378,7 +378,7 @@ resolvconffixon() {
 	resolvconf -u
 	# on s'assure que les dns du FAI soient bien ajoutés au
 	# fichier /etc/resolv.conf malgré l'utilisation de dnsmasq.
-	cat < /etc/resolv.conf | grep ^nameserver | grep -v 127.0.0.1 | sort -u > /etc/resolvconf/resolv.conf.d/tail
+	grep ^nameserver /etc/resolv.conf | grep -v 127.0.0.1 | sort -u > /etc/resolvconf/resolv.conf.d/tail
     fi
     $DNSMASQstart
     sleep 1
@@ -417,8 +417,8 @@ fi
 
 
 initblenabled() {
-    USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
-    GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
+    USERHTTPD=$( grep /var/www /etc/passwd | cut -d":" -f1)
+    GROUPHTTPD=$( grep "$USERHTTPD" /etc/group | cut -d":" -f1)
     cat << EOF > $CATEGORIES_ENABLED
 adult
 agressif
@@ -869,7 +869,7 @@ EOF
 	## manière transparente
 	# retrieve forcesafesearch.google.com ip
 	forcesafesearchgoogle=$(host -ta forcesafesearch.google.com|cut -d" " -f4)
-	if [ "$(cat < $SAFE_CONF | grep -c "^SAFEGOOGLE" )" -eq 1 ];then
+	if [ "$( grep -c "^SAFEGOOGLE" $SAFE_CONF )" -eq 1 ];then
 	    echo "# forcesafesearch redirect server for google"
 	    # pour chaque sous domaine de google
 	    for subdomaingoogle in $(wget http://www.google.com/supported_domains -O - 2> /dev/null )
@@ -877,15 +877,15 @@ EOF
 		echo "address=/www$subdomaingoogle/$forcesafesearchgoogle"
 	    done
 	fi
-	if [ "$(cat < $SAFE_CONF | grep -c "^SAFEYOUTUBE" )" -eq 1 ];then
+	if [ "$( grep -c "^SAFEYOUTUBE" $SAFE_CONF )" -eq 1 ];then
 	    echo "address=/www.youtube.com/$forcesafesearchgoogle"
 	fi
 	## on force à passer par strict.bing.com de manière transparente
-	if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
+	if [ "$( grep -c "^SAFEBING" $SAFE_CONF )" -eq 1 ];then
 	    echo "address=/.bing.com/$(host -ta strict.bing.com |cut -d" " -f4 | grep -v alias | sed '1q;d')"
 	fi
 
-	if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
+	if [ "$( grep -c "^SAFEDUCK" $SAFE_CONF )" -eq 1 ];then
 	    echo "# on force a passer par safe.duckduckgo.com"
 	    echo "address=/safe.duckduckgo.com/$(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias | sed '1q;d')"
 	    ## les requêtes sur http(s)://duckduckgo.com sont
@@ -894,7 +894,7 @@ EOF
 	    echo "address=/duckduckgo.com/$ADMIN_IP4"
 	fi
 
-	if [ "$(cat < $SAFE_CONF | grep -c "^SAFEQWANT" )" -eq 1 ];then
+	if [ "$( grep -c "^SAFEQWANT" $SAFE_CONF  )" -eq 1 ];then
 	    echo "# on force a passer par www.qwantjunior.com"
 	    echo "address=/www.qwantjunior.com/$(host -ta www.qwantjunior.com|cut -d" " -f4 | grep -v alias | sed '1q;d')"
 	    ## les requêtes sur http(s)://www.qwant.com sont
@@ -1192,7 +1192,7 @@ iptablesreload() {
 	$IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 	$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
 
-	ipdailymotion=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.dailymotion.com/" | cut -d "/" -f3)
+	ipdailymotion=$( grep "address=/.dailymotion.com/" $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | cut -d "/" -f3)
 	# on rejette l'acces https à dailymotion.com
 	$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
 
@@ -1225,7 +1225,7 @@ iptablesreload() {
 	   source "$FILEIPTIMEWEB"
 	fi
 
-	if [ "$(cat < $FILE_CONF | grep -c IPRULES=ON )" -eq 1 ];then
+	if [ "$( grep -c IPRULES=ON $FILE_CONF )" -eq 1 ];then
 	   ipglobal
 	fi
 	#setproxy
@@ -1673,7 +1673,7 @@ CActparental() {
      DIR_TMP=${TMPDIR-/tmp}/ctparental-mkcert.$$
      mkdir "$DIR_TMP"
      mkdir "$CADIR" 2> /dev/null
-     
+
      ## création de la clef privée ca et du certificat ca
      openssl genrsa  1024 > "$DIR_TMP"/cactparental.key 2> /dev/null
      openssl req -new -x509 -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 5000 -key "$DIR_TMP"/cactparental.key > "$DIR_TMP"/cactparental.crt
@@ -1767,7 +1767,7 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
 "
 	} > /etc/network/interfaces.d/ctparentallo
 
-	if [ $(cat < /etc/network/interfaces | grep -c "source.*/etc/network/interfaces.d/*") -eq 0 ];then
+	if [ $( grep -c "source.*/etc/network/interfaces.d/*" /etc/network/interfaces ) -eq 0 ];then
 	   echo "source /etc/network/interfaces.d/*" >> /etc/network/interfaces
 	fi
     fi
@@ -1810,7 +1810,7 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
 	while true; do
 	   $EDIT $DIR_CONF/dist.conf
 	   clear
-	   cat < "$DIR_CONF"/dist.conf | grep -v -E ^# | grep -v ^$
+	   grep -v -E ^# "$DIR_CONF"/dist.conf | grep -v ^$
 	   gettext 'Enter: S to continue with these parameters.'
 	   gettext 'Enter: Q to Quit setup.'
 	   gettext 'Enter any other choice to change settings.'
@@ -1904,16 +1904,16 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
 
 nomade() {
     #### si il y a un changement dans la conf réseaux ####
-    if [ "$DNS1v4" != "$(cat < $FILE_CONF | grep DNS1v4 | cut -d"=" -f2)"  -o \
-	"$DNS2v4" != "$(cat < $FILE_CONF | grep DNS2v4 | cut -d"=" -f2)"  -o \
-	"$DNS1v6" != "$(cat < $FILE_CONF | grep DNS1v6 | cut -d"=" -f2)"  -o \
-	"$DNS2v6" != "$(cat < $FILE_CONF | grep DNS2v6 | cut -d"=" -f2)"  -o \
-	"$i_WAN_ipv4" != "$(cat < $FILE_CONF | grep I_WAN_IPV4 | cut -d"=" -f2)"  -o \
-	"$i_WAN_ipv6" != "$(cat < $FILE_CONF | grep I_WAN_IPV6 | cut -d"=" -f2)"  -o \
-	"$ipbox_ipv4" != "$(cat < $FILE_CONF | grep IP_BOX_IPV4 | cut -d"=" -f2)"  -o \
-	"$ipbox_ipv6" != "$(cat < $FILE_CONF | grep IP_BOX_IPV6 | cut -d"=" -f2)"  -o \
-	"$ip_i_WAN_ipv4" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV4 | cut -d"=" -f2)" -o \
-	"$ip_i_WAN_ipv6" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV6 | cut -d"=" -f2)" ]
+    if [ "$DNS1v4" != "$( grep DNS1v4 $FILE_CONF | cut -d"=" -f2 )"  -o \
+	"$DNS2v4" != "$( grep DNS2v4 $FILE_CONF | cut -d"=" -f2 )"  -o \
+	"$DNS1v6" != "$( grep DNS1v6 $FILE_CONF | cut -d"=" -f2 )"  -o \
+	"$DNS2v6" != "$( grep DNS2v6 $FILE_CONF | cut -d"=" -f2 )"  -o \
+	"$i_WAN_ipv4" != "$( grep I_WAN_IPV4 $FILE_CONF | cut -d"=" -f2 )"  -o \
+	"$i_WAN_ipv6" != "$( grep I_WAN_IPV6 $FILE_CONF | cut -d"=" -f2 )"  -o \
+	"$ipbox_ipv4" != "$( grep IP_BOX_IPV4 $FILE_CONF | cut -d"=" -f2 )"  -o \
+	"$ipbox_ipv6" != "$( grep IP_BOX_IPV6 $FILE_CONF | cut -d"=" -f2 )"  -o \
+	"$ip_i_WAN_ipv4" != "$( grep IP_IWAN_IPV4 $FILE_CONF | cut -d"=" -f2 )" -o \
+	"$ip_i_WAN_ipv6" != "$( grep IP_IWAN_IPV6 $FILE_CONF | cut -d"=" -f2 )" ]
     then
 	networkisoknext
 	# on sauvegarde ces changement dans le fichier de conf CTparental.
@@ -2019,8 +2019,8 @@ activegourpectoff() {
      $SED "s?^GCTOFF.*?GCTOFF=ON?g" $FILE_CONF
      updatelistgctoff
      applistegctoff
-     USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
-     GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
+     USERHTTPD=$( grep /var/www /etc/passwd | cut -d":" -f1)
+     GROUPHTTPD=$( grep "$USERHTTPD" /etc/group | cut -d":" -f1)
      chown root:"$GROUPHTTPD" "$FILE_GCTOFFCONF"
      chmod 660 "$FILE_GCTOFFCONF"
      $CRONrestart
@@ -2254,25 +2254,25 @@ timecronalert() {
 updatetimelogin() {
     if [ ! -f $FILEIPTIMEWEB ]; then touch $FILEIPTIMEWEB; fi
     USERSCONECT=$(who | awk '//{print $1}' | sort -u)
-    if [ "$(cat < $FILE_HCOMPT | grep -c "$(date +%D)")" -eq 1 ] ; then
+    if [ "$( grep -c "$(date +%D)" $FILE_HCOMPT )" -eq 1 ] ; then
 	# on incrémente le compteur de temps de connection. Pour
 	# chaque utilisateur connecté
 	for PCUSER in $USERSCONECT
 	do
-	    if [ "$(cat < $FILE_HCONF | grep -c "^$PCUSER=user=" )" -eq 1 ] ;then
-		if [ "$(cat < $FILE_HCOMPT | grep -c "^$PCUSER=" )" -eq 0 ] ;then
+	    if [ "$( grep -c "^$PCUSER=user=" $FILE_HCONF )" -eq 1 ] ;then
+		if [ "$( grep -c "^$PCUSER=" $FILE_HCOMPT )" -eq 0 ] ;then
 		    echo "$PCUSER=1=1" >> $FILE_HCOMPT
 		else
-		    var=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f2) + 1 ))
+		    var=$(($( grep "^$PCUSER=" $FILE_HCOMPT | cut -d"=" -f2 ) + 1 ))
 		    uidpcuser=$(id -u $PCUSER)
 		    if [ "$(ss -t -e -o state established | grep -c uid:$uidpcuser)" -ge 1 ];then
-			varweb=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) + 1 ))
+			varweb=$(($( grep "^$PCUSER=" $FILE_HCOMPT | cut -d"=" -f3 ) + 1 ))
 		    else
-			varweb=$(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3)
+			varweb=$( grep "^$PCUSER=" $FILE_HCOMPT | cut -d"=" -f3)
 		    fi
 		    $SED "s?^$PCUSER=.*?$PCUSER=$var=$varweb?g" $FILE_HCOMPT
-		    count=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f3 ) - var ))
-		    countweb=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f4 ) - varweb ))
+		    count=$(($( grep "^$PCUSER=user=" $FILE_HCONF | cut -d "=" -f3 ) - var ))
+		    countweb=$(($( grep "^$PCUSER=user=" $FILE_HCONF | cut -d "=" -f4 ) - varweb ))
 		    # si le compteur de l'usager dépasse la valeur max
 		    # autorisée on verrouille le compte et on
 		    # déconnecte l'utilisateur.
@@ -2290,7 +2290,7 @@ updatetimelogin() {
 		    fi
 
 		    if [ "$countweb" -le 0 ];then
-			if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -eq 0 ];then
+			if [ "$( grep -c "$PCUSER" $FILEIPTIMEWEB )" -eq 0 ];then
 			    # on bloque l'accès direct , via dansguardian et via le proxy
 			    echo "$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -j REJECT" >> "$FILEIPTIMEWEB"
 			    echo "$IPTABLES -A OUTPUT -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -p tcp --dport $E2GUport -j REJECT" >> "$FILEIPTIMEWEB"
@@ -2300,7 +2300,7 @@ updatetimelogin() {
 			    export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Your surf time has expired!')"
 			fi
 		    else
-			if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -ge 1 ];then
+			if [ "$( grep -c "$PCUSER" $FILEIPTIMEWEB )" -ge 1 ];then
 			    $SED "/$PCUSER/d" $FILEIPTIMEWEB
 			    iptablesreload
 			fi
@@ -2314,7 +2314,7 @@ updatetimelogin() {
 		fi
 	    else
 		# on efface les lignes relatives à cet utilisateur
-		if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -ge 1 ];then
+		if [ "$( grep -c "$PCUSER" $FILEIPTIMEWEB )" -ge 1 ];then
 		    $SED "/$PCUSER/d" $FILEIPTIMEWEB
 		    iptablesreload
 		fi
@@ -2340,7 +2340,7 @@ requiredpamtime() {
 	for FILE in $GESTIONNAIREDESESSIONS
 	do
 	    if [ -f "$DIRPAM""$FILE" ];then
-		if [ "$(cat < "$DIRPAM""$FILE" | grep -c "^account required pam_time.so")" -eq 0  ] ; then
+		if [ "$( grep -c "^account required pam_time.so" "$DIRPAM$FILE" )" -eq 0  ] ; then
 		    $SED "1i account required pam_time.so"  "$DIRPAM$FILE"
 		fi
 		TESTGESTIONNAIRE=1
@@ -2353,7 +2353,7 @@ requiredpamtime() {
 	    exit 1
 	fi
      else
-	if [ "$(cat < "$DIRPAM""$COMMONFILEGS" | grep -c "^account required pam_time.so")" -eq 0  ] ; then
+	if [ "$( grep -c "^account required pam_time.so" "$DIRPAM$COMMONFILEGS")" -eq 0  ] ; then
 	    $SED "1i account required pam_time.so"  $DIRPAM$COMMONFILEGS
 	fi
      fi
@@ -2425,7 +2425,7 @@ X ( 1 a \$timesession )= "
 	    if [ $alltime = "O" ];then
 		break
 	    fi
-	    
+
             clear
             at=$(gettext "at")
             and=$(gettext "and")
@@ -2636,7 +2636,7 @@ confgrub2() {
     ##avec le mot de passe grub.
 
     #apt-get install console-data
-    layout1="$(cat < /etc/default/keyboard | grep "XKBLAYOUT" | awk -F "\"" '{print $2}' | awk -F "," '{print $1}')"
+    layout1="$( grep "XKBLAYOUT" /etc/default/keyboard  | awk -F "\"" '{print $2}' | awk -F "," '{print $1}')"
     setxkbmap us
     loadkeys us
     clear
@@ -2737,7 +2737,7 @@ importconf() {
 
 	 tar -xvzf "$FILEimpconf" -C /
 	 $SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
-	 FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"
+	 FILTRAGEISOFF="$( grep -c "DNSMASQ=OFF" $FILE_CONF )"
 	 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	     adapt
 	     catChoice
@@ -2749,12 +2749,12 @@ importconf() {
 	     dnsmasqoff
 	     FILTRAGEISOFF=1
 	 fi
-	 if [ "$(cat < $FILE_CONF | grep -c GCTOFF=ON )" -eq 1 ];then
+	 if [ "$( grep -c GCTOFF=ON $FILE_CONF )" -eq 1 ];then
 	     activegourpectoff
 	 else
 	     desactivegourpectoff
 	 fi
-	 if [ "$(cat < $FILE_CONF | grep -c HOURSCONNECT=ON )" -eq 1 ];then
+	 if [ "$( grep -c HOURSCONNECT=ON $FILE_CONF )" -eq 1 ];then
 	     readTimeFILECONF
 	 else
 	     desactivetimelogin
