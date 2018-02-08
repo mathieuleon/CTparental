@@ -11,7 +11,9 @@ DIR_CONF="/etc/CTparental"
 DIR_SHARE="/usr/share/CTparental"
 FILE_CONF="$DIR_CONF/CTparental.conf"
 if [ -f "$DIR_CONF/CTparental.conf" ];then
-    export LANG=$(cat < $FILE_CONF | grep "^LANG" | cut -d "=" -f2 )
+    if [ $( grep -c "^LANG=" $FILE_CONF ) -ge 1 ] ;then
+		export LANG=$( grep "^LANG" $FILE_CONF | cut -d "=" -f2 )
+    fi
 fi
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
@@ -113,7 +115,7 @@ if [ ! -f $FILE_CONF ] ; then
     mkdir -p "$DIR_SHARE"/
     cat << EOF > $FILE_CONF
 LASTUPDATE=0
-LANG=$LANG
+#LANG=$LANG
 DNSMASQ=BLACK
 AUTOUPDATE=OFF
 HOURSCONNECT=OFF
