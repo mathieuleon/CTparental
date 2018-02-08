@@ -232,7 +232,7 @@ DIRHTML=${DIRHTML:="/var/www/CTparental"}
 DIRadminHTML=${DIRadminHTML:="/var/www/CTadmin"}
 PASSWORDFILEHTTPD=${PASSWORDFILEHTTPD:="/etc/lighttpd/lighttpd-htdigest.user"}
 REALMADMINHTTPD=${REALMADMINHTTPD:="interface admin"}
-CADIR=${CADIR:="/usr/share/ca-certificates/ctparental"}
+CADIR=${CADIR:="/usr/local/share/ca-certificates/ctparental"}
 UPDATECASYSTEM=${UPDATECASYSTEM:="update-ca-certificates"}
 PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
 CMDINSTALL=""
@@ -1671,7 +1671,7 @@ CActparental() {
      DIR_TMP=${TMPDIR-/tmp}/ctparental-mkcert.$$
      mkdir "$DIR_TMP"
      mkdir "$CADIR" 2> /dev/null
-
+     
      ## création de la clef privée ca et du certificat ca
      openssl genrsa  1024 > "$DIR_TMP"/cactparental.key 2> /dev/null
      openssl req -new -x509 -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 5000 -key "$DIR_TMP"/cactparental.key > "$DIR_TMP"/cactparental.crt
@@ -1679,22 +1679,22 @@ CActparental() {
      ## création clef et certificat *.ct.local et signature par le ca
      openssl genrsa 1024 > "$DIR_TMP"/ct.local.key 2> /dev/null
      openssl req -new -sha256  -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=*.ct.local" -key "$DIR_TMP"/ct.local.key > "$DIR_TMP"/ct.local.csr
-     openssl x509 -req -extfile <(printf "subjectAltName=DNS:admin.ct.local,DNS:privet.ct.local") -in "$DIR_TMP"/ct.local.csr -out "$DIR_TMP"/ct.local.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl
+     openssl x509 -req -extfile <(printf "subjectAltName=DNS:admin.ct.local,DNS:privet.ct.local") -in "$DIR_TMP"/ct.local.csr -days 5000 -out "$DIR_TMP"/ct.local.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAcreateserial -CAserial "$DIR_TMP"/ca.srl
 
      ## création du certificat duckduckgo pour redirection vers safe.duckduckgo.com
      openssl genrsa 1024 > "$DIR_TMP"/duckduckgo.key 2> /dev/null
      openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key "$DIR_TMP"/duckduckgo.key > "$DIR_TMP"/duckduckgo.csr
-     openssl x509 -req  -extfile <(printf "subjectAltName=DNS:duckduckgo.com,DNS:www.duckduckgo.com") -in "$DIR_TMP"/duckduckgo.csr -out "$DIR_TMP"/duckduckgo.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
+     openssl x509 -req  -extfile <(printf "subjectAltName=DNS:duckduckgo.com,DNS:www.duckduckgo.com") -in "$DIR_TMP"/duckduckgo.csr -days 5000 -out "$DIR_TMP"/duckduckgo.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
 
      ## création du certificat www.qwant.com pour redirection vers www.qwantjunior.com
      openssl genrsa 1024 > "$DIR_TMP"/qwant.key 2> /dev/null
      openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=www.qwant.com" -key "$DIR_TMP"/qwant.key > "$DIR_TMP"/qwant.csr
-     openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.qwant.com,DNS:qwant.com") -in "$DIR_TMP"/qwant.csr -out "$DIR_TMP"/qwant.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
+     openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.qwant.com,DNS:qwant.com") -in "$DIR_TMP"/qwant.csr -days 5000 -out "$DIR_TMP"/qwant.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
 
     ## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
     openssl genrsa 1024 > "$DIR_TMP"/search.yahoo.com.key 2> /dev/null
     openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key "$DIR_TMP"/search.yahoo.com.key > "$DIR_TMP"/search.yahoo.com.csr
-    openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.search.yahoo.com,DNS:search.yahoo.com")  -in "$DIR_TMP"/search.yahoo.com.csr -out "$DIR_TMP"/search.yahoo.com.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
+    openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.search.yahoo.com,DNS:search.yahoo.com")  -in "$DIR_TMP"/search.yahoo.com.csr -days 5000 -out "$DIR_TMP"/search.yahoo.com.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
 
     ## instalation de la CA dans les ca de confiance.
     cp -f "$DIR_TMP"/cactparental.crt "$CADIR"/

@@ -1,7 +1,7 @@
 Controle parental.
  Filtrage web basé sur iptables dnsmasq dansguardian privoxy lighttpd cron et la blacklist de l'université de Toulouse.
  une gestion des horaires de connection est aussi intégrée et
- une interface web (http://127.0.0.1/CTadmin) permettant de paramétrer tous ça.
+ une interface web (https://admin.ct.local) permettant de paramétrer tous ça.
  Le couple login mot de passe doit être saisi à l'install, mais peut être
  modifié par la suite grâce à la commande CTparental -uhtml.
  
