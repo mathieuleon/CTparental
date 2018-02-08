@@ -232,7 +232,7 @@ DIRHTML=${DIRHTML:="/var/www/CTparental"}
 DIRadminHTML=${DIRadminHTML:="/var/www/CTadmin"}
 PASSWORDFILEHTTPD=${PASSWORDFILEHTTPD:="/etc/lighttpd/lighttpd-htdigest.user"}
 REALMADMINHTTPD=${REALMADMINHTTPD:="interface admin"}
-CADIR=${CADIR:="/usr/share/ca-certificates/ctparental"}
+CADIR=${CADIR:="/usr/local/share/ca-certificates/ctparental"}
 UPDATECASYSTEM=${UPDATECASYSTEM:="update-ca-certificates"}
 PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
 CMDINSTALL=""
@@ -1671,7 +1671,7 @@ CActparental() {
      DIR_TMP=${TMPDIR-/tmp}/ctparental-mkcert.$$
      mkdir "$DIR_TMP"
      mkdir "$CADIR" 2> /dev/null
-
+     
      ## création de la clef privée ca et du certificat ca
      openssl genrsa  1024 > "$DIR_TMP"/cactparental.key 2> /dev/null
      openssl req -new -x509 -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 5000 -key "$DIR_TMP"/cactparental.key > "$DIR_TMP"/cactparental.crt
