@@ -15,7 +15,7 @@ msgstr ""
 # Copyright: © 2013-2016 Guillaume Marsat <guillaume.marsat@laposte.net>
 # License: GPL-3+
 # # CTparental
-msgid "Root rights  needed to run this script."
+msgid "Root rights needed to run this script."
 msgstr "Necesita privilegios de root para ejecutar este script."
 
 msgid "invalid directory path!"
@@ -346,6 +346,13 @@ msgstr ""
 msgid "X must take a value between 1 and 1440 \n"
 msgstr "X debe tener un valor entre 1 y 1440 \n"
 
+msgid ""
+"$PCUSER is allowed to surf the Internet X minutes per day \n"
+"X ( 1 a $timesession )= "
+msgstr ""
+"$PCUSER est autorisé à surfer X minutes par jour \n"
+"X ( 1 a $timesession )= "
+
 msgid "X must take a value between 1 and $timesession \n"
 msgstr "X debe tener un valor entre 1 y $timesession \n"
 
@@ -457,6 +464,9 @@ msgstr "Filtrado por WhiteList"
 
 msgid "Domain names filtering"
 msgstr "Filtrado de nombres de dominio"
+
+msgid "Error opening the file"
+msgstr "Erreur d'ouverture du fichier"
 
 msgid "Actually, the Domain name filter is on"
 msgstr "El filtrado de nombres de dominio está activado actualmente"
