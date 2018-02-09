@@ -1865,6 +1865,8 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
     echo ':msg,contains,"iptables" /var/log/iptables.log' > "$RSYSLOGCTPARENTAL"
     echo '& ~' >> "$RSYSLOGCTPARENTAL"
     #######################
+    dhclient -4 -i $I_WAN_IPV4
+    dhclient -6 -i $I_WAN_IPV6
 
     if [ ! -f blacklists.tar.gz ]
     then
