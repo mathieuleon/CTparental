@@ -4,7 +4,7 @@ function form_filter ($form_content)
 {
     // réencodage iso + format unix + rc fin de ligne (ouf...)
     $list = str_replace("\r\n", "\n", utf8_decode($form_content));
-    
+
     if (strlen($list) != 0)
     {
         if ($list[strlen($list)-1] != "\n")
@@ -12,7 +12,7 @@ function form_filter ($form_content)
             $list[strlen($list)] = "\n";
         }
     }
-    
+
     return $list;
 }
 
@@ -50,13 +50,13 @@ function WaitForTheFileToDisappear ($filewait)
 if (is_file ($conf_file))
 {
     $tab = file($conf_file);
-    
+
     if ($tab)
     {
         foreach ($tab as $line)
         {
-            $field = explode("=", $line);        
-            if ($field[0] == "DNSMASQ")         { $DNSMASQ      = trim($field[1]); }        
+            $field = explode("=", $line);
+            if ($field[0] == "DNSMASQ")         { $DNSMASQ      = trim($field[1]); }
         }
     }
 }
@@ -68,12 +68,12 @@ else
 if (isset($_GET['dgfile']))
 {
     $dg_confswitch=$_GET['dgfile'];
-} 
+}
 else
 {
     if ($DNSMASQ <> "OFF")
     {
-		
+
 		if ( $DNSMASQ == 'WHITE' )	{ $dg_confswitch = 'WhiteList Filtering'; }	else { $dg_confswitch = 'Blacklist filtering'; }
     }
     else
@@ -81,7 +81,7 @@ else
         $dg_confswitch = 'Hours of allowed connections';
     }
 }
-        
+
 switch ($dg_confswitch)
 {
     case 'extensions to be filtered' :
@@ -108,7 +108,7 @@ switch ($dg_confswitch)
 if (isset($_POST['choix'])){ $choix=$_POST['choix']; } else { $choix=""; }
 switch ($choix)
 {
-	
+
 case 'change_file1' :
 	$tab=file($dg_file_edit);
 	if ($tab)
@@ -121,22 +121,22 @@ case 'change_file1' :
 			if (trim($ligne) != '') # the line isn't empty
 			{
 				$ext_lignes=explode(" ", $line);
-				
+
 				if ($_POST['chk-'.$numline] == "on" )
 				{
 					if(preg_match('/^#/',$ligne)) {
 						$line=substr($ligne,1);
 					}
 				}
-				else { 				
+				else {
 						if(!preg_match('/^#/',$ligne)) {
-							$line="#".$ligne;			
+							$line="#".$ligne;
 						}
 				}
 				//echo $line."<br>";
 				fwrite($pointeur,$line);
-		    }	
-		    $numline=$numline+1;			
+		    }
+		    $numline=$numline+1;
 			}
 		fclose($pointeur);
 		}
@@ -160,8 +160,8 @@ case 'change_file2' :
 					}
 				//echo $line."<br>";
 				fwrite($pointeur,$line);
-		    }	
-		    $numline=$numline+1;			
+		    }
+		    $numline=$numline+1;
 			}
 		fclose($pointeur);
 		}
@@ -181,19 +181,19 @@ case 'change_file3' :
 			{
 				$ext_lignes=explode(" ", $line);
 					if(!preg_match('/^#/',$ligne)) {
-						$line="#".$ligne;			
+						$line="#".$ligne;
 					}
-			
+
 				//echo $line."<br>";
 				fwrite($pointeur,$line);
-		    }	
-		    $numline=$numline+1;			
+		    }
+		    $numline=$numline+1;
 			}
 		fclose($pointeur);
 		}
 	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-dgreload");
-	break;	
+	break;
 case 'change_safesearch' :
 	$tab=file($dg_file_edit);
 	if ($tab)
@@ -206,22 +206,22 @@ case 'change_safesearch' :
 			if (trim($ligne) != '') # the line isn't empty
 			{
 				$ext_lignes=explode(" ", $line);
-				
+
 				if ($_POST['chk-'.$numline] == "on" )
 				{
 					if(preg_match('/^#/',$ligne)) {
 						$line=substr($ligne,1);
 					}
 				}
-				else { 				
+				else {
 						if(!preg_match('/^#/',$ligne)) {
-							$line="#".$ligne;			
+							$line="#".$ligne;
 						}
 				}
 				//echo $line."<br>";
 				fwrite($pointeur,$line);
-		    }	
-		    $numline=$numline+1;			
+		    }
+		    $numline=$numline+1;
 			}
 		fclose($pointeur);
 		}
@@ -286,7 +286,7 @@ case 'MAJ_cat' :
 		foreach ($_POST as $key => $value)
 			{
                         if (strstr($key,'chk-'))
-				{	
+				{
 				$line=str_replace('chk-','',$key)."\n";
 				fwrite($pointeur,$line);
 				}
@@ -309,27 +309,27 @@ case 'MAJ_H' :
 	$formatheuresok=1;
 	if (isset($_POST['selectuser'])){ $selectuser=$_POST['selectuser']; }
 	#echo "$selectuser";
-	$tab=file($hconf_file);	
+	$tab=file($hconf_file);
 	if ($tab)
 	{
-		$pointeur=fopen($hconf_file, "w+");	
+		$pointeur=fopen($hconf_file, "w+");
 		foreach ($tab as $line)
 		{
 			if (strstr($line,$selectuser) == false)
 			{
 				fwrite($pointeur,$line); # on reécrit toutes les lignes ne correspondant pas à l'utilisateur sélectionné
 			}
-	
+
 		}
 	}
 	else {echo gettext('Error opening the file')." $hconf_file";}
-	if (isset($_POST["isadmin"])){fwrite($pointeur,"$selectuser=admin="."\n"); } 
-	else 
+	if (isset($_POST["isadmin"])){fwrite($pointeur,"$selectuser=admin="."\n"); }
+	else
 	{
 		if (isset($_POST["tmax"])){
 			if ( ( preg_match( "/^[1-9]$|^[1-9][0-9]$|^[1-9][0-9][0-9]$|^1[0-3][0-9][0-9]$|^14[0-3][0-9]$|^1440$/", $_POST["tmax"] ) and preg_match( "/^[1-9]$|^[1-9][0-9]$|^[1-9][0-9][0-9]$|^1[0-3][0-9][0-9]$|^14[0-3][0-9]$|^1440$/", $_POST["tmax2"] )) == 1  )
 			{
-				if ( $_POST["tmax2"] <= $_POST["tmax"] ) 
+				if ( $_POST["tmax2"] <= $_POST["tmax"] )
 				{
 				fwrite($pointeur,"$selectuser=user=".$_POST["tmax"]."=".$_POST["tmax2"]."\n");
 				}
@@ -337,10 +337,10 @@ case 'MAJ_H' :
 				{
 					fwrite($pointeur,"$selectuser=user=".$_POST["tmax"]."=".$_POST["tmax"]."\n");
 					echo "<H3>".gettext('Time surf between 1 to')." ".$_POST["tmax"]."</H3>";
-					
+
 				}
 			}
-			else {fwrite($pointeur,"$selectuser=user=1440=1440"."\n"); 
+			else {fwrite($pointeur,"$selectuser=user=1440=1440"."\n");
 				  echo "<H3>".gettext('You must enter a value between 1 and 1440 minutes.')."</H3>";}
 		}
 		else {fwrite($pointeur,"$selectuser=user=1440=1440"."\n"); }
@@ -354,8 +354,8 @@ case 'MAJ_H' :
 			if (preg_match("/^[0-1][0-9]h[0-5][0-9]$|^2[0-3]h[0-5][0-9]$/",$h1[$numday])!=1){$formatheuresok=0;}
 			if (preg_match("/^[0-1][0-9]h[0-5][0-9]$|^2[0-3]h[0-5][0-9]$/",$h2[$numday])!=1){$formatheuresok=0;}
 			if ($h3[$numday]=="")
-			{	
-	
+			{
+
 				if ($formatheuresok == 1)
 				{
 					$t1=explode("h", $h1[$numday]);
@@ -372,13 +372,13 @@ case 'MAJ_H' :
 						echo "<H3>$week[$numday] : ".gettext('time inconsistency: ')." $h1[$numday]>=$h2[$numday]</H3>";
 					}
 				}
-				else 
+				else
 				{
 					fwrite($pointeur,"$selectuser=$numday=00h00:23h59"."\n");
 					echo "<H3>$week[$numday] : ".gettext('A bad time format has been found: 8h30 instance must be written 08h30')."</H3>";
 				}
 			}
-			else 
+			else
 			{
 				if (preg_match("/^[0-1][0-9]h[0-5][0-9]$|^2[0-3]h[0-5][0-9]$/",$h3[$numday])!=1){$formatheuresok=0;}
 				if (preg_match("/^[0-1][0-9]h[0-5][0-9]$|^2[0-3]h[0-5][0-9]$/",$h4[$numday])!=1){$formatheuresok=0;}
@@ -402,22 +402,22 @@ case 'MAJ_H' :
 						echo "<H3>$week[$numday] : ".gettext('time inconsistency: ')." $h1[$numday]>=$h2[$numday]>=$h3[$numday]>=$h4[$numday]</H3>";
 					}
 				}
-				else 
+				else
 				{
 					fwrite($pointeur,"$selectuser=$numday=00h00:23h59"."\n");
 					echo "<H3>$week[$numday] : ".gettext('A bad time format has been found: 8h30 instance must be written 08h30')."</H3>";
-					
+
 				}
 			}
 
 		}
 	}
-	
+
 	fclose($pointeur);
 	WaitForTheFileToDisappear ($pidfilecmdCT);
 	exec ($cmdCT."-trf");
 	break;
-	
+
 case 'change_user' :
 	$tab=file($conf_ctoff_file);
 	if ($tab)
@@ -430,7 +430,7 @@ case 'change_user' :
 			if (trim($ligne) != '') # the line isn't empty
 			{
 				$ext_lignes=explode(" ", $line);
-				
+
 				if ($_POST['chk-'.$numline] == "on" )
 				{
 					if(preg_match('/^#/',$ligne)) {
@@ -438,9 +438,9 @@ case 'change_user' :
 					}
 
 				}
-				else { 				
+				else {
 						if(!preg_match('/^#/',$ligne)) {
-							$line="#".$ligne;			
+							$line="#".$ligne;
 						}
 						if(preg_match('/^\+/',$ligne)) {
 						$line=$ligne;
@@ -448,33 +448,33 @@ case 'change_user' :
 				}
 				//echo $line."<br>";
 				fwrite($pointeur,$line);
-		    }	
-		    $numline=$numline+1;			
+		    }
+		    $numline=$numline+1;
 			}
 		fclose($pointeur);
 		}
 	else {echo gettext('Error opening the file')." $conf_ctoff_file";}
 	WaitForTheFileToDisappear ($pidfilecmdCT);
-	exec ($cmdCT."-gctalist");
+	exec ($cmdCT."-gctapl");
 	break;
 }
 
 if (is_file ($conf_file))
 {
     $tab = file($conf_file);
-    
+
     if ($tab)
     {
         foreach ($tab as $line)
         {
             $field = explode("=", $line);
-            
+
             if ($field[0] == "LASTUPDATE")      { $LASTUPDATE   = trim($field[2]); }
             if ($field[0] == "DNSMASQ")         { $DNSMASQ      = trim($field[1]); }
             if ($field[0] == "AUTOUPDATE")      { $AUTOUPDATE   = trim($field[1]); }
             if ($field[0] == "HOURSCONNECT")    { $HOURSCONNECT = trim($field[1]); }
             if ($field[0] == "GCTOFF")          { $GCTOFF       = trim($field[1]); }
-            if ($field[0] == "PRIVOXYDF")   	{ $PRIVOXYDF 	= trim($field[1]); }            
+            if ($field[0] == "PRIVOXYDF")   	{ $PRIVOXYDF 	= trim($field[1]); }
         }
     }
 }
@@ -548,7 +548,7 @@ echo "</nav>";
 
 echo "<div class='col-sm-3 col-md-2 sidebar'>";
 echo "<ul class='nav nav-sidebar'>";
-    
+
 if ($DNSMASQ <> "OFF")
 {
     $temp = array
@@ -561,7 +561,7 @@ if ($DNSMASQ <> "OFF")
         'privileged group',
         'Safesearch configuration'
     );
-    
+
     foreach ($temp as $item)
     {
         echo "<li role='".gettext($item)."'".(($dg_confswitch == $item) ? " class='active'" : "").">";
@@ -574,7 +574,7 @@ $item = 'Hours of allowed connections';
 echo "<li role='".gettext($item)."'".(($dg_confswitch == $item) ? " class='active'" : "").">";
 echo "<a href='".$_SERVER["PHP_SELF"]."?dgfile=".$item."'>".gettext($item)."</a>";
 echo "</li>";
-    
+
 echo "</ul>";
 echo "</div>";
 
@@ -603,7 +603,7 @@ switch ($dg_confswitch)
         break;
     case 'Safesearch configuration':
         include 'safesearch.php';
-        break;  
+        break;
     case 'Hours of allowed connections':
         include 'hours.php';
         break;
