@@ -3025,14 +3025,14 @@ then run the command CTparental -ipton") $Fcolor"
 	$E2GUARDIANrestart
 	iptablesreload
 	;;
-    -logqueryon )
+    -logdnson )
 	{
 	    echo "log-queries"
 	    echo "log-facility=/var/log/dnsmasq.query.log"
 	} > "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
 	resolvconffixon
 	;;
-    -logqueryoff )
+    -logdnsoff )
 	rm -f "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
 	resolvconffixon
 	rm -f /var/log/dnsmasq.query.log
