@@ -3,7 +3,7 @@ Section: utils
 Priority: optional
 Maintainer: marsat <CTparental@laposte.net>
 Uploaders: Gilles Filippini <gilles.filippini@free.fr>,
- DEMAREST Maxime <demar.max@openmailbox.org> 
+ DEMAREST Maxime <demar.max@openmailbox.org>
 Homepage: https://github.com/marsat/CTparental.git
 Vcs-Browser: https://github.com/marsat/CTparental.git
 Vcs-Git: https://github.com/marsat/CTparental.git
@@ -13,7 +13,7 @@ Standards-Version:4.21.01
 Package: ctparental
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${misc:Depends},debconf,dnsmasq,lighttpd,lighttpd-mod-magnet,perl,sudo,wget,php-cgi,php-xml,libnotify-bin,notification-daemon,iptables-persistent,rsyslog,dansguardian,privoxy,openssl,libnss3-tools,console-data,dnsutils
+Depends: ${misc:Depends},debconf,dnsmasq,lighttpd,lighttpd-mod-magnet,perl,sudo,wget,php-cgi,php-xml,libnotify-bin,notification-daemon,iptables-persistent,rsyslog,dansguardian,privoxy,openssl,libnss3-tools,console-data,dnsutils,ifupdown2|ifupdown
 Conflicts: e2guardian,firewalld
 Description: Controle parental.
  Filtrage web basé sur dnsmasq, lighttpd et cron,
