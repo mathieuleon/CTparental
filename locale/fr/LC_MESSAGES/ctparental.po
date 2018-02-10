@@ -15,6 +15,9 @@ msgstr ""
 # Copyright: © 2013-2016 Guillaume Marsat <guillaume.marsat@laposte.net>
 # License: GPL-3+
 # # CTparental
+msgid "Already in progress"
+msgstr "Déjà en cours"
+
 msgid "Root rights needed to run this script."
 msgstr "Il vous faut des droits root pour lancer ce script."
 
@@ -780,7 +783,10 @@ msgstr "Sélectionnez les extensions à filtrer"
 msgid "Select the mimetype to be filtered"
 msgstr "Sélectionnez le type MIME à filtrer"
 
-msgid "e2guardian configuration"
+msgid "Dansguardian configuration"
+msgstr "Configuration de Dansguardian"
+
+msgid "E2guardian configuration"
 msgstr "Configuration de e2guardian"
 
 msgid "Safesearch configuration"
