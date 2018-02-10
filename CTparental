@@ -2807,7 +2807,7 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	              CTparental -gctalist")
 -gctoff$(gettext "	    => Disable privileged group.")
 	      $(gettext "all users of the system undergo the filtering!")
--gctalist$(eval_gettext "	    => Add / Delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF")
+-gctapl$(eval_gettext "	    => Add / Delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF")
 -ipton$(gettext "	    => Enable rules of custom firewall.")
 -iptoff$(gettext "	    => Disable rules of custom firewall.")
 -grubPon$(gettext "    => Enable the superuser of grub2.")
@@ -2829,225 +2829,225 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 
 arg1=${1}
 case $arg1 in
-    -\? | -h* | --h*)
-	echo "$usage"
+	-\? | -h* | --h*)
+		echo "$usage"
 	;;
-    -i )
-	networkisoknext
-	install
+	-i )
+		networkisoknext
+		install
 	;;
-    -u )
-	uninstall
+	-u )
+	    uninstall
 	;;
-    -dl )
+	-dl )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			networkisoknext
+			download
+			adapt
+			catChoice
+			dnsmasqon
+			$SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=$(date +%d-%m-%Y\ %T)?g" $FILE_CONF
+		fi
+	;;
+	-ubl )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			networkisoknext
+			adapt
+			catChoice
+			dnsmasqon
+		fi
+	;;
+	-uhtml )
+		networkisoknext
+		FoncHTTPDCONF
+	;;
+	-rl )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			networkisoknext
+			catChoice
+			dnsmasqon
+		fi
+	;;
+	-on )
+		networkisoknext
+		FILTRAGEISOFF=0
+		dnsmasqon
+		iptablesreload
+		activegourpectoff
+	;;
+	-off )
+		desactivegourpectoff
+		autoupdateoff
+		dnsmasqoff
+		FILTRAGEISOFF=1
+		iptablesreload
+	;;
+	-wlo )
 	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            networkisoknext
-	    download
-	    adapt
-	    catChoice
-	    dnsmasqon
-	    $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=$(date +%d-%m-%Y\ %T)?g" $FILE_CONF
+		networkisoknext
+		dnsmasqwhitelistonly
 	fi
 	;;
-    -ubl )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            networkisoknext
-	    adapt
-	    catChoice
-	    dnsmasqon
-	fi
+	-cble )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			networkisoknext
+			choiblenabled
+			catChoice
+			dnsmasqon
+		fi
 	;;
-    -uhtml )
-	networkisoknext
-	FoncHTTPDCONF
+	-dble )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			networkisoknext
+			initblenabled
+			catChoice
+			dnsmasqon
+		fi
 	;;
-    -rl )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            networkisoknext
-            catChoice
-            dnsmasqon
-	fi
+	-tlo )
+		activetimelogin
 	;;
-    -on )
-	networkisoknext
-	FILTRAGEISOFF=0
-	dnsmasqon
-	iptablesreload
-	activegourpectoff
+	-tlu )
+		desactivetimelogin
 	;;
-    -off )
-	desactivegourpectoff
-	autoupdateoff
-	dnsmasqoff
-	FILTRAGEISOFF=1
-	iptablesreload
+	-trf )
+		readTimeFILECONF
 	;;
-    -wlo )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-	    networkisoknext
-	    dnsmasqwhitelistonly
-	fi
+	-aupon )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			autoupdateon
+		fi
 	;;
-    -cble )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            networkisoknext
-	    choiblenabled
-	    catChoice
-	    dnsmasqon
-	fi
+	-aupoff )
+		autoupdateoff
 	;;
-    -dble )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            networkisoknext
-	    initblenabled
-	    catChoice
-	    dnsmasqon
-	fi
+	-aup )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			networkisoknext
+			autoupdate
+		fi
 	;;
-    -tlo )
-	activetimelogin
+	-listusers )
+		listeusers
 	;;
-    -tlu )
-	desactivetimelogin
+	-gcton )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			networkisoknext
+			activegourpectoff
+			iptablesreload
+		fi
 	;;
-    -trf )
-	readTimeFILECONF
+	-gctoff )
+		desactivegourpectoff
+		iptablesreload
 	;;
-    -aupon )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            autoupdateon
-	fi
+	-gctulist )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			networkisoknext
+			updatelistgctoff
+			iptablesreload
+		fi
 	;;
-    -aupoff )
-	autoupdateoff
+	-gctapl )
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			networkisoknext
+			if [ "$(updatelistgctoff)" -eq 1 ];then
+				updatecauser
+			fi
+			unset test
+			applistegctoff
+			iptablesreload
+		fi
 	;;
-    -aup )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            networkisoknext
-	    autoupdate
-	fi
-	;;
-    -listusers )
-	listeusers
-	;;
-    -gcton )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            networkisoknext
-	    activegourpectoff
-	    iptablesreload
-	fi
-	;;
-    -gctoff )
-	desactivegourpectoff
-	iptablesreload
-	;;
-    -gctulist )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            networkisoknext
-	    updatelistgctoff
-	    iptablesreload
-	fi
-	;;
-    -gctalist )
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-            networkisoknext
-	    if [ "$(updatelistgctoff)" -eq 1 ];then
-		updatecauser
-	    fi
-	    unset test
-	    applistegctoff
-	    iptablesreload
-	fi
-	;;
-    -ipton )
-	networkisoknext
-	$SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
-	iptablesreload
-	echo -e "$RougeD $(eval_gettext "to add custom rules edit the file
+	-ipton )
+		networkisoknext
+		$SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
+		iptablesreload
+		echo -e "$RougeD $(eval_gettext "to add custom rules edit the file
 \$FILEIPTABLES
 then run the command CTparental -ipton") $Fcolor"
 	;;
-    -iptoff )
-	$SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
-	iptablesreload
-	;;
-    -cron )
-	# appelé toutes les minutes par cron pour activer/désactiver
-	# les usagers ayant des restrictions de temps journalier de
-	# connexion.
-	if [ $(cat  < $FILE_CONF | grep -c "HOURSCONNECT=ON") -eq 1 ];then
-	    updatetimelogin
-	fi
-	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-	    # appelé toutes les minutes par cron pour modifier la
-	    # configuration en cas de changement de réseau.
-	    nomade
-	    networkisoknext
-	    # appelé toutes les minutes par cron pour activer le
-	    # filtrage sur les usagers nouvellement créés.
-	    if [ "$(updatelistgctoff)" -eq 1 ];then
-		applistegctoff
+	-iptoff )
+		$SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
 		iptablesreload
-	    fi
-	fi
-	updatecauser
 	;;
-    -dgreload )
-	$E2GUARDIANrestart
+	-cron )
+		# appelé toutes les minutes par cron pour activer/désactiver
+		# les usagers ayant des restrictions de temps journalier de
+		# connexion.
+		if [ $(cat  < $FILE_CONF | grep -c "HOURSCONNECT=ON") -eq 1 ];then
+			updatetimelogin
+		fi
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			# appelé toutes les minutes par cron pour modifier la
+			# configuration en cas de changement de réseau.
+			nomade
+			networkisoknext
+			# appelé toutes les minutes par cron pour activer le
+			# filtrage sur les usagers nouvellement créés.
+			if [ "$(updatelistgctoff)" -eq 1 ];then
+			applistegctoff
+			iptablesreload
+			fi
+		fi
+		updatecauser
 	;;
-    -grubPon )
-	confgrub2
+	-dgreload )
+		$E2GUARDIANrestart
 	;;
-    -grubPoff )
-	rm -rf /etc/grub.d/99_password
-	update-grub2
+	-grubPon )
+	    confgrub2
 	;;
-    -pfoff )
-	privoxydefaultfilteroff
+	-grubPoff )
+		rm -rf /etc/grub.d/99_password
+		update-grub2
 	;;
-    -pfon )
-	privoxydefaultfilteron
+	-pfoff )
+		privoxydefaultfilteroff
 	;;
-    -ron )
-	cp -f "$DIR_SHARE"/www/CTparental/index.php "$DIRHTML"/index.php
-	cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
-	cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
-	chown -R root:"$GROUPHTTPD" "$DIRHTML"
-	echo $E2GUARDIANrestart
-	$E2GUARDIANrestart
-	iptablesreload
+	-pfon )
+		privoxydefaultfilteron
 	;;
-    -roff )
-	cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRHTML"/index.php
-	cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
-	cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
-	chown -R root:"$GROUPHTTPD" "$DIRHTML"
-	$E2GUARDIANrestart
-	iptablesreload
+	-ron )
+		cp -f "$DIR_SHARE"/www/CTparental/index.php "$DIRHTML"/index.php
+		cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
+		cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
+		chown -R root:"$GROUPHTTPD" "$DIRHTML"
+		echo $E2GUARDIANrestart
+		$E2GUARDIANrestart
+		iptablesreload
 	;;
-    -logdnson )
-	{
-	    echo "log-queries"
-	    echo "log-facility=/var/log/dnsmasq.query.log"
-	} > "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
-	resolvconffixon
+	-roff )
+		cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRHTML"/index.php
+		cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
+		cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
+		chown -R root:"$GROUPHTTPD" "$DIRHTML"
+		$E2GUARDIANrestart
+		iptablesreload
 	;;
-    -logdnsoff )
-	rm -f "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
-	resolvconffixon
-	rm -f /var/log/dnsmasq.query.log
+	-logdnson )
+		{
+			echo "log-queries"
+			echo "log-facility=/var/log/dnsmasq.query.log"
+		} > "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
+		resolvconffixon
 	;;
-    -exp )
-	exportconf
+	-logdnsoff )
+		rm -f "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
+		resolvconffixon
+		rm -f /var/log/dnsmasq.query.log
 	;;
-    -imp )
-	importconf
+	-exp )
+		exportconf
 	;;
-    -cainstall )
+	-imp )
+		importconf
+	;;
+	-cainstall )
 	updatecauser
 	;;
 
-    *)
+	*)
 	echo "$(gettext "Unknown argument"):$1";
 	echo "$usage";
 	exit 1
