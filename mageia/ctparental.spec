@@ -1,5 +1,5 @@
 %define	name ctparental
-%define version	4.21.01e
+%define version	4.21.02e
 %define release	1
 
 Summary: Parental Controls
@@ -29,16 +29,16 @@ exit 0
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/etc/CTparental
-mkdir -p $RPM_BUILD_ROOT/usr/share/locale/fr_FR/LC_MESSAGES
-mkdir -p $RPM_BUILD_ROOT/usr/share/locale/es_ES/LC_MESSAGES
+mkdir -p $RPM_BUILD_ROOT/usr/share/locale/fr/LC_MESSAGES
+mkdir -p $RPM_BUILD_ROOT/usr/share/locale/es/LC_MESSAGES
 mkdir -p $RPM_BUILD_ROOT/usr/share/CTparental
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
 install -m755 $RPM_BUILD_DIR/CTparental $RPM_BUILD_ROOT/usr/bin
 install -m755 $RPM_BUILD_DIR/CTparental-bl-infos $RPM_BUILD_ROOT/usr/bin
 install -m644 $RPM_BUILD_DIR/debian/CTparental.conf $RPM_BUILD_ROOT/etc/CTparental
 install -m644 $RPM_BUILD_DIR/mageia/dist.conf $RPM_BUILD_ROOT/etc/CTparental
-install -m644 $RPM_BUILD_DIR/locale/fr_FR/LC_MESSAGES/ctparental.mo $RPM_BUILD_ROOT/usr/share/locale/fr_FR/LC_MESSAGES/
-install -m644 $RPM_BUILD_DIR/locale/es_ES/LC_MESSAGES/ctparental.mo $RPM_BUILD_ROOT/usr/share/locale/es_ES/LC_MESSAGES/
+install -m644 $RPM_BUILD_DIR/locale/fr/LC_MESSAGES/ctparental.mo $RPM_BUILD_ROOT/usr/share/locale/fr/LC_MESSAGES/
+install -m644 $RPM_BUILD_DIR/locale/es/LC_MESSAGES/ctparental.mo $RPM_BUILD_ROOT/usr/share/locale/es/LC_MESSAGES/
 cp -r $RPM_BUILD_DIR/www $RPM_BUILD_ROOT/usr/share/CTparental
 cp -r $RPM_BUILD_DIR/confe2guardian $RPM_BUILD_ROOT/usr/share/CTparental
 install -m644 $RPM_BUILD_DIR/man/CTparental.1.gz $RPM_BUILD_ROOT/usr/share/man/man1
@@ -103,8 +103,8 @@ exit 0
 /usr/share/CTparental/www/CTparental/js/jquery-1.12.3.min.js
 /usr/share/CTparental/www/CTparental/js/npm.js
 /usr/share/CTparental/www/CTparental/locale.php
-/usr/share/locale/fr_FR/LC_MESSAGES/ctparental.mo
-/usr/share/locale/es_ES/LC_MESSAGES/ctparental.mo
+/usr/share/locale/fr/LC_MESSAGES/ctparental.mo
+/usr/share/locale/es/LC_MESSAGES/ctparental.mo
 /usr/share/man/man1/CTparental.1.gz
 
 
