@@ -2769,62 +2769,62 @@ importconf() {
 # and func # ne pas effacer cette ligne !!
 
 usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -off }|{ -cble }|{ -dble }
-                               |{ -tlo }|{ -tlu }|{ -uhtml }|{ -aupon }|{ -aupoff }|{ -aup }
--i$(gettext "	=> Install parental control on the computer (desktop PC). Can be used with
-	  an additional parameter to specify a source path for the redirection page.
-	  example: CTparental -dirhtml -i /home/toto/html/
-	  if no option a default page is used.")
--u$(gettext "	=> uninstall the Parental Control Computer (desktop PC)")
--dl$(gettext "	=> updates parental control from the blacklist of the University of Toulouse")
--ubl$(eval_gettext "	=> To be done after each change of the file \$DNS_FILTER_OSSI")
--rl$(eval_gettext "	=> To be done after each change of the file \$DREAB")
--on$(gettext "	=> Enable parental control")
--off$(gettext "	=> Disable parental control")
--cble$(gettext "	=> Set the filter mode by whitelist or blacklist (default)
-	  and the categories that you want to activate.")
--dble$(gettext "	=> Reset the default active categories and blacklist filtering.")
--tlo$(gettext "	=> Enable and configure the login time restrictions for users.")
--tlu$(gettext "	=> Disable the login time restrictions for users.")
--uhtml$(gettext "	=> updates the redirect page from a source directory or default.
-	  examples:
-	          - With a source directory: CTparental -uhtml -dirhtml /home/toto/html/
-	          - Default: CTparental -uhtml
-	  also lets you change the login couple password of the web interface.")
--aupon$(gettext "	=> Enable the automatic update of the Toulouse blacklist (every 7 days).")
--aupoff$(gettext "	=> Disable the automatic update of the Toulouse blacklist.")
--aup$(gettext "	=> as -dl but only if there is no update for more than 7 days.")
--nodep$(gettext "	=> if placed after -i or -u allows not install / uninstall the dependencies, useful if
-	  we prefer to install them by hand, or for the postinst and prerm script of deb.
-	  examples:
-	  CTparental -i -nodep
-	  CTparental -dirhtml -i /home/toto/html/ -nodep
-	  CTparental -u -nodep")
--nomanuel$(gettext "	=> used only for the postinst and prerm script.")
--gcton$(eval_gettext "	=> Enable a group of privileged users that will not undergo filtering.
-	  exemples:
-	          CTparental -gctulist
-	          Comment all users that you want to filter in \$FILE_GCTOFFCONF
-	          CTparental -gctalist")
--gctoff$(gettext "	=> Disable privileged group.")
-	  $(gettext "all users of the system undergo the filtering!")
--gctalist$(eval_gettext "	=> Add / Delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF")
--ipton$(gettext "	=> Enable rules of custom firewall.")
--iptoff$(gettext "	=> Disable rules of custom firewall.")
--grubPon$(gettext "	=> Enable the superuser of grub2.")
--grubPoff$(gettext "	=> Disable the superuser of grub2.")
--pfoff$(gettext "	=> Disable default rules privoxy.")
--pfon$(gettext "	=> Enable default rules privoxy. (default is Enable)")
--ron$(gettext "	=> Enable redirect page.")
--roff$(gettext "	=> Disabled redirect page.")
--exp$(gettext "	=> Export configuration.
-	  exemple:
-	          CTparental -exp /home/myhomedir/")
--imp$(gettext "	=> Import a configuration.
-	  exemple:
-	          CTparental -imp /home/myhomedir/CTparental.conf.yy.mm.dd.tar.gz")
--logqueryon$(gettext "	=> For debugging only.
-	  Enabling dnsmasq query log in the /var/log/dnsmasq.query.log file.")
--logqueryoff$(gettext "	=> To disable dnsmasq query log in /var/log/dnsmasq.query.log .")
+		     |{ -tlo }|{ -tlu }|{ -uhtml }|{ -aupon }|{ -aupoff }|{ -aup }
+-i$(gettext "	    => Install parental control on the computer (desktop PC). Can be used with
+	      an additional parameter to specify a source path for the redirection page.
+	      example: CTparental -dirhtml -i /home/toto/html/
+	      if no option a default page is used.")
+-u$(gettext "	    => uninstall the Parental Control Computer (desktop PC)")
+-dl$(gettext "	    => updates parental control from the blacklist of the University of Toulouse")
+-ubl$(eval_gettext "	    => To be done after each change of the file \$DNS_FILTER_OSSI")
+-rl$(eval_gettext "	    => To be done after each change of the file \$DREAB")
+-on$(gettext "	    => Enable parental control")
+-off$(gettext "	    => Disable parental control")
+-cble$(gettext "	    => Set the filter mode by whitelist or blacklist (default)
+	      and the categories that you want to activate.")
+-dble$(gettext "	    => Reset the default active categories and blacklist filtering.")
+-tlo$(gettext "	    => Enable and configure the login time restrictions for users.")
+-tlu$(gettext "	    => Disable the login time restrictions for users.")
+-uhtml$(gettext "	    => updates the redirect page from a source directory or default.
+	      examples:
+	              - With a source directory: CTparental -uhtml -dirhtml /home/toto/html/
+	              - Default: CTparental -uhtml
+	      also lets you change the login couple password of the web interface.")
+-aupon$(gettext "	    => Enable the automatic update of the Toulouse blacklist (every 7 days).")
+-aupoff$(gettext "	    => Disable the automatic update of the Toulouse blacklist.")
+-aup$(gettext "	    => as -dl but only if there is no update for more than 7 days.")
+-nodep$(gettext "	    => if placed after -i or -u allows not install / uninstall the dependencies, useful if
+	      we prefer to install them by hand, or for the postinst and prerm script of deb.
+	      examples:
+	              CTparental -i -nodep
+	              CTparental -dirhtml -i /home/toto/html/ -nodep
+	              CTparental -u -nodep")
+-nomanuel$(gettext "   => used only for the postinst and prerm script.")
+-gcton$(eval_gettext "	    => Enable a group of privileged users that will not undergo filtering.
+	      exemples:
+	              CTparental -gctulist
+	              Comment all users that you want to filter in \$FILE_GCTOFFCONF
+	              CTparental -gctalist")
+-gctoff$(gettext "	    => Disable privileged group.")
+	      $(gettext "all users of the system undergo the filtering!")
+-gctalist$(eval_gettext "	    => Add / Delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF")
+-ipton$(gettext "	    => Enable rules of custom firewall.")
+-iptoff$(gettext "	    => Disable rules of custom firewall.")
+-grubPon$(gettext "    => Enable the superuser of grub2.")
+-grubPoff$(gettext "   => Disable the superuser of grub2.")
+-pfoff$(gettext "	    => Disable default rules privoxy.")
+-pfon$(gettext "	    => Enable default rules privoxy. (default is Enable)")
+-ron$(gettext "	    => Enable redirect page.")
+-roff$(gettext "	    => Disabled redirect page.")
+-exp$(gettext "	    => Export configuration.
+	      exemple:
+	              CTparental -exp /home/myhomedir/")
+-imp$(gettext "	    => Import a configuration.
+	      exemple:
+	              CTparental -imp /home/myhomedir/CTparental.conf.yy.mm.dd.tar.gz")
+-logdnson$(gettext "   => For debugging only.
+	      Enabling dnsmasq query log in the /var/log/dnsmasq.query.log file.")
+-logdnsoff$(gettext "  => To disable dnsmasq query log in /var/log/dnsmasq.query.log .")
 "
 
 arg1=${1}
