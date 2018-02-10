@@ -190,13 +190,13 @@ msgstr ""
 "\t       así como las categorías que desea activar."
 
 msgid "\t    => Reset the default active categories and blacklist filtering."
-msgstr "\t=> Devuelve las categorías activas predeterminadas y el filtrado por lista negra."
+msgstr "\t    => Devuelve las categorías activas predeterminadas y el filtrado por lista negra."
 
 msgid "\t    => Enable and configure the login time restrictions for users."
-msgstr "\t=> Activa y establece las restricciones horarias de inicio de sesión para los usuarios."
+msgstr "\t    => Activa y establece las restricciones horarias de inicio de sesión para los usuarios."
 
 msgid "\t    => Disable the login time restrictions for users."
-msgstr "\t=> Desactiva las restricciones horarias de inicio de sesión para los usuarios."
+msgstr "\t    => Desactiva las restricciones horarias de inicio de sesión para los usuarios."
 
 msgid ""
 "\t    => updates the redirect page from a source directory or default.\n"
@@ -212,13 +212,13 @@ msgstr ""
 "\t       también permite cambiar el nombre de usuario y contraseña de la interfaz web."
 
 msgid "\t    => Enable the automatic update of the Toulouse blacklist (every 7 days)."
-msgstr "\t=> Activar la actualización automática de la lista negra de Tolouse (cada 7 días)."
+msgstr "\t    => Activar la actualización automática de la lista negra de Tolouse (cada 7 días)."
 
 msgid "\t    => Disable the automatic update of the Toulouse blacklist."
-msgstr "\t=> Desactivar la actualización automática de la lista negra de Tolouse."
+msgstr "\t    => Desactivar la actualización automática de la lista negra de Tolouse."
 
 msgid "\t    => as -dl but only if there is no update for more than 7 days."
-msgstr "\t=> como -dl pero sólo si no hubo actualización alguna durante más de 7 días."
+msgstr "\t    => como -dl pero sólo si no hubo actualización alguna durante más de 7 días."
 
 msgid ""
 "\t    => if placed after -i or -u allows not install / uninstall the dependencies, useful if\n"
@@ -295,7 +295,7 @@ msgstr ""
 "\t       Activar el registro de consultas dnsmasq en el archivo /var/log/dnsmasq.query.log ."
 
 msgid "  => To disable dnsmasq query log in /var/log/dnsmasq.query.log ."
-msgstr "   => Para deshabilitarel registro de consultas dnsmasq en /var/log/dnsmasq.query.log ."
+msgstr "  => Para deshabilitarel registro de consultas dnsmasq en /var/log/dnsmasq.query.log ."
 
 msgid ""
 "to add custom rules edit the file \n"
