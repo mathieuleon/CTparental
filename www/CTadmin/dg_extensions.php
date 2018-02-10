@@ -1,7 +1,7 @@
 <?php
 // affichage des formulaires
 
-echo "<h1 class='page-header'>".gettext('e2guardian configuration')."</h1>";
+echo "<h1 class='page-header'>".gettext('E2guardian configuration')."</h1>";
 echo "<h3>".gettext('Select the extensions to be filtered')."</h3>";
 echo "<p class='text-muted'>".$dg_file_edit."</p>";
 
@@ -31,7 +31,7 @@ $cols  = 1;
 if ($tab) # the file isn't empty
 {
     $chknum = 1;
-    
+
     foreach ($tab as $ligne)
     {
         if (trim($ligne) != '') # the line isn't empty
@@ -40,7 +40,7 @@ if ($tab) # the file isn't empty
             {
                 $s = substr($ligne, 1);
                 $s = trim($s);
-                
+
                 if ($s[0] != '.')
                 {
 					$chknum = $chknum + 1;
@@ -49,12 +49,12 @@ if ($tab) # the file isn't empty
             }
 
             if ($cols == 1) { echo "<div class='col-md-6'>"; }
-            
+
             echo "<div class='checkbox'>";
             echo "<label>";
 
             echo "<input type='checkbox' name='chk-$chknum'";
-            
+
             if (preg_match('/^#/', $ligne))
             {
                 echo ">";
@@ -81,10 +81,10 @@ if ($tab) # the file isn't empty
                 $cols = 1;
             }
         }
-    
+
         $chknum = $chknum + 1;
     }
-    
+
     if ($cols > 1 and $cols < $count + 1)
     {
         echo "</div>";

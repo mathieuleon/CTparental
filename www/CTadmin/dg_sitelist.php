@@ -1,7 +1,7 @@
 <?php
 // affichage des formulaires
 
-echo "<h1 class='page-header'>".gettext('e2guardian configuration')."</h1>";
+echo "<h1 class='page-header'>".gettext('E2guardian configuration')."</h1>";
 echo "<h3>".gettext('Select the type of packet filtering')."</h3>";
 echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=*ip **ips ...' method='post'>";
 
@@ -14,7 +14,7 @@ $tab = file($dg_file_edit);
 if ($tab) # the file isn't empty
 {
     $chknum = 1;
-    
+
     foreach ($tab as $ligne)
     {
         if (trim($ligne) != '') # the line isn't empty
@@ -23,7 +23,7 @@ if ($tab) # the file isn't empty
             {
                 $s = substr($ligne, 1);
                 $s = trim($s);
-                
+
                 if ($s[0] != '*')
                 {
                     if (strstr($s, '!'))
@@ -36,7 +36,7 @@ if ($tab) # the file isn't empty
                     else if (!strstr($s, ':'))
                     {
                         $s = explode(',', $s);
-                        
+
                         echo "<span>";
                         echo $s[0]." ";
                         echo "</span>";
@@ -45,12 +45,12 @@ if ($tab) # the file isn't empty
                     continue;
                 }
             }
-            
+
             echo "<div class='checkbox'>";
             echo "<label>";
 
             echo "<input type='checkbox' name='chk-$chknum'";
-            
+
             if (preg_match('/^#/', $ligne))
             {
                 echo ">";
@@ -70,7 +70,7 @@ if ($tab) # the file isn't empty
             echo "</label>";
             echo "</div>";
         }
-    
+
         $chknum = $chknum + 1;
     }
 }
