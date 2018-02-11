@@ -346,6 +346,67 @@ export reseau_box_ipv6_l
 export DNS1v6=${DNS1v6:=2001:4860:4860::8888}
 export DNS2v6=${DNS2v6:=2001:4860:4860::8844}
 
+ipV4ok() {
+	ip=$(echo "$1" | cut -d"/" -f1)
+	mask=$(echo "$1" | grep "/" | cut -d"/" -f2)
+	if [ "$(echo "$1" | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$")" -eq 1 ];then
+		echo 1
+		return 1
+	fi
+	if [ ! "$(echo "$ip" | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$")" -eq 1 ];then
+		echo 0
+		return 0
+	fi
+	if [ "$(echo "$mask" | grep -c "^\([1-9]\|[1-2][0-9]\|3[0-2]\)$")" -eq 1 ];then
+		echo 1
+		return 1
+	fi
+	i=1
+	octn=255
+	result=1
+while [ $i -le 4 ]
+do
+	oct=$( echo "$mask" | grep '\.'| cut -d "." -f$i )
+	if [ -z "$oct" ] ; then
+		result=0
+		break
+	fi
+	if [ ! "$octn" -eq 255 ];then
+		if [ ! "$oct" -eq 0 ];then
+			result=0
+			break
+		fi
+	fi
+	octn=$oct
+	if [ ! "$oct" -eq 255 ] &&  [ ! "$oct" -eq 254 ]  &&  [ ! "$oct" -eq 252 ] &&  [ ! "$oct" -eq 248 ] &&  [ ! "$oct" -eq 240 ] &&  [ ! "$oct" -eq 224 ] &&  [ ! "$oct" -eq 192 ] &&  [ ! "$oct" -eq 128 ] &&  [ ! "$oct" -eq 0 ]; then
+		result=0
+		break
+	  fi
+	i=$(( i + 1 ))
+done
+	echo $result
+	return $result
+}
+
+ipV6ok (){
+ip=$(echo "$1" | cut -d"/" -f1)
+mask=$(echo "$1" | grep "/" | cut -d"/" -f2) # de 1 a 128
+if [ $(echo $ip | grep -Ec "^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}:([0-9A-Fa-f]{1,4}:)?[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){4}:([0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){3}:([0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){2}:([0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}((b((25[0-5])|(1d{2})|(2[0-4]d)|(d{1,2}))b).){3}(b((25[0-5])|(1d{2})|(2[0-4]d)|(d{1,2}))b))|(([0-9A-Fa-f]{1,4}:){0,5}:((b((25[0-5])|(1d{2})|(2[0-4]d)|(d{1,2}))b).){3}(b((25[0-5])|(1d{2})|(2[0-4]d)|(d{1,2}))b))|(::([0-9A-Fa-f]{1,4}:){0,5}((b((25[0-5])|(1d{2})|(2[0-4]d)|(d{1,2}))b).){3}(b((25[0-5])|(1d{2})|(2[0-4]d)|(d{1,2}))b))|([0-9A-Fa-f]{1,4}::([0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})|(::([0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:))$" ) -eq 0 ] ;then
+echo 0
+return 0
+fi
+if [ "$(echo "$mask" | grep -c "^\([1-9]\|[1-9][0-9]\|[1][0-1][0-9]\|[1][2][0-8]\)$")" -eq 1 ];then
+	echo 1
+	return 1
+fi
+if [ -z $mask ];then
+	echo 1
+	return 1
+fi
+echo 0
+return 0
+}
+
 networkisoknext() {
     ipv4ok=0
     $PING4 -c1 -w1 "$ipbox_ipv4" 2> /dev/null
@@ -998,9 +1059,13 @@ ipglobal() {
 	while read ligne
 	do
 	   ipdrop=$(echo "$ligne" | cut -d " " -f1)
-	   if [ "$( ipMaskValide "$ipdrop" )" -eq 1 ] ;then
+	   if [ "$( ipV4ok "$ipdrop" )" -eq 1 ] ;then
 		$IPTABLES -I INPUT  -s "$ipdrop" -j DROP
 		$IPTABLES -I OUTPUT  -d "$ipdrop" -j DROP
+	   fi
+	   if [ "$( ipV6ok "$ipdrop" )" -eq 1 ] ;then
+		$IPTABLES6 -I INPUT  -s "$ipdrop" -j DROP
+		$IPTABLES6 -I OUTPUT  -d "$ipdrop" -j DROP
 	   fi
 	done < $FILEIPBLACKLIST
     else
