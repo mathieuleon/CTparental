@@ -1123,6 +1123,8 @@ ipglobal() {
     modprobe ip_conntrack_ftp
     $IPTABLES -A OUTPUT -p tcp --dport 21 -j ACCEPT
     $IPTABLES -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p tcp --dport 21 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
     if [ -e "$FILEIPTABLES" ] ;  then
 	source "$FILEIPTABLES"
@@ -3034,6 +3036,9 @@ case $arg1 in
 		iptablesreload
 		echo -e "$RougeD $(eval_gettext "to add custom rules edit the file
 \$FILEIPTABLES
+then run the command CTparental -ipton")
+
+$(eval_gettext "to add ipv4/ipv6 blacklist edit the file \$FILEIPBLACKLIST
 then run the command CTparental -ipton") $Fcolor"
 	;;
 	-iptoff )
