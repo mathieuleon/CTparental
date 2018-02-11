@@ -1,5 +1,5 @@
 %define	name ctparental
-%define version	4.21.02e
+%define version	4.21.03e
 %define release	1
 
 Summary: Parental Controls
@@ -15,8 +15,8 @@ Provides: %{name}
 Requires: dnsmasq , lighttpd , lighttpd-mod_auth , lighttpd-mod_magnet , perl , sudo , wget , php-cgi , libnotify , notification-daemon , rsyslog , e2guardian , privoxy , newt , shorewall , shorewall-ipv6 , shorewall-core , /usr/bin/certutil
 
 %description
-CTparental est un Contrôle parental 
-basé sur dnsmasq , e2guardian , privoxy , shorewall(iptables et iptable6) 
+CTparental est un Contrôle parental
+basé sur dnsmasq , e2guardian , privoxy , shorewall(iptables et iptable6)
 et la blackliste de l’université de Toulouse.
 
 %prep
@@ -112,10 +112,10 @@ exit 0
 ping -c3 www.google.fr > /dev/null
 test="$?"
 if [ "$test" -eq 0 ];then
-	/usr/bin/CTparental -i -nodep -nomanuel  1>&2 
+	/usr/bin/CTparental -i -nodep -nomanuel  1>&2
 else
 echo "problême de conection internet veuiller lancer la commande suivant quant celui-ci reviendras."
-echo '/usr/bin/CTparental -i -nodep -nomanuel  1>&2' 
+echo '/usr/bin/CTparental -i -nodep -nomanuel  1>&2'
 fi
 exit 0
 
