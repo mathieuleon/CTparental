@@ -173,10 +173,11 @@ E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 
 #### DEPENDANCES par DEFAUT #####
-DEPENDANCES=${DEPENDANCES:=" console-data dansguardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail dnsutils "}
+
+DEPENDANCES=${DEPENDANCES:=" console-data dansguardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail dnsutils rsyslog"}
 
 #### PAQUETS EN CONFLIT par DEFAUT #####
-CONFLICTS=${CONFLICTS:=" e2guardian mini-httpd apache2 firewalld "}
+CONFLICTS=${CONFLICTS:=" e2guardian firewalld "}
 
 #### COMMANDES de services par DEFAUT #####
 CMDSERVICE=${CMDSERVICE:="service "}
@@ -197,6 +198,7 @@ IPTABLESsave=${IPTABLESsave:="$CMDSERVICE netfilter-persistent save"}
 IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
 E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE dansguardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
+RSYSLOGRESTART=${RSYSLOGRESTART:="$CMDSERVICE rsyslog restart"}
 PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
 
@@ -1076,13 +1078,13 @@ ipglobal() {
     else
     {
 	echo '# - one ip per line.
-# - ipv4 address or subnet ipv4 / mask (/xxx.xxx.xxx.xxx or / xxx)
-# - ipv6 address or subnet ipv6 / mask (/ 1 to 128)
+# - ipv4 address or subnet ipv4 / mask (ip/xxx.xxx.xxx.xxx or ip/1 to 32)
+# - ipv6 address or subnet ipv6 / mask (ip/ 1 to 128)
 # examples:
 # 10.10.2.3
-# 192.168.182.1/24
+# 192.168.182.0/24
 # 2001:db8::f23f
-# 2001:db8:: / 32'
+# 2001:db8:: / 44'
 	} >  $FILEIPBLACKLIST
 	chown root:root  $FILEIPBLACKLIST
 	chmod 750  $FILEIPBLACKLIST
@@ -1152,6 +1154,35 @@ ipglobal() {
     $IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
     $IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
     $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
+
+    if [ ! -e /etc/rsyslog.d/iptables.conf ] ;  then
+    {
+    echo '
+:msg, startswith, "iptables: " /var/log/iptables/iptables.log
+& ~
+'
+    } > /etc/rsyslog.d/iptables.conf
+    $RSYSLOGRESTART
+    fi
+    if [ ! -e /etc/logrotate.d/iptables ] ; then
+    {
+    echo '
+/var/log/iptables/*.log {
+		daily
+		missingok
+		rotate 14
+		compress
+		delaycompress
+		notifempty
+		create 640 root adm
+		sharedscripts
+		postrotate
+		service rsyslog restart ; sleep 5
+		endscript
+}
+'
+    } > /etc/logrotate.d/iptables
+    fi
     echo "</ipglobal>"
 }
 
