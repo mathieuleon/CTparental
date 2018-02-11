@@ -3079,12 +3079,14 @@ case $arg1 in
 		networkisoknext
 		$SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
 		iptablesreload
-		echo -e "$RougeD $(eval_gettext "to add custom rules edit the file
-\$FILEIPTABLES
-then run the command CTparental -ipton")
+		echo -e "$RougeD $(eval_gettext 'to add custom rules edit the file 
+$FILEIPTABLES 
+then run the command CTparental -ipton') 
 
-$(eval_gettext "to add ipv4/ipv6 blacklist edit the file \$FILEIPBLACKLIST
-then run the command CTparental -ipton") $Fcolor"
+$(eval_gettext 'to add ipv4/ipv6 blacklist edit the file 
+$FILEIPBLACKLIST 
+then run the command CTparental -ipton') 
+ $Fcolor"
 	;;
 	-iptoff )
 		$SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
