@@ -1076,13 +1076,13 @@ ipglobal() {
     else
     {
 	echo '# - one ip per line.
-# - ipv4 address or subnet ipv4 / mask (/xxx.xxx.xxx.xxx or / xxx)
-# - ipv6 address or subnet ipv6 / mask (/ 1 to 128)
+# - ipv4 address or subnet ipv4 / mask (ip/xxx.xxx.xxx.xxx or ip/1 to 32)
+# - ipv6 address or subnet ipv6 / mask (ip/ 1 to 128)
 # examples:
 # 10.10.2.3
-# 192.168.182.1/24
+# 192.168.182.0/24
 # 2001:db8::f23f
-# 2001:db8:: / 32'
+# 2001:db8:: / 44'
 	} >  $FILEIPBLACKLIST
 	chown root:root  $FILEIPBLACKLIST
 	chmod 750  $FILEIPBLACKLIST
