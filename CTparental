@@ -173,7 +173,7 @@ E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 
 #### DEPENDANCES par DEFAUT #####
-DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail dnsutils "}
+DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail dnsutils rsyslog "}
 
 #### PAQUETS EN CONFLIT par DEFAUT #####
 CONFLICTS=${CONFLICTS:=" dansguardian mini-httpd apache2 firewalld "}
@@ -197,6 +197,7 @@ IPTABLESsave=${IPTABLESsave:="$CMDSERVICE netfilter-persistent save"}
 IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
 E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE e2guardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
+RSYSLOGRESTART=${RSYSLOGRESTART:="$CMDSERVICE rsyslog restart"}
 PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
 
@@ -1152,6 +1153,32 @@ ipglobal() {
     $IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
     $IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
     $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
+    {
+    echo '
+    :msg, startswith, "iptables: " /var/log/iptables/iptables.log
+    & ~
+    '
+    } > /etc/rsyslog.d/iptables.conf
+    $RSYSLOGRESTART
+
+    {
+    echo '
+    /var/log/iptables/*.log {
+    		daily
+    		missingok
+    		rotate 14
+    		compress
+    		delaycompress
+    		notifempty
+    		create 640 root adm
+    		sharedscripts
+    		postrotate
+    		service rsyslog restart ; sleep 5
+    		endscript
+    }
+    '
+    } > /etc/logrotate.d/iptables
+
     echo "</ipglobal>"
 }
 
