@@ -1042,6 +1042,7 @@ dnsmasqoff() {
 }
 
 ipglobal() {
+	echo "<ipglobal>"
     ### BLOQUE TOUT PAR DEFAUT (si aucune règle n'est définie par la suite) ###
     $IPTABLES -P INPUT DROP
     $IPTABLES -P OUTPUT DROP
@@ -1050,9 +1051,11 @@ ipglobal() {
     $IPTABLES6 -P OUTPUT DROP
     $IPTABLES6 -P FORWARD DROP
     # TCP Syn Flood
-    $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p tcp --syn -m limit --limit 3/s -j ACCEPT
+    $IPTABLES -A INPUT -p tcp --syn -m limit --limit 3/s -j ACCEPT
+    $IPTABLES6 -A INPUT -p tcp --syn -m limit --limit 3/s -j ACCEPT
     # UDP Syn Flood
-    $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p udp -m limit --limit 10/s -j ACCEPT
+    $IPTABLES -A INPUT -p udp -m limit --limit 10/s -j ACCEPT
+    $IPTABLES6 -A INPUT -p udp -m limit --limit 10/s -j ACCEPT
 
     ### IP indésirables
     if [ -e "$FILEIPBLACKLIST" ] ;  then
@@ -1085,10 +1088,10 @@ ipglobal() {
     $IPTABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
     $IPTABLES6 -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
     ### DHCP
-    $IPTABLES -A OUTPUT -o "$i_WAN_ipv4" -p udp --sport 68 --dport 67 -j ACCEPT
-    $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p udp --sport 67 --dport 68 -j ACCEPT
-    $IPTABLES6 -A OUTPUT -o "$i_WAN_ipv6" -p udp --sport 68 --dport 67 -j ACCEPT
-    $IPTABLES6 -A INPUT -i "$i_WAN_ipv6" -p udp --sport 67 --dport 68 -j ACCEPT
+    $IPTABLES -A OUTPUT -p udp --sport 68 --dport 67 -j ACCEPT
+    $IPTABLES -A INPUT -p udp --sport 67 --dport 68 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p udp --sport 68 --dport 67 -j ACCEPT
+    $IPTABLES6 -A INPUT -p udp --sport 67 --dport 68 -j ACCEPT
 
     ### DNS indispensable pour naviguer facilement sur le web ###
     $IPTABLES -A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
@@ -1134,6 +1137,7 @@ ipglobal() {
     $IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
     $IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
     $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
+	echo "</ipglobal>"
 }
 
 initfileiptables() {
