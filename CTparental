@@ -1153,32 +1153,35 @@ ipglobal() {
     $IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
     $IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
     $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
+
+    if [ ! -e /etc/rsyslog.d/iptables.conf ] ;  then
     {
     echo '
-    :msg, startswith, "iptables: " /var/log/iptables/iptables.log
-    & ~
-    '
+:msg, startswith, "iptables: " /var/log/iptables/iptables.log
+& ~
+'
     } > /etc/rsyslog.d/iptables.conf
     $RSYSLOGRESTART
-
+    fi
+    if [ ! -e /etc/logrotate.d/iptables ] ; then
     {
     echo '
-    /var/log/iptables/*.log {
-    		daily
-    		missingok
-    		rotate 14
-    		compress
-    		delaycompress
-    		notifempty
-    		create 640 root adm
-    		sharedscripts
-    		postrotate
-    		service rsyslog restart ; sleep 5
-    		endscript
-    }
-    '
+/var/log/iptables/*.log {
+		daily
+		missingok
+		rotate 14
+		compress
+		delaycompress
+		notifempty
+		create 640 root adm
+		sharedscripts
+		postrotate
+		service rsyslog restart ; sleep 5
+		endscript
+}
+'
     } > /etc/logrotate.d/iptables
-
+    fi
     echo "</ipglobal>"
 }
 
