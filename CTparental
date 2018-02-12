@@ -410,13 +410,13 @@ return 0
 
 networkisoknext() {
     ipv4ok=0
-    $PING4 -c1 -w1 "$ipbox_ipv4" 2> /dev/null
+    $PING4 -c1 -w1 "$ipbox_ipv4" 2>/dev/null 1>/dev/null
     if [ $? -eq  0 ];then
 	ipv4ok=1
     fi
 
     ipv6ok=0
-    $PING6 -c1 -w1 "$ipbox_ipv6" 2> /dev/null
+    $PING6 -c1 -w1 "$ipbox_ipv6" 2>/dev/null 1>/dev/null
     if [ $? -eq  0 ];then
 	ipv6ok=1
     fi
