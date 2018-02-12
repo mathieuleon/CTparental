@@ -60,8 +60,8 @@ currently 3 languages are supported, English, French and Spanish.
 
   es_PY.UTF-8, es_SV.UTF-8, es_US.UTF-8, es_UY.UTF-8
 
-  es_VE.UTF-8, en_BE.UTF-8, fr_CA.UTF-8, fr_CH.UTF-8
+  es_VE.UTF-8, fr_BE.UTF-8 , fr_CA.UTF-8 , fr_CH.UTF-8
 
-  en_EN.UTF-8, en_LU.UTF-8
+  fr_FR.UTF-8 , fr_LU.UTF-8
 
   taking into account in the web interface requires to restart the service lighttpd
