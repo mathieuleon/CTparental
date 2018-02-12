@@ -1084,7 +1084,7 @@ ipglobal() {
 # 10.10.2.3
 # 192.168.182.0/24
 # 2001:db8::f23f
-# 2001:db8:: / 44'
+# 2001:db8::/44'
 	} >  $FILEIPBLACKLIST
 	chown root:root  $FILEIPBLACKLIST
 	chmod 750  $FILEIPBLACKLIST
