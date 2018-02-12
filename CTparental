@@ -1058,7 +1058,6 @@ ipglobal() {
     # UDP Syn Flood
     $IPTABLES -A INPUT -p udp -m limit --limit 10/s -j ACCEPT
     $IPTABLES6 -A INPUT -p udp -m limit --limit 10/s -j ACCEPT
-
     ### IP indésirables
     if [ -e "$FILEIPBLACKLIST" ] ;  then
     echo "<$FILEIPBLACKLIST>"
@@ -1096,6 +1095,16 @@ ipglobal() {
     $IPTABLES6 -A INPUT  -i lo -j ACCEPT
     $IPTABLES6 -A OUTPUT -o lo -j ACCEPT
 
+    ## bloque le multicast dns (mDNS)
+    $IPTABLES6 -A OUTPUT -p udp --dport 5353 -j DROP
+    $IPTABLES6 -A INPUT -p udp --sport 5353 -j DROP
+    $IPTABLES -A OUTPUT -p udp --dport 5353 -j DROP
+    $IPTABLES -A INPUT -p udp --sport 5353 -j DROP
+
+    ## accépter requette ipv6 de recherche de routeurs
+    $IPTABLES6 -A OUTPUT -p icmpv6 -d ff02::2  -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p icmpv6 -d ff02::16  -j ACCEPT
+
     ### accepte en entrée les connexions déjà établies (en gros cela
     ### permet d'accepter les connexions initiées par son propre PC)
     $IPTABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
@@ -1126,7 +1135,7 @@ ipglobal() {
 
     ### ping ... autorise à "pinger" un ordinateur distant ###
     $IPTABLES -A OUTPUT -p icmp -j ACCEPT
-    $IPTABLES6 -A OUTPUT -p icmp -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p icmpv6 -j ACCEPT
 
     ### clientNTP ... syncro à un serveur de temps ###
     $IPTABLES -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
@@ -1148,9 +1157,9 @@ ipglobal() {
 	source "$FILEIPTABLES"
     fi
     ### LOG ### Log tout ce qui qui n'est pas accepté par une règle précédente
-    $IPTABLES6 -A OUTPUT -j LOG  --log-prefix "iptables6: "
-    $IPTABLES6 -A INPUT -j LOG   --log-prefix "iptables6: "
-    $IPTABLES6 -A FORWARD -j LOG  --log-prefix "iptables6: "
+    $IPTABLES6 -A OUTPUT -j LOG  --log-prefix "ip6tables: "
+    $IPTABLES6 -A INPUT -j LOG   --log-prefix "ip6tables: "
+    $IPTABLES6 -A FORWARD -j LOG  --log-prefix "ip6tables: "
     $IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
     $IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
     $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
@@ -1158,8 +1167,12 @@ ipglobal() {
     if [ ! -e /etc/rsyslog.d/iptables.conf ] ;  then
     {
     echo '
-:msg, startswith, "iptables: " /var/log/iptables/iptables.log
-& ~
+:msg,contains,"iptables: " /var/log/iptables/iptables.log
+&~
+
+:msg,contains,"ip6tables: " /var/log/iptables/ip6tables.log
+&~
+
 '
     } > /etc/rsyslog.d/iptables.conf
     $RSYSLOGRESTART
@@ -1302,6 +1315,11 @@ iptablesreload() {
     if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	$IPTABLES -t nat -A OUTPUT -j ctparental
 	$IPTABLES6 -t nat -A OUTPUT -j ctparental
+    ## bloque le multicast dns (mDNS)
+    $IPTABLES6 -A OUTPUT -p udp --dport 5353 -j DROP
+    $IPTABLES6 -A INPUT -p udp --sport 5353 -j DROP
+    $IPTABLES -A OUTPUT -p udp --dport 5353 -j DROP
+    $IPTABLES -A INPUT -p udp --sport 5353 -j DROP
 
 	# Force privoxy à utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
 	$IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
