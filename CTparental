@@ -1060,7 +1060,7 @@ ipglobal() {
 
     ### IP indésirables
     if [ -e "$FILEIPBLACKLIST" ] ;  then
-    echo "</$FILEIPBLACKLIST>"
+    echo "<$FILEIPBLACKLIST>"
 	while read ligne
 	do
 	   ipdrop=$(echo "$ligne" | cut -d " " -f1)
