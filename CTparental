@@ -2176,6 +2176,12 @@ uninstall() {
 	rm -f /etc/network/interfaces.d/ctparentallo
      fi
      $NETWORKINGrestart
+     $SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
+     rm -f "$FILEIPTABLES"
+     rm -f "$FILEIPBLACKLIST"
+     rm -f "$FILEIPTIMEWEB"
+     rm -f /etc/rsyslog.d/iptables.conf
+     $RSYSLOGRESTART
      desactivegourpectoff
      autoupdateoff
      dnsmasqoff
