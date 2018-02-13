@@ -1,3 +1,10 @@
+ctparental (4.21.04-1.0) unstable; urgency=medium
+
+  * améliorations des iptables.
+  * correction dans gestion des log iptables par rsyslog + logrotate.
+
+ -- Guillaume marsat <CTparental1@laposte.net>  Tue, 13 Feb 2018 09:46:26 +0100
+ 
 ctparental (4.21.03-1.0) unstable; urgency=medium
 
   * correction bug dans les iptables.
