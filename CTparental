@@ -208,7 +208,7 @@ LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
 #### LOCALISATION du fichier de chargement de modules ####
 FILEMODULESLOAD=${MODULESLOAD:="/etc/modules-load.d/modules.conf"}
 
-RSYSLOGCTPARENTAL=${RSYSLOGCTPARENTAL:="/etc/rsyslog.d/iptables.conf"}
+RSYSLOGCTPARENTAL=${RSYSLOGCTPARENTAL:="/etc/rsyslog.d/10-iptables.conf"}
 
 #### COMMANDES D'ACTIVATION DES SERVICES AU DEMARRAGE DU PC ####
 ENCRON=${ENCRON:=""}
@@ -1088,18 +1088,17 @@ ipglobal() {
 	chown root:root  $FILEIPBLACKLIST
 	chmod 750  $FILEIPBLACKLIST
     fi
-
-    ### ACCEPT ALL interface loopback ###
-    $IPTABLES -A INPUT  -i lo -j ACCEPT
-    $IPTABLES -A OUTPUT -o lo -j ACCEPT
-    $IPTABLES6 -A INPUT  -i lo -j ACCEPT
-    $IPTABLES6 -A OUTPUT -o lo -j ACCEPT
-
     ## bloque le multicast dns (mDNS)
     $IPTABLES6 -A OUTPUT -p udp --dport 5353 -j DROP
     $IPTABLES6 -A INPUT -p udp --sport 5353 -j DROP
     $IPTABLES -A OUTPUT -p udp --dport 5353 -j DROP
     $IPTABLES -A INPUT -p udp --sport 5353 -j DROP
+    
+    ### ACCEPT ALL interface loopback ###
+    $IPTABLES -A INPUT  -i lo -j ACCEPT
+    $IPTABLES -A OUTPUT -o lo -j ACCEPT
+    $IPTABLES6 -A INPUT  -i lo -j ACCEPT
+    $IPTABLES6 -A OUTPUT -o lo -j ACCEPT
 
     ## accépter requette ipv6 de recherche de routeurs
     $IPTABLES6 -A OUTPUT -p icmpv6 -d ff02::2  -j ACCEPT
@@ -1164,7 +1163,7 @@ ipglobal() {
     $IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
     $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
 
-    if [ ! -e /etc/rsyslog.d/iptables.conf ] ;  then
+    if [ ! -e $RSYSLOGCTPARENTAL ] ;  then
     {
     echo '
 :msg,contains,"iptables: " /var/log/iptables/iptables.log
@@ -1174,7 +1173,7 @@ ipglobal() {
 &~
 
 '
-    } > /etc/rsyslog.d/iptables.conf
+    } > $RSYSLOGCTPARENTAL
     $RSYSLOGRESTART
     fi
     if [ ! -e /etc/logrotate.d/iptables ] ; then
@@ -1910,7 +1909,8 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
     if [ $nomanuel -eq 0 ]; then
 	cp -rf www "$DIR_SHARE"
 	cp -rf confDansgouardian "$DIR_SHARE"
-	cp -f locale/fr_FR/LC_MESSAGES/ctparental.mo		/usr/share/locale/fr_FR/LC_MESSAGES/
+	cp -f locale/fr/LC_MESSAGES/ctparental.mo		/usr/share/locale/fr/LC_MESSAGES/
+	cp -f locale/es/LC_MESSAGES/ctparental.mo		/usr/share/locale/es/LC_MESSAGES/
     fi
     iptablesreload
     groupadd ctoff
@@ -2023,6 +2023,9 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
     FoncHTTPDCONF
     activegourpectoff
     FILTRAGEISOFF=0
+    rm -f /etc/rsyslog.d/iptables.conf # for old install
+    rm -f $RSYSLOGCTPARENTAL
+    $RSYSLOGRESTART
     iptablesreload
     $ENCRON
     $ENLIGHTTPD
@@ -2199,7 +2202,7 @@ uninstall() {
      rm -f "$FILEIPTABLES"
      rm -f "$FILEIPBLACKLIST"
      rm -f "$FILEIPTIMEWEB"
-     rm -f /etc/rsyslog.d/iptables.conf
+     rm -f $RSYSLOGCTPARENTAL
      $RSYSLOGRESTART
      desactivegourpectoff
      autoupdateoff
@@ -3119,7 +3122,7 @@ then run the command CTparental -ipton')
 	-iptoff )
 		$SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
 		iptablesreload
-		rm -f /etc/rsyslog.d/iptables.conf
+		rm -f $RSYSLOGCTPARENTAL
 		$RSYSLOGRESTART
 	;;
 	-cron )
