@@ -1398,6 +1398,9 @@ updatecauser() {
 	    done
 	    # on ajoute le nouveau certificat
 	    certutil -A -d "$cert8dbdir"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
+	    chown ${user}:${user} ${cert8db}
+	    chown ${user}:${user} ${cert9dbdir}/key3.db
+	    chown ${user}:${user} ${cert9dbdir}/pkcs11.txt
 	done
 
 	#on install le cacertificat dans tous les profile chrome chromium
@@ -1413,6 +1416,9 @@ updatecauser() {
 		fi
 	    done
 	    certutil -A -d sql:"$cert9dbdir"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
+	    chown ${user}:${user} ${cert9db}
+	    chown ${user}:${user} ${cert9dbdir}/key4.db
+	    chown ${user}:${user} ${cert9dbdir}/pkcs11.txt
 	done
      done
      echo "</updatecauser>"
