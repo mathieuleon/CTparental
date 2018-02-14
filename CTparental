@@ -1997,8 +1997,6 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
     fi
     modprobe ip_conntrack_ftp
     $SED "s?.*ip_conntrack_ftp.*?ip_conntrack_ftp?g" "$FILEMODULESLOAD"
-    echo ':msg,contains,"iptables" /var/log/iptables.log' > "$RSYSLOGCTPARENTAL"
-    echo '& ~' >> "$RSYSLOGCTPARENTAL"
     #######################
     if [ ! -f blacklists.tar.gz ]
     then
