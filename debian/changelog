@@ -1,9 +1,17 @@
+ctparental (4.21.05-1.0) unstable; urgency=medium
+
+  * correction des erreurs des certificat dus a certx.db keyx.db pkcs11.txt ayans des droit root
+  dans les profiles utilisateurs.
+
+ -- Guillaume marsat <CTparental1@laposte.net>  Wed, 14 Feb 2018 15:09:41 +0100
+ 
 ctparental (4.21.04-1.0) unstable; urgency=medium
 
   * améliorations des iptables.
   * correction dans gestion des log iptables par rsyslog + logrotate.
 
  -- Guillaume marsat <CTparental1@laposte.net>  Tue, 13 Feb 2018 09:46:26 +0100
+
  
 ctparental (4.21.03-1.0) unstable; urgency=medium
 
