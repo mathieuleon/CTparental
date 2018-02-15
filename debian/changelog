@@ -2,6 +2,8 @@ ctparental (4.21.05-1.0) unstable; urgency=medium
 
   * correction des erreurs des certificat dus a certx.db keyx.db pkcs11.txt ayans des droit root
   dans les profiles utilisateurs.
+  * optimisation du temps d'execution de updatecauser qui pouvais ralantire considérablement 
+  sur des profiles utilisateurs ayant beaucoups de fichiers.
 
  -- Guillaume marsat <CTparental1@laposte.net>  Wed, 14 Feb 2018 15:09:41 +0100
  

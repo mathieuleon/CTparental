@@ -1379,12 +1379,12 @@ iptablesreload() {
 }
 
 updatecauser() {
-     echo "<updatecauser>"
+     echo "<updatecauser $(date)>"
      for user in $(listeusers) ; do
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-
+	echo $HOMEPCUSER 
 	#on installe le cacertificat dans tous les profils firefox
-	for cert8db in $(find $HOMEPCUSER/ -name "cert8.db"  | grep -v Trash )
+	for cert8db in $(find $HOMEPCUSER/.mozilla/firefox/ -mindepth 2 -maxdepth 2 -name "cert8.db")
 	do
 	    cert8dbdir=$(dirname ${cert8db});
 	    # on supprime tous les anciens certificats
@@ -1398,12 +1398,10 @@ updatecauser() {
 	    # on ajoute le nouveau certificat
 	    certutil -A -d "$cert8dbdir"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
 	    chown ${user}:${user} ${cert8db}
-	    chown ${user}:${user} ${cert9dbdir}/key3.db
-	    chown ${user}:${user} ${cert9dbdir}/pkcs11.txt
+	    chown ${user}:${user} ${cert8dbdir}/key3.db
+	    chown ${user}:${user} ${cert8dbdir}/pkcs11.txt
 	done
-
-	#on install le cacertificat dans tous les profile chrome chromium
-	for cert9db in $(find $HOMEPCUSER/ -name "cert9.db" | grep -v Trash)
+	for cert9db in $(find $HOMEPCUSER/.mozilla/firefox/ -mindepth 2 -maxdepth 2 -name "cert9.db")
 	do
 	    cert9dbdir=$(dirname ${cert9db});
 	    # on supprime tous les anciens certificats
@@ -1419,8 +1417,26 @@ updatecauser() {
 	    chown ${user}:${user} ${cert9dbdir}/key4.db
 	    chown ${user}:${user} ${cert9dbdir}/pkcs11.txt
 	done
-     done
-     echo "</updatecauser>"
+	#on install le cacertificat dans tous les profile chrome chromium
+	for cert9db in $(find $HOMEPCUSER/.pki/nssdb/ -maxdepth 1 -name "cert9.db")
+	do
+	    cert9dbdir=$(dirname ${cert9db});
+	    # on supprime tous les anciens certificats
+	    while true
+	    do
+		certutil -D -d sql:"$cert9dbdir"/ -n"CActparental - ctparental" 2&> /dev/null
+		if [ ! $? -eq 0 ];then
+		    break
+		fi
+	    done
+	    certutil -A -d sql:"$cert9dbdir"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
+	    chown ${user}:${user} ${cert9db}
+	    chown ${user}:${user} ${cert9dbdir}/key4.db
+	    chown ${user}:${user} ${cert9dbdir}/pkcs11.txt
+	done
+
+    done
+     echo "</updatecauser $(date)>"
  }
 
 dnsmasqwhitelistonly() {
@@ -2043,6 +2059,7 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
 }
 
 nomade() {
+    echo "<nomade>"
     #### si il y a un changement dans la conf réseaux ####
     if [ "$DNS1v4" != "$( grep DNS1v4 $FILE_CONF | cut -d"=" -f2 )"  -o \
 	"$DNS2v4" != "$( grep DNS2v4 $FILE_CONF | cut -d"=" -f2 )"  -o \
@@ -2082,6 +2099,7 @@ nomade() {
 	# on reconfigure les règles du pare-feu.
 	iptablesreload
      fi
+    echo "</nomade>"
 }
 
 updatelistgctoff() {
@@ -2149,7 +2167,6 @@ applistegctoff() {
 	    $DELUSERTOGROUP "${PCUSER//#/}" ctoff 2> /dev/null
 	fi
      done < "$FILE_GCTOFFCONF"
-
      echo "</applistegctoff>"
 }
 
@@ -3139,7 +3156,7 @@ then run the command CTparental -ipton')
 			# appelé toutes les minutes par cron pour modifier la
 			# configuration en cas de changement de réseau.
 			nomade
-			networkisoknext
+			##networkisoknext # déja présent dan nomade
 			# appelé toutes les minutes par cron pour activer le
 			# filtrage sur les usagers nouvellement créés.
 			if [ "$(updatelistgctoff)" -eq 1 ];then
