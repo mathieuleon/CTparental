@@ -1,5 +1,5 @@
 %define	name ctparental
-%define version	4.21.04e
+%define version	4.21.05e
 %define release	1
 
 Summary: Parental Controls
@@ -120,5 +120,7 @@ fi
 exit 0
 
 %preun
+pkill -15 CTparental
+rm -f /var/run/CTparental.pid
 CTparental -u -nodep -nomanuel  1>&2
 exit 0
