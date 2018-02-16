@@ -15,6 +15,15 @@ msgstr ""
 # Copyright: © 2013-2016 Guillaume Marsat <guillaume.marsat@laposte.net>
 # License: GPL-3+
 # # CTparental
+msgid "Too many processes already in progress, please try again later."
+msgstr "Demasiados procesos en curso, intente de nuevo más tarde."
+
+msgid "Waiting for the end of the process $pidtest"
+msgstr "Esperando el final del proceso $pidtest"
+
+msgid "The wait is too long please try again later."
+msgstr "La espera es demasiado larga, inténtalo de nuevo más tarde."
+
 msgid "Already in progress"
 msgstr "Ya en progreso"
 
