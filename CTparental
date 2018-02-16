@@ -39,15 +39,40 @@ if [ ! $UID -lt $UIDMINUSER ]; then
     echo ""
     exit 1
 fi
-## On ne fait rien si ctparental est déja en cours de traitement.
+## On ne fait rien si ctparental est déja en cours de traitement long.
 PIDFILE="/var/run/CTparental.pid"
+PIDFILEWAIT="/var/run/CTparentalwait.pid"
 if [ -f $PIDFILE ];then
-    if [ $( ps -A | grep -c "$(cat $PIDFILE)") -eq 0 ] ; then
-	rm -f $PIDFILE
-    else
-	gettext 'Already in progress'
-	echo ""
-	exit 2
+	pidtest=$(cat $PIDFILE)
+	if [ $( ps -A | grep -c "$pidtest") -eq 0 ] ; then
+		rm -f $PIDFILE
+	else
+		if [ -f $PIDFILEWAIT ] ; then
+			gettext 'Too many processes already in progress, please try again later'
+			echo ""
+			exit 2
+		fi
+		echo $$ > $PIDFILEWAIT
+		## on attend que le processus déja en cour ce termine max 15 secondes
+		eval_gettext 'Waiting for the end of the process $pidtest'
+		for ((count=0 ; 55 - count ; count++))
+		do
+			sleep 1
+			echo -n "."
+			if [ $( ps -A | grep -c "$pidtest") -eq 0 ] ; then
+				rm -f $PIDFILE
+				break
+			fi
+		done
+		echo ""
+		## si le processus et encore en cour au bout de 15 seconde on abendonne l'éxecution d'un nouveaux processus
+		if [ $( ps -A | grep -c "$pidtest") -ge 1 ] ; then
+			gettext 'The wait is too long please try again later'
+			echo ""
+			rm -f $PIDFILEWAIT
+			exit 2
+		fi
+		rm -f $PIDFILEWAIT
     fi
 fi
 echo $$ > $PIDFILE

@@ -1,3 +1,11 @@
+ctparental (4.21.06-1.0) unstable; urgency=medium
+
+  * Ajout de la mise en attente de 1 processus CTparental au cas ou une commande serais demander pendent
+  l'execution d'un CTparental -cron , max 1 processus en execution et 1 en attente, les autres sont
+  fermer automatiquement.
+
+ -- Guillaume marsat <CTparental1@laposte.net>  Fri, 16 Feb 2018 09:59:41 +0100
+ 
 ctparental (4.21.05-1.0) unstable; urgency=medium
 
   * correction des erreurs des certificat dus a certx.db keyx.db pkcs11.txt ayans des droit root
