@@ -49,7 +49,7 @@ if [ -f $PIDFILE ];then
 	else
 		## si déja 2 processus sont lancer on ferme le nouveaux.
 		if [ -f $PIDFILEWAIT ] ; then
-			gettext 'Too many processes already in progress, please try again later'
+			gettext 'Too many processes already in progress, please try again later.'
 			echo ""
 			exit 2
 		fi
@@ -68,7 +68,7 @@ if [ -f $PIDFILE ];then
 		echo ""
 		## si le processus et encore en cour au bout de 15 seconde on abendonne l'éxecution d'un nouveaux processus
 		if [ $( ps -A | grep -c "$pidtest") -ge 1 ] ; then
-			gettext 'The wait is too long please try again later'
+			gettext 'The wait is too long please try again later.'
 			echo ""
 			rm -f $PIDFILEWAIT
 			exit 2
