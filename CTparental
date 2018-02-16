@@ -1380,8 +1380,8 @@ iptablesreload() {
 }
 
 updatecauser() {
-     echo "<updatecauser>"
-     for user in $(listeusers) ; do
+    echo "<updatecauser>"
+    for user in $(listeusers) ; do
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
 	#on installe le cacertificat dans tous les profils firefox
     if [ -d "$HOMEPCUSER/.mozilla/firefox" ] ;then
@@ -1420,10 +1420,8 @@ updatecauser() {
 	done
 	fi
 	#on install le cacertificat dans tous les profile chrome chromium
-	if [ -d "$HOMEPCUSER/.pki/nssdb" ] ;then
-	for cert9db in $(find $HOMEPCUSER/.pki/nssdb/ -maxdepth 1 -name "cert9.db")
-	do
-	    cert9dbdir=$(dirname ${cert9db});
+	if [ -f "$HOMEPCUSER/.pki/nssdb/cert9.db" ] ;then
+	    cert9dbdir="$HOMEPCUSER/.pki/nssdb/"
 	    # on supprime tous les anciens certificats
 	    while true
 	    do
@@ -1436,11 +1434,10 @@ updatecauser() {
 	    chown ${user}:${user} ${cert9db}
 	    chown ${user}:${user} ${cert9dbdir}/key4.db
 	    chown ${user}:${user} ${cert9dbdir}/pkcs11.txt
-	done
-    fi
+	fi
     done
      echo "</updatecauser>"
- }
+}
 
 dnsmasqwhitelistonly() {
      $SED "s?^DNSMASQ.*?DNSMASQ=WHITE?g" $FILE_CONF
