@@ -66,7 +66,7 @@ if [ -f $PIDFILE ];then
 			fi
 		done
 		echo ""
-		## si le processus et encore en cour au bout de 15 seconde on abendonne l'éxecution d'un nouveaux processus
+		## si le processus et encore en cour au bout de 55 seconde on abendonne l'éxecution d'un nouveaux processus
 		if [ $( ps -A | grep -c "$pidtest") -ge 1 ] ; then
 			gettext 'The wait is too long please try again later.'
 			echo ""
@@ -3175,14 +3175,13 @@ then run the command CTparental -ipton')
 		# appelé toutes les minutes par cron pour activer/désactiver
 		# les usagers ayant des restrictions de temps journalier de
 		# connexion.
-		if [ $(cat  < $FILE_CONF | grep -c "HOURSCONNECT=ON") -eq 1 ];then
+		if [ $( grep -c "HOURSCONNECT=ON" $FILE_CONF ) -eq 1 ];then
 			updatetimelogin
 		fi
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			# appelé toutes les minutes par cron pour modifier la
 			# configuration en cas de changement de réseau.
 			nomade
-			##networkisoknext # déja présent dan nomade
 			# appelé toutes les minutes par cron pour activer le
 			# filtrage sur les usagers nouvellement créés.
 			if [ "$(updatelistgctoff)" -eq 1 ];then
