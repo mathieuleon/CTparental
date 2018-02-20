@@ -3,9 +3,8 @@ set -e
 # Source debconf library
 . /usr/share/debconf/confmodule
 #DEBHELPER#
-pkill -15 CTparental
-rm -f /var/run/CTparental.pid
+pkill -15 CTparental || true
+rm -f /var/run/CTparental.pid || true
 CTparental -u -nodep -nomanuel
-exit 0
 
 
