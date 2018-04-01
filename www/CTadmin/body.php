@@ -39,6 +39,7 @@ $wl_domains            = $dirconf."domaine-rehabiliter.conf";
 $bl_domains            = $dirconf."blacklist-local.conf";
 
 $cmdCT = "sudo -h localhost -u root /usr/bin/CTparental ";
+$cmdListUsers = "/usr/bin/CTlistusers ";
 $pidfilecmdCT = "/var/run/CTparental.pid";
 function WaitForTheFileToDisappear ($filewait)
 {

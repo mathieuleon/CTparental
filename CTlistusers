@@ -1,0 +1,28 @@
+#!/bin/bash
+DIR_CONF="/etc/CTparental"
+DIR_SHARE="/usr/share/CTparental"
+FILE_CONF="$DIR_CONF/CTparental.conf"
+if [ -f "$DIR_CONF/CTparental.conf" ];then
+    if [ $( grep -c "^LANG=" $FILE_CONF ) -ge 1 ] ;then
+		export LANG=$( grep "^LANG" $FILE_CONF | cut -d "=" -f2 )
+    fi
+fi
+DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
+#chargement des locales.
+set -a
+source /usr/bin/gettext.sh
+set +a
+export TEXTDOMAINDIR="$DIRLOCALE"
+export TEXTDOMAIN="ctparental"
+CHEMINCTPARENTLE="$(readlink -f "$0")"
+
+
+## imports du plugin de la distribution si il existe
+if [ -f "${DIR_CONF}/dist.conf" ];then . "${DIR_CONF}/dist.conf"; fi
+
+#### UID MINIMUM pour les UTILISATEURS
+UIDMINUSER=${UIDMINUSER:=500}
+source "$DIR_SHARE/listeusers"
+
+listusers
+exit 0

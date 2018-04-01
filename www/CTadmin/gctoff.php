@@ -30,7 +30,7 @@ if ($GCTOFF == "ON")
     
     // Read the "CTOFF.conf" file
     WaitForTheFileToDisappear ($pidfilecmdCT);
-    exec ($cmdCT."-gctulist");
+    exec ($cmdListUsers);
     $tab = file($conf_ctoff_file);
     if ($tab)  # the file isn't empty
     {
