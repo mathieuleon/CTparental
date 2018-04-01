@@ -22,7 +22,7 @@ if ($HOURSCONNECT == "ON")
 
     ### on lit est on interprète le fichier CTparental.conf
     WaitForTheFileToDisappear ($pidfilecmdCT);
-    exec ($cmdListUsers 2> /dev/null",$USERSPC); # récupération des utilisateurs du poste.(UID >= 1000)
+    exec ("$cmdListUsers 2> /dev/null",$USERSPC); # récupération des utilisateurs du poste.(UID >= 1000)
     echo "<form action='".$_SERVER["PHP_SELF"]."?dgfile=Hours of allowed connections' method=POST>";
             echo "<select name=\"selectuser\">";
             if (isset($selectuser)){echo "<option value=\"$selectuser\">$selectuser\n"; }
