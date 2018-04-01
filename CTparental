@@ -2699,17 +2699,7 @@ desactivetimelogin() {
     echo "</desactivetimelogin>"
 }
 
-listeusers() {
-    for LIGNES in $(getent passwd | cut -d":" -f1,3,6)
-    do
-	#echo $(echo $LIGNES | cut -d":" -f2)
-	if [ "$(echo "$LIGNES" | cut -d":" -f2)" -ge "$UIDMINUSER" ] ;then
-	    if [ -d "$( echo "$LIGNES" | cut -d":" -f3 )" ] ;then
-		echo "$LIGNES" | cut -d":" -f1
-	    fi
-	fi
-    done
-}
+source "$DIR_SHARE/listeusers"
 
 readTimeFILECONF() {
     requiredpamtime

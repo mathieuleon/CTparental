@@ -7,4 +7,5 @@ locale/es/LC_MESSAGES/ctparental.mo		usr/share/locale/es/LC_MESSAGES/
 www											usr/share/CTparental
 confe2guardian								usr/share/CTparental
 man/CTparental.1.gz							usr/share/man/man1
-ConfLanIs									usr/share/CTparental
+fonctions/ConfLanIs							usr/share/CTparental
+fonctions/listeusers						usr/share/CTparental
