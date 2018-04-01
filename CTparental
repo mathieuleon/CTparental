@@ -1272,7 +1272,7 @@ iptablesreload() {
     if [ ! -f $FILEIPTABLES ]; then initfileiptables ; fi
     md5iptold=$(grep MD5IPT= "$FILE_CONF" | cut -d"=" -f2)
     md5iptnew="$({
-cat ${FILEIPBLACKLIST} ${FILEIPTABLES} ${FILEIPTIMEWEB} ${FILE_GCTOFFCONF} || true
+md5sum ${FILEIPBLACKLIST} ${FILEIPTABLES} ${FILEIPTIMEWEB} ${FILE_GCTOFFCONF}
 listeusers
 echo $( grep -c IPRULES=ON $FILE_CONF )
 echo $FILTRAGEISOFF
