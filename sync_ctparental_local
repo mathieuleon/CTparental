@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ipv6localinterfaces=$(ip addr | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+
+ipv6localnetwork=$(ping6 -nc3 ff02::1%enp2s0 | awk '{print $4}' |grep : | cut -d"%" -f1 | sort -u)
+
+
+
+
+

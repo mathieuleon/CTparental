@@ -1,0 +1,53 @@
+#!/bin/bash
+i_WAN_ipv4="$(ip -4 route | grep default | awk '{print $5}')" # GW!
+if [ "$i_WAN_ipv4" =  "" ];then
+    ipbox_ipv4=""
+    ip_i_WAN_ipv4=""
+    ip_broadcast_ipv4=""
+    reseau_box_ipv4=""
+else
+    ipbox_ipv4="$(ip -4 route | grep default | awk '{print $3}')"
+    ip_i_WAN_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/inet /{print substr($2,1)}')"
+    ip_broadcast_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/brd /{print substr($4,1)}')"
+    reseau_box_ipv4="$(ip -4 route | grep "$i_WAN_ipv4" | grep -v default | grep "src" | awk '//{print substr($1,1)}' )"
+fi
+export i_WAN_ipv4
+export ipbox_ipv4
+export ip_i_WAN_ipv4
+export reseau_box_ipv4
+export ip_broadcast_ipv4
+
+DNS1v4="$(dig -4 +all +retry=1 +tries=1 | grep SERVER | cut -d "(" -f2 | sed -e "s/)//g")"
+if [ ! "$DNS1v4" =  "" ];then
+    iptables -A OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
+    DNS2v4="$(dig -4 +all +retry=1 +tries=1 | grep SERVER | cut -d "(" -f2 | sed -e "s/)//g")"
+    iptables -D OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
+fi
+
+#echo "intefaceWAN="$i_WAN_ipv4" ipbox_ipv4="$ipbox_ipv4" ipinterfaceWan="$ip_i_WAN_ipv4" reseau_box_ipv4="$reseau_box_ipv4" broadcast="$ip_broadcast_ipv4" dns1="$DNS1" dns2="$DNS2
+# on utilise les DNS google en cas de problême de détection de ceux du fai
+export DNS1v4=${DNS1v4:=8.8.8.8}
+export DNS2v4=${DNS2v4:=8.8.4.4}
+
+
+i_WAN_ipv6="$(ip -6 route | grep default | awk '{print $5}')" # GW!
+if [ "$i_WAN_ipv6" =  "" ];then
+    ipbox_ipv6=""
+    ip_i_WAN_ipv6=""
+    reseau_box_ipv6_g=""
+else
+    ipbox_ipv6="$(ip -6 route | grep default | awk '{print $3}')"
+    ip_i_WAN_ipv6="$(ip -6 address show "$i_WAN_ipv6" | awk '/inet/{print substr($2,1)}')"
+    reseau_box_ipv6_g="$(ip -6 route | grep "$i_WAN_ipv6" | grep -v default | awk '//{print substr($1,1)}')"
+fi
+
+reseau_box_ipv6_l="fe80::/64"
+
+export i_WAN_ipv6
+export ipbox_ipv6
+export ip_i_WAN_ipv6
+export reseau_box_ipv6_g
+export reseau_box_ipv6_l
+# on utilise les DNS google en cas de problême de détection de ceux du fai
+export DNS1v6=${DNS1v6:=2001:4860:4860::8888}
+export DNS2v6=${DNS2v6:=2001:4860:4860::8844}

@@ -151,6 +151,7 @@ REDIRECT=ON
 # Pare-feu minimal.
 IPRULES=OFF
 MD5DREAB=
+MD5IPT=
 I_WAN_IPV4=
 I_WAN_IPV6=
 IP_BOX_IPV4=
@@ -320,58 +321,7 @@ if [ -z "$CMDINSTALL" ] ; then
     exit 1
 fi
 
-i_WAN_ipv4="$(ip -4 route | grep default | awk '{print $5}')" # GW!
-if [ "$i_WAN_ipv4" =  "" ];then
-    ipbox_ipv4=""
-    ip_i_WAN_ipv4=""
-    ip_broadcast_ipv4=""
-    reseau_box_ipv4=""
-else
-    ipbox_ipv4="$(ip -4 route | grep default | awk '{print $3}')"
-    ip_i_WAN_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/inet /{print substr($2,1)}')"
-    ip_broadcast_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/brd /{print substr($4,1)}')"
-    reseau_box_ipv4="$(ip -4 route | grep "$i_WAN_ipv4" | grep -v default | grep "src" | awk '//{print substr($1,1)}' )"
-fi
-export i_WAN_ipv4
-export ipbox_ipv4
-export ip_i_WAN_ipv4
-export reseau_box_ipv4
-export ip_broadcast_ipv4
-
-DNS1v4="$(dig -4 +all +retry=1 +tries=1 | grep SERVER | cut -d "(" -f2 | sed -e "s/)//g")"
-if [ ! "$DNS1v4" =  "" ];then
-    iptables -A OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
-    DNS2v4="$(dig -4 +all +retry=1 +tries=1 | grep SERVER | cut -d "(" -f2 | sed -e "s/)//g")"
-    iptables -D OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
-fi
-
-#echo "intefaceWAN="$i_WAN_ipv4" ipbox_ipv4="$ipbox_ipv4" ipinterfaceWan="$ip_i_WAN_ipv4" reseau_box_ipv4="$reseau_box_ipv4" broadcast="$ip_broadcast_ipv4" dns1="$DNS1" dns2="$DNS2
-# on utilise les DNS google en cas de problême de détection de ceux du fai
-export DNS1v4=${DNS1v4:=8.8.8.8}
-export DNS2v4=${DNS2v4:=8.8.4.4}
-
-
-i_WAN_ipv6="$(ip -6 route | grep default | awk '{print $5}')" # GW!
-if [ "$i_WAN_ipv6" =  "" ];then
-    ipbox_ipv6=""
-    ip_i_WAN_ipv6=""
-    reseau_box_ipv6_g=""
-else
-    ipbox_ipv6="$(ip -6 route | grep default | awk '{print $3}')"
-    ip_i_WAN_ipv6="$(ip -6 address show "$i_WAN_ipv6" | awk '/inet/{print substr($2,1)}')"
-    reseau_box_ipv6_g="$(ip -6 route | grep "$i_WAN_ipv6" | grep -v default | awk '//{print substr($1,1)}')"
-fi
-
-reseau_box_ipv6_l="fe80::/64"
-
-export i_WAN_ipv6
-export ipbox_ipv6
-export ip_i_WAN_ipv6
-export reseau_box_ipv6_g
-export reseau_box_ipv6_l
-# on utilise les DNS google en cas de problême de détection de ceux du fai
-export DNS1v6=${DNS1v6:=2001:4860:4860::8888}
-export DNS2v6=${DNS2v6:=2001:4860:4860::8844}
+source "$DIR_SHARE\ConfLanIs"
 
 ipV4ok() {
 	ip=$(echo "$1" | cut -d"/" -f1)
@@ -1315,92 +1265,104 @@ EOF
 }
 
 iptablesreload() {
+
     echo "<iptablesreload>"
-    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
-    $IPTABLES6 -F
-    $IPTABLES6 -X
-    $IPTABLES6 -t nat -F
-    $IPTABLES6 -t mangle -F
-    $IPTABLES6 -t nat -X
-    $IPTABLES6 -t nat -N ctparental
-    $IPTABLES6 -P INPUT ACCEPT
-    $IPTABLES6 -P OUTPUT ACCEPT
-    $IPTABLES6 -P FORWARD ACCEPT
-    $IPTABLES -F
-    $IPTABLES -X
-    $IPTABLES -t nat -F
-    $IPTABLES -t mangle -F
-    $IPTABLES -t nat -X
-    $IPTABLES -t nat -N ctparental
-    $IPTABLES -P INPUT ACCEPT
-    $IPTABLES -P OUTPUT ACCEPT
-    $IPTABLES -P FORWARD ACCEPT
+    md5iptold=$(grep MD5IPT= "$FILE_CONF" | cut -d"=" -f2)
+    md5iptnew="$({
+cat ${FILEIPBLACKLIST} ${FILEIPTABLES} ${FILEIPTIMEWEB} ${FILE_GCTOFFCONF}
+echo $(listeusers)
+echo $( grep -c IPRULES=ON $FILE_CONF )
+echo $FILTRAGEISOFF
+} | md5sum )"
+    if [ ! "$md5iptold" = "$md5iptnew" ]; then
+		### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
+		$IPTABLES6 -F
+		$IPTABLES6 -X
+		$IPTABLES6 -t nat -F
+		$IPTABLES6 -t mangle -F
+		$IPTABLES6 -t nat -X
+		$IPTABLES6 -t nat -N ctparental
+		$IPTABLES6 -P INPUT ACCEPT
+		$IPTABLES6 -P OUTPUT ACCEPT
+		$IPTABLES6 -P FORWARD ACCEPT
+		$IPTABLES -F
+		$IPTABLES -X
+		$IPTABLES -t nat -F
+		$IPTABLES -t mangle -F
+		$IPTABLES -t nat -X
+		$IPTABLES -t nat -N ctparental
+		$IPTABLES -P INPUT ACCEPT
+		$IPTABLES -P OUTPUT ACCEPT
+		$IPTABLES -P FORWARD ACCEPT
 
-    if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-	$IPTABLES -t nat -A OUTPUT -j ctparental
-	$IPTABLES6 -t nat -A OUTPUT -j ctparental
-    ## bloque le multicast dns (mDNS)
-    $IPTABLES6 -A OUTPUT -p udp --dport 5353 -j DROP
-    $IPTABLES6 -A INPUT -p udp --sport 5353 -j DROP
-    $IPTABLES -A OUTPUT -p udp --dport 5353 -j DROP
-    $IPTABLES -A INPUT -p udp --sport 5353 -j DROP
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+		$IPTABLES -t nat -A OUTPUT -j ctparental
+		$IPTABLES6 -t nat -A OUTPUT -j ctparental
+		## bloque le multicast dns (mDNS)
+		$IPTABLES6 -A OUTPUT -p udp --dport 5353 -j DROP
+		$IPTABLES6 -A INPUT -p udp --sport 5353 -j DROP
+		$IPTABLES -A OUTPUT -p udp --dport 5353 -j DROP
+		$IPTABLES -A INPUT -p udp --sport 5353 -j DROP
 
-	# Force privoxy à utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
-	$IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-	$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
+		# Force privoxy à utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
+		$IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
+		$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
 
-	ipdailymotion=$( grep "address=/.dailymotion.com/" $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | cut -d "/" -f3)
-	# on rejette l'acces https à dailymotion.com
-	$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
+		ipdailymotion=$( grep "address=/.dailymotion.com/" $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | cut -d "/" -f3)
+		# on rejette l'acces https à dailymotion.com
+		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
 
-	for user in $(listeusers) ; do
-	    if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
-		#on redirige les requêtes DNS ipv4 des usagers filtrés sur dnsmasq très important pour l'https.
-		$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54
-		$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-		#on redirige les requêtes DNS ipv6 des usagers filtrés sur dnsmasq très important pour l'https.
-		$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to [::1]:54
-		$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to [::1]:54
-		#force passage par dansguardian pour les utilisateurs filtrés
-		$IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
-		$IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
-		# e2guardian ne gérant pas encore ipv6 on se contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
-		$IPTABLES6 -t nat -A ctparental -d 2000::/3 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
-		# on rejette l'accès https à dailymotion.com
-		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT
-		#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
-		#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
-		#le proxy ne faisant que forwarder les flux https
-		#forcer le passage par celui-ci pour https n'apporte
-		#pas de sécurité seul dnsmasq peut bloquer.
-		#$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
-		#$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'accès https sans passer par le proxy pour les utilisateurs filtrés.
-		#$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
-	   fi
-	done
-	if [ -e "$FILEIPTIMEWEB" ] ;  then
-	   echo "<$FILEIPTIMEWEB>"
-	   source "$FILEIPTIMEWEB"
-	   echo "</$FILEIPTIMEWEB>"
-	fi
+		for user in $(listeusers) ; do
+			if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
+			#on redirige les requêtes DNS ipv4 des usagers filtrés sur dnsmasq très important pour l'https.
+			$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54
+			$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
+			#on redirige les requêtes DNS ipv6 des usagers filtrés sur dnsmasq très important pour l'https.
+			$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to [::1]:54
+			$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to [::1]:54
+			#force passage par dansguardian pour les utilisateurs filtrés
+			$IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
+			$IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
+			# e2guardian ne gérant pas encore ipv6 on se contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
+			$IPTABLES6 -t nat -A ctparental -d 2000::/3 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
+			# on rejette l'accès https à dailymotion.com
+			$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT
+			#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
+			#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
+			#le proxy ne faisant que forwarder les flux https
+			#forcer le passage par celui-ci pour https n'apporte
+			#pas de sécurité seul dnsmasq peut bloquer.
+			#$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
+			#$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'accès https sans passer par le proxy pour les utilisateurs filtrés.
+			#$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
+		   fi
+		done
+		if [ -e "$FILEIPTIMEWEB" ] ;  then
+		   echo "<$FILEIPTIMEWEB>"
+		   source "$FILEIPTIMEWEB"
+		   echo "</$FILEIPTIMEWEB>"
+		fi
 
-	if [ "$( grep -c IPRULES=ON $FILE_CONF )" -eq 1 ];then
-	   ipglobal
-	fi
-	#setproxy
-	#else
-	#unsetproxy
+		if [ "$( grep -c IPRULES=ON $FILE_CONF )" -eq 1 ];then
+		   ipglobal
+		fi
+		#setproxy
+		#else
+		#unsetproxy
+		fi
+
+		# Save configuration so that it survives a reboot
+		if [ "$IPTABLESsaveFILE" = "" ] ;then
+		$IPTABLESsave
+		else
+		$IPTABLESsave > "$IPTABLESsaveFILE"
+		fi
+		if [ -e "$DIRHTML"/cactparental.crt ];then
+		updatecauser
+		fi
+    
     fi
-
-    # Save configuration so that it survives a reboot
-    if [ "$IPTABLESsaveFILE" = "" ] ;then
-	$IPTABLESsave
-    else
-	$IPTABLESsave > "$IPTABLESsaveFILE"
-    fi
-    if [ -e "$DIRHTML"/cactparental.crt ];then
-	updatecauser
-    fi
+    $SED "s?^MD5IPT.*?MD5IPT=$md5iptnew?g" $FILE_CONF
     echo "</iptablesreload>"
 }
 
