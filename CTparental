@@ -321,7 +321,7 @@ if [ -z "$CMDINSTALL" ] ; then
     exit 1
 fi
 
-source "$DIR_SHARE\ConfLanIs"
+source "$DIR_SHARE/ConfLanIs"
 
 ipV4ok() {
 	ip=$(echo "$1" | cut -d"/" -f1)
