@@ -1034,7 +1034,6 @@ ipglobal() {
     $IPTABLES -A INPUT -p udp -m limit --limit 10/s -j ACCEPT
     $IPTABLES6 -A INPUT -p udp -m limit --limit 10/s -j ACCEPT
     ### IP indésirables
-    if [ -e "$FILEIPBLACKLIST" ] ;  then
     echo "<$FILEIPBLACKLIST>"
 	while read ligne
 	do
@@ -1049,20 +1048,8 @@ ipglobal() {
 	   fi
 	done < $FILEIPBLACKLIST
 	echo "</$FILEIPBLACKLIST>"
-    else
-    {
-	echo '# - one ip per line.
-# - ipv4 address or subnet ipv4 / mask (ip/xxx.xxx.xxx.xxx or ip/1 to 32)
-# - ipv6 address or subnet ipv6 / mask (ip/ 1 to 128)
-# examples:
-# 10.10.2.3
-# 192.168.182.0/24
-# 2001:db8::f23f
-# 2001:db8::/44'
-	} >  $FILEIPBLACKLIST
-	chown root:root  $FILEIPBLACKLIST
-	chmod 750  $FILEIPBLACKLIST
-    fi
+
+
     ## bloque le multicast dns (mDNS)
     $IPTABLES6 -A OUTPUT -p udp --dport 5353 -j DROP
     $IPTABLES6 -A INPUT -p udp --sport 5353 -j DROP
@@ -1122,14 +1109,10 @@ ipglobal() {
     $IPTABLES6 -A OUTPUT -p tcp --dport 21 -j ACCEPT
     $IPTABLES6 -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
-    if [ -e "$FILEIPTABLES" ] ;  then
     echo "<$FILEIPTABLES>"
 	source "$FILEIPTABLES"
 	echo "</$FILEIPTABLES>"
-    else
-	initfileiptables
-	source "$FILEIPTABLES"
-    fi
+
     ### LOG ### Log tout ce qui qui n'est pas accepté par une règle précédente
     $IPTABLES6 -A OUTPUT -j LOG  --log-prefix "ip6tables: "
     $IPTABLES6 -A INPUT -j LOG   --log-prefix "ip6tables: "
@@ -1267,9 +1250,29 @@ EOF
 iptablesreload() {
 
     echo "<iptablesreload>"
-    if [ ! -f $FILEIPTIMEWEB ]; then touch $FILEIPTIMEWEB; fi
-    if [ ! -f $FILEIPBLACKLIST ]; then touch $FILEIPBLACKLIST; fi
-    if [ ! -f $FILEIPTABLES ]; then initfileiptables ; fi
+    if [ ! -f $FILEIPTIMEWEB ]; then 
+    touch $FILEIPTIMEWEB
+    chown root:root  $FILEIPTIMEWEB
+	chmod 750  $FILEIPTIMEWEB
+    fi
+    if [ ! -f $FILEIPBLACKLIST ]; then 
+    {
+	echo '# - one ip per line.
+# - ipv4 address or subnet ipv4 / mask (ip/xxx.xxx.xxx.xxx or ip/1 to 32)
+# - ipv6 address or subnet ipv6 / mask (ip/ 1 to 128)
+# examples:
+# 10.10.2.3
+# 192.168.182.0/24
+# 2001:db8::f23f
+# 2001:db8::/44'
+	} >  $FILEIPBLACKLIST
+	chown root:root  $FILEIPBLACKLIST
+	chmod 750  $FILEIPBLACKLIST
+    
+    fi
+    if [ ! -f $FILEIPTABLES ]; then 
+    initfileiptables
+    fi
     md5iptold=$(grep MD5IPT= "$FILE_CONF" | cut -d"=" -f2)
     md5iptnew="$({
 md5sum ${FILEIPBLACKLIST} ${FILEIPTABLES} ${FILEIPTIMEWEB} ${FILE_GCTOFFCONF}
@@ -1340,11 +1343,9 @@ echo $FILTRAGEISOFF
 			#$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
 		   fi
 		done
-		if [ -e "$FILEIPTIMEWEB" ] ;  then
 		   echo "<$FILEIPTIMEWEB>"
 		   source "$FILEIPTIMEWEB"
 		   echo "</$FILEIPTIMEWEB>"
-		fi
 
 		if [ "$( grep -c IPRULES=ON $FILE_CONF )" -eq 1 ];then
 		   ipglobal
