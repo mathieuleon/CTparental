@@ -1364,9 +1364,8 @@ echo $FILTRAGEISOFF
 		if [ -e "$DIRHTML"/cactparental.crt ];then
 		updatecauser
 		fi
-    
-    fi
     $SED "s?^MD5IPT.*?MD5IPT=$md5iptnew?g" $FILE_CONF
+    fi
     echo "</iptablesreload>"
 }
 
