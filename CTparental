@@ -3154,7 +3154,6 @@ then run the command CTparental -ipton')
 			iptablesreload
 			fi
 		fi
-		updatecauser
 	;;
 	-dgreload )
 		$E2GUARDIANrestart
