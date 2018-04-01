@@ -456,7 +456,7 @@ case 'change_user' :
 		}
 	else {echo gettext('Error opening the file')." $conf_ctoff_file";}
 	WaitForTheFileToDisappear ($pidfilecmdCT);
-	exec ($cmdCT."-gctapl");
+	exec ($cmdCT."-gctalist");
 	break;
 }
 

@@ -2955,7 +2955,7 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	              CTparental -gctalist")
 -gctoff$(gettext "	    => Disable privileged group.")
 	      $(gettext "all users of the system undergo the filtering!")
--gctapl$(eval_gettext "	    => Add / Delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF")
+-gctalist$(eval_gettext "	    => Add / Delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF")
 -ipton$(gettext "	    => Enable rules of custom firewall.")
 -iptoff$(gettext "	    => Disable rules of custom firewall.")
 -grubPon$(gettext "    => Enable the superuser of grub2.")
@@ -3075,9 +3075,6 @@ case $arg1 in
 			autoupdate
 		fi
 	;;
-	-listusers )
-		listeusers
-	;;
 	-gcton )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			networkisoknext
@@ -3091,12 +3088,10 @@ case $arg1 in
 	;;
 	-gctulist )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-			networkisoknext
 			updatelistgctoff
-			iptablesreload
 		fi
 	;;
-	-gctapl )
+	-gctalist )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			networkisoknext
 			if [ "$(updatelistgctoff)" -eq 1 ];then
