@@ -437,11 +437,10 @@ resolvconffixoff() {
 
 
 PRIVATE_IP4="127.0.0.10"
-#PRIVATE_IP6="fd00::127:10"
-PRIVATE_IP6="fe80::127:10"
+PRIVATE_IP6="fd00::127:10"
 ADMIN_IP4="127.0.0.11"
-#ADMIN_IP6="fd00::127:11"
-ADMIN_IP6="fe80::127:11"
+ADMIN_IP6="fd00::127:11"
+
 
 
 FILE_tmp=${FILE_tmp:="$tempDIRRamfs/filetmp.txt"}
