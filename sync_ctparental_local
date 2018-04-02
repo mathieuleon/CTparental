@@ -1,4 +1,5 @@
 #!/bin/bash
+source "$DIR_SHARE/ConfLanIs"
 
 ipv6localinterfaces=$(ip addr | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
 
