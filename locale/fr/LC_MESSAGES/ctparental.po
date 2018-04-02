@@ -272,8 +272,8 @@ msgstr "tous les utilisateurs du système subissent le filtrage !"
 msgid "\t    => Update the config file ,"
 msgstr "\t    => Met à jour le fichier de configuration,"
 
-msgid "\t    => Add / Delete users in the ctoff group based on the config file, $FILE_GCTOFFCONF"
-msgstr "\t    => Ajoute/Supprime les utilisateurs dans le groupe ctoff en fonction du fichier de configuration, $FILE_GCTOFFCONF"
+msgid "\t=> Add / Delete users in the ctoff group based on the config file, $FILE_GCTOFFCONF"
+msgstr "\t=> Ajoute/Supprime les utilisateurs dans le groupe ctoff en fonction du fichier de configuration, $FILE_GCTOFFCONF"
 
 msgid "\t    => Enable rules of custom firewall."
 msgstr "\t    => Active les règles de pare-feu personnalisées."
