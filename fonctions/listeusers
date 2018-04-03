@@ -1,5 +1,5 @@
 listeusers() {
-    for LIGNES in $(getent passwd | cut -d":" -f1,3,6)
+    for LIGNES in $(getent passwd | cut -d":" -f1,3,6 | grep -v "^ctsync:")
     do
 	#echo $(echo $LIGNES | cut -d":" -f2)
 	if [ "$(echo "$LIGNES" | cut -d":" -f2)" -ge "$UIDMINUSER" ] ;then

@@ -1,11 +1,84 @@
 #!/bin/bash
 source "$DIR_SHARE/ConfLanIs"
 
-ipv6localinterfaces=$(ip addr | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+if [ "$i_WAN_ipv6" =  "" ];then
+ipv6localinterfaces=$(ip addr show $i_WAN_ipv4  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+else
+ipv6localinterfaces=$(ip addr show $i_WAN_ipv6  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+fi
+##apt-get install rsync openssh-server
+genpasswd() {
+  local length=${1:-8}
+  tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${length} | xargs
+}
+serversyncon () {
+	echo <serversyncon>
+	useradd --shell /bin/bash --create-home --system ctsync
+	chmod 750 /home/ctsync
+	password=$(genpasswd)
+	echo "password ctsync =   $password" > /root/passwordctsync.txt
+	echo "ctsync:$password" | chpasswd
+	rm -rf /home/ctsync/.ssh
+	mkdir -p /home/ctsync/.ssh
+	mkdir -p /home/ctsync/confct/
+	{ echo "
+Port 22
+AddressFamily inet6
+ListenAddress fe80::/10
 
-ipv6localnetwork=$(ping6 -nc3 ff02::1%enp2s0 | awk '{print $4}' |grep : | cut -d"%" -f1 | sort -u)
+#SyslogFacility AUTH
+#LogLevel INFO
+StrictModes yes
+PubkeyAuthentication yes
+AuthorizedKeysFile	.ssh/authorized_keys
+PasswordAuthentication yes
+PermitEmptyPasswords no
+UsePAM yes
+AllowAgentForwarding yes
+AllowTcpForwarding yes
+X11Forwarding no
+PrintMotd no
+Banner none
+AcceptEnv LANG LC_*
+# override default of no subsystems
+Subsystem	sftp	/usr/lib/openssh/sftp-server"
+} > /etc/ssh/sshd_config
+service sshd restart
 
+{
+echo" # pour activer la syncro avec ce poste lancer les commandes suivante sur les postes de votre réseaux local que vous voulez syncroniser
+ # le mot de passe suivant seras demmandée: $password
+CTparental -cson $ipv6localinterfaces
+"
+} 
+echo "* */15 * * * root /usr/bin/CTparental -expsync /home/ctsync/ > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
+	echo </serversyncon>
+}
 
-
-
+clientsyncon () {
+	echo "<clientsyncon>"
+	useradd --shell /bin/bash --create-home --system ctsync
+	chmod 750 /home/ctsync
+	password=$(genpasswd)
+	echo "password ctsync =   $password"
+	echo "ctsync:$password" | chpasswd
+	rm -rf /home/ctsync/.ssh
+	mkdir -p /home/ctsync/.ssh
+	mkdir -p /home/ctsync/confct/
+	ssh-keygen -t rsa -b 2048 -P "" -f /home/ctsync/.ssh/id_rsa -q
+	chown ctsync:ctsync /home/ctsync/.ssh/id_rsa
+	chmod 600 /home/ctsync/.ssh/id_rsa
+	ssh-copy-id ctsync@$ipv6localinterfaces
+	echo "* */15 * * * ctsync  sleep $(/usr/bin/perl -e 'print int(rand(120))') && rsync --delete --chmod 755 -av ctsync@$ipv6localinterfaces:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
+	
+	echo "</clientsyncon>"
+}
+sync () {
+	echo "<sync>"
+	# on fait une pause aléatoire pour pas que les clients syncronisent tous en même temps
+	sleep ${RANDOM:0-2}
+	ssh-copy-id ctsync@$ipv6localinterfaces
+	echo "* */15 * * * root /usr/bin/CTparental -sync > /dev/null" >> /etc/cron.d/CTparentalclient
+	echo "</sync>"
+}
 
