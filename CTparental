@@ -3249,8 +3249,8 @@ then run the command CTparental -ipton')
 		if [ $# == 3 ]; then
 			addadminhttpd $2 $3
 		fi
-	*)
 	;;
+	*)
 	echo "$(gettext "Unknown argument"):$1";
 	echo "$usage";
 	exit 1
