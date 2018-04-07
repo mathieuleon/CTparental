@@ -3017,6 +3017,7 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 -logdnson$(gettext "   => For debugging only.
 	      Enabling dnsmasq query log in the /var/log/dnsmasq.query.log file.")
 -logdnsoff$(gettext "  => To disable dnsmasq query log in /var/log/dnsmasq.query.log .")
+-setadmin$(gettext "    => To change the login couple password.")
 "
 
 arg1=${1}
@@ -3244,7 +3245,11 @@ then run the command CTparental -ipton')
 	-cainstall )
 	updatecauser
 	;;
-
+	-setadmin )
+		if [ $# == 3 ]; then
+			addadminhttpd $2 $3
+		fi
+	;;
 	*)
 	echo "$(gettext "Unknown argument"):$1";
 	echo "$usage";
