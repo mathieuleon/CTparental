@@ -49,7 +49,7 @@ CTparental -cson $SRVipv6linklocal $passwordsrv
 "
 } > /root/commande_clients_ctsync.txt
 cat /root/commande_clients_ctsync.txt
-echo "* */15 * * * root /usr/bin/CTparental -expsync /home/ctsync/ > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
+echo "* */15 * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
 	echo </serversyncon>
 }
 
@@ -73,4 +73,25 @@ $passwordsrv
 	echo "</clientsyncon>"
 }
 
+clientsync () {
+	rsync --chmod 755 -av ctsync@$SRVipv6linklocal:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz.md5
+	rsync --chmod 755 -av ctsync@$SRVipv6linklocal:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz
+	md5fileorig=$(grep " " "/home/ctsync/confCTparental.tar.gz.md5" | cut -d" " -f1)
+	md5filenew=$( md5sum /home/ctsync/confCTparental.tar.gz | cut -d" " -f1 )
+	## on sassure que les fichiers sont pas corrompus.
+	if [ "$md5fileorig" = "$md5filenew" ]; then
+	 if [ -f /home/ctsync/confCTparental.tar.gz.md5.old ];then
+		md5fileorig=$(grep " " "/home/ctsync/confCTparental.tar.gz.md5.old" | cut -d" " -f1)
+		## on verifie si il y a un changement dans la conf
+		if [ "$md5fileorig" = "$md5filenew" ]; then
+		FILEimpconf=/home/ctsync/confCTparental.tar.gz
+		importconf
+		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5.old
+		fi
+	 else
+		FILEimpconf=/home/ctsync/confCTparental.tar.gz
+		importconf
+		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5.old
+	 fi
+	fi
 

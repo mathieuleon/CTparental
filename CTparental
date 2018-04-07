@@ -2856,8 +2856,19 @@ EOF
     update-grub2
 }
 expsync () {
+     md5old=$(grep " " "/home/ctsync/MD5EXPSYNC.txt" | cut -d" " -f1)
+     md5new="$({cat "$FILEexpconf" "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
+	"$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
+	"$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
+	"$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
+	"$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
+	"$FILEIPTABLES" "$FILEIPBLACKLIST" | md5sum })"
+     if [ ! "$md5old" = "$md5new" ]; then
 FILEexpconf="/home/ctsync/confCTparental.tar.gz"
-exportconf	
+exportconf
+	echo $md5new > /home/ctsync/MD5EXPSYNC.txt
+	md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5
+     fi
 }
 exportconf() {
     if [ ! -e "$FILEIPTABLES" ] ;  then
