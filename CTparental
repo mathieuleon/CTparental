@@ -80,40 +80,6 @@ echo $$ > $PIDFILE
 
 noinstalldep="0"
 nomanuel="0"
-x=($*)
-narg=0
-for arg in $* ; do
-    narg=$(( $narg + 1 ))
-    case $arg in
-	-nodep )
-	   noinstalldep=1
-	   ;;
-	-nomanuel )
-	   nomanuel=1
-	   ;;
-	-dirhtml )
-	   DIRhtmlPersonaliser=${x[$narg]}
-	   if [ ! -d "$DIRhtmlPersonaliser" ];then
-		gettext 'Invalid directory path!'
-		exit 0
-	   fi
-	   ;;
-	-exp )
-	   DIRexpconf=${x[$narg]}
-	   if [ ! -d "$DIRexpconf" ];then
-		gettext 'Invalid directory path!'
-		exit 0
-	   fi
-	   ;;
-	-imp )
-	   FILEimpconf=${x[$narg]}
-	   if [ ! -e "$FILEimpconf" ];then
-		gettext 'Error opening the file'
-		exit 0
-	   fi
-	   ;;
-    esac
-done
 
 # fonction pause pour debugage
 pause() {
@@ -3067,7 +3033,7 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 		     |{ -tlo }|{ -tlu }|{ -uhtml }|{ -aupon }|{ -aupoff }|{ -aup }
 -i$(gettext "	    => Install parental control on the computer (desktop PC). Can be used with
 	      an additional parameter to specify a source path for the redirection page.
-	      example: CTparental -dirhtml -i /home/toto/html/
+	      example: CTparental -i -dirhtml /home/toto/html/
 	      if no option a default page is used.")
 -u$(gettext "	    => uninstall the Parental Control Computer (desktop PC)")
 -dl$(gettext "	    => updates parental control from the blacklist of the University of Toulouse")
@@ -3092,7 +3058,7 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	      we prefer to install them by hand, or for the postinst and prerm script of deb.
 	      examples:
 	              CTparental -i -nodep
-	              CTparental -dirhtml -i /home/toto/html/ -nodep
+	              CTparental -i -dirhtml /home/toto/html/ -nodep
 	              CTparental -u -nodep")
 -nomanuel$(gettext "   => used only for the postinst and prerm script.")
 -gcton$(eval_gettext "	    => Enable a group of privileged users that will not undergo filtering.
@@ -3120,6 +3086,7 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 -logdnson$(gettext "   => For debugging only.
 	      Enabling dnsmasq query log in the /var/log/dnsmasq.query.log file.")
 -logdnsoff$(gettext "  => To disable dnsmasq query log in /var/log/dnsmasq.query.log .")
+-setadmin$(gettext "    => To change the login couple password.")
 "
 
 arg1=${1}
@@ -3128,11 +3095,39 @@ case $arg1 in
 		echo "$usage"
 	;;
 	-i )
+		CTparental -i -dirhtml /home/toto/html/ -nodep
+		if [ $2 = "-dirhtml" ]; then
+			if [ $# == 3 ]; then
+				DIRhtmlPersonaliser=$3
+				if [ ! -d "$DIRhtmlPersonaliser" ];then
+					gettext 'Invalid directory path!'
+					exit 0
+				fi
+				if [ $4 = "-nodep" ]; then
+					noinstalldep=1
+				fi
+			else
+				echo "$(gettext "Missing argument, wwwCTadminPath")";
+				echo "CTparental -uhtml -dirhtml \"/dir/wwwCTadminPath\" ";
+			fi
+		fi
+		if [ $2 = "-nodep" ]; then
+			noinstalldep=1
+		fi
+		if [ $3 = "-nomanuel" ]; then
+			nomanuel=1
+		fi
 		networkisoknext
 		install
 	;;
 	-u )
-	    uninstall
+		if [ $2 = "-nodep" ]; then
+			noinstalldep=1
+		fi
+		if [ $3 = "-nomanuel" ]; then
+			nomanuel=1
+		fi
+		uninstall
 	;;
 	-dl )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -3153,8 +3148,21 @@ case $arg1 in
 		fi
 	;;
 	-uhtml )
-		networkisoknext
-		FoncHTTPDCONF
+		if [ $2 = "-dirhtml" ]; then
+			if [ $# == 3 ]; then
+				DIRhtmlPersonaliser=$3
+				if [ ! -d "$DIRhtmlPersonaliser" ];then
+					gettext 'Invalid directory path!'
+					exit 0
+				fi
+			else
+				echo "$(gettext "Missing argument, wwwCTadminPath")";
+				echo "CTparental -uhtml -dirhtml \"/dir/wwwCTadminPath\" ";
+			fi
+		else
+			networkisoknext
+			FoncHTTPDCONF
+		fi
 	;;
 	-rl )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -3333,15 +3341,44 @@ then run the command CTparental -ipton')
 		rm -f /var/log/dnsmasq.query.log
 	;;
 	-exp )
+		if [ $# == 2 ]; then
+			DIRexpconf=$2
+			if [ ! -d "$DIRexpconf" ];then
+				gettext 'Invalid directory path!'
+				exit 0
+			fi
+		else
+			echo "$(gettext "Missing argument, directory path")";
+			echo "CTparental -exp \"/directory/path\"";
+			exit 0
+		fi
 		exportconf
 	;;
 	-imp )
+		if [ $# == 2 ]; then
+			FILEimpconf=$2
+			if [ ! -e "$FILEimpconf" ];then
+				gettext 'Error opening the file'
+				exit 0
+			fi
+		else
+			echo "$(gettext "Missing argument, fileconf path")";
+			echo "CTparental -imp \"/directory/fileconf\"";
+			exit 0
+		fi
 		importconf
 	;;
 	-cainstall )
-	updatecauser
+		updatecauser
 	;;
-
+	-setadmin )
+		if [ $# == 3 ]; then
+			addadminhttpd $2 $3
+		else
+			echo "$(gettext "Missing argument, login or password")";
+			echo "CTparental -setadmin \"login\" \"password\" ";
+		fi
+	;;
 	*)
 	echo "$(gettext "Unknown argument"):$1";
 	echo "$usage";
