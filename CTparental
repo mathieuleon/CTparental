@@ -2018,6 +2018,7 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
     $ENNETWORK
     { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalcron
     echo "*/1 * * * * root /usr/bin/CTparental -cron > /dev/null" >> /etc/cron.d/CTparentalcron
+    echo > "$DIR_CONF"/ctsync.conf
 }
 
 nomade() {
@@ -2153,7 +2154,6 @@ desactivegourpectoff() {
 
 uninstall() {
      $SED "/.ct.local/d" /etc/hosts
-
      # On force la désinstall par dpkg ou rpm si l'install a été effectuée par un package.
      if [ $nomanuel -eq 0 ]; then
 	muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
@@ -2288,6 +2288,7 @@ uninstall() {
      else
 	$IPTABLESsave > "$IPTABLESsaveFILE"
      fi
+     rm -f "$DIR_CONF"/ctsync.conf
 }
 
 choiblenabled() {
@@ -2826,21 +2827,6 @@ EOF
     chmod 755 /etc/grub.d/99_password
     update-grub2
 }
-expsync () {
-     md5old=$(grep " " "/home/ctsync/MD5EXPSYNC.txt" | cut -d" " -f1)
-     md5new="$({cat "$FILEexpconf" "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
-	"$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
-	"$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
-	"$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
-	"$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
-	"$FILEIPTABLES" "$FILEIPBLACKLIST" | md5sum })"
-     if [ ! "$md5old" = "$md5new" ]; then
-FILEexpconf="/home/ctsync/confCTparental.tar.gz"
-exportconf
-	echo $md5new > /home/ctsync/MD5EXPSYNC.txt
-	md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5
-     fi
-}
 exportconf() {
     if [ ! -e "$FILEIPTABLES" ] ;  then
 	echo > "$FILEIPTABLES"
@@ -2903,20 +2889,40 @@ genpasswd() {
   local length=${1:-8}
   tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${length} | xargs
 }
+expsync () {
+	if [ $(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf ) -eq 1 ] ;then
+     md5old=$(grep " " "/home/ctsync/MD5EXPSYNC.txt" | cut -d" " -f1)
+     md5new="$({cat "$FILEexpconf" "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
+ "$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
+ "$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
+ "$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
+ "$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
+ "$FILEIPTABLES" "$FILEIPBLACKLIST" | md5sum })"
+		if [ ! "$md5old" = "$md5new" ]; then
+		FILEexpconf="/home/ctsync/confCTparental.tar.gz"
+		exportconf
+		echo $md5new > /home/ctsync/MD5EXPSYNC.txt
+		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5
+		fi
+	fi
+}
 serversyncon () {
 	echo <serversyncon>
-	if [ "$i_WAN_ipv6" =  "" ];then
-	SRVipv6linklocal=$(ip addr show $i_WAN_ipv4  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+	if [ $(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf ) -eq 1 ] ;then
+		echo "$(gettext "You must first disable client mode")"
 	else
-	SRVipv6linklocal=$(ip addr show $i_WAN_ipv6  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
-	fi
-	useradd --shell /bin/bash --create-home --system ctsync
-	chmod 750 /home/ctsync
-	passwordsrv=$(genpasswd)
-	echo "ctsync:$passwordsrv" | chpasswd
-	rm -rf /home/ctsync/.ssh
-	mkdir -p /home/ctsync/.ssh
-	{ echo "
+			if [ "$i_WAN_ipv6" =  "" ];then
+			SRVipv6linklocal=$(ip addr show $i_WAN_ipv4  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+			else
+			SRVipv6linklocal=$(ip addr show $i_WAN_ipv6  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+			fi
+			useradd --shell /bin/bash --create-home --system ctsync
+			chmod 750 /home/ctsync
+			passwordsrv=$(genpasswd)
+			echo "ctsync:$passwordsrv" | chpasswd
+			rm -rf /home/ctsync/.ssh
+			mkdir -p /home/ctsync/.ssh
+			{ echo "
 Port $PORTSSH
 AddressFamily inet6
 ListenAddress fe80::/10
@@ -2938,17 +2944,20 @@ AcceptEnv LANG LC_*
 # override default of no subsystems
 Subsystem	sftp	/usr/lib/openssh/sftp-server"
 } > /etc/ssh/sshd_config
-$SSHrestart
+		$SSHrestart
 
-{
-echo" # pour activer la syncro avec ce poste lancer les commandes suivante sur les postes de votre réseaux local que vous voulez syncroniser
-CTparental -cson \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
-SRVSYNC=ON
-PORTSSH=$PORTSSH
-"
-} > "$DIR_CONF"/ctsync.conf
-echo "* */15 * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
-$CRONrestart
+		{
+		echo" # pour activer la syncro avec ce poste lancer les commandes suivante sur les postes de votre réseaux local que vous voulez syncroniser
+		CTparental -cson \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
+		SRVSYNC=ON
+		PORTSSH=$PORTSSH
+		"
+		} > "$DIR_CONF"/ctsync.conf
+		chown root:root "$DIR_CONF"/ctsync.conf
+		chmod 640 "$DIR_CONF"/ctsync.conf
+		echo "* */15 * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
+		$CRONrestart
+	fi
 echo </serversyncon>
 }
 
@@ -2963,28 +2972,33 @@ serversyncoff () {
 
 clientsyncon () {
 	echo "<clientsyncon>"
-	
-	useradd --shell /bin/bash --create-home --system ctsync
-	chmod 750 /home/ctsync
-	password=$(genpasswd)
-	echo "ctsync:$password" | chpasswd
-	rm -rf /home/ctsync/.ssh
-	mkdir -p /home/ctsync/.ssh
-	echo "le mots de passe demandée est le suivant:
-$passwordsrv
-"
-	ssh-keygen -t rsa -b 2048 -P "" -f /home/ctsync/.ssh/id_rsa -q
-	chown root:root /home/ctsync/.ssh/id_rsa
-	chmod 600 /home/ctsync/.ssh/id_rsa
-	ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub "-p $PORTSSH ctsync@$SRVipv6linklocal"
-	echo "* */15 * * * root  sleep $(/usr/bin/perl -e 'print int(rand(120))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
-	{
-	echo"
-SRVipv6linklocal=$SRVipv6linklocal
-PORTSSH=$PORTSSH
-CSYNC=ON
-"
-	} > "$DIR_CONF"/ctsync.conf
+	if [ $(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf ) -eq 1 ] ;then
+		echo "$(gettext "You must first disable server mode")"
+	else
+		useradd --shell /bin/bash --create-home --system ctsync
+		chmod 750 /home/ctsync
+		password=$(genpasswd)
+		echo "ctsync:$password" | chpasswd
+		rm -rf /home/ctsync/.ssh
+		mkdir -p /home/ctsync/.ssh
+		echo "le mots de passe demandée est le suivant:
+	$passwordsrv
+	"
+		ssh-keygen -t rsa -b 2048 -P "" -f /home/ctsync/.ssh/id_rsa -q
+		chown root:root /home/ctsync/.ssh/id_rsa
+		chmod 600 /home/ctsync/.ssh/id_rsa
+		ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub "-p $PORTSSH ctsync@$SRVipv6linklocal"
+		echo "* */15 * * * root  sleep $(/usr/bin/perl -e 'print int(rand(120))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
+		{
+		echo"
+	SRVipv6linklocal=$SRVipv6linklocal
+	PORTSSH=$PORTSSH
+	CSYNC=ON
+	"
+		} > "$DIR_CONF"/ctsync.conf
+		chown root:root "$DIR_CONF"/ctsync.conf
+		chmod 640 "$DIR_CONF"/ctsync.conf
+	fi
 	echo "</clientsyncon>"
 }
 
