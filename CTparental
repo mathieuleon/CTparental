@@ -200,7 +200,7 @@ E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 
 #### DEPENDANCES par DEFAUT #####
-DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail dnsutils rsyslog "}
+DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail dnsutils rsyslog rsync openssh-server "}
 
 #### PAQUETS EN CONFLIT par DEFAUT #####
 CONFLICTS=${CONFLICTS:=" dansguardian mini-httpd apache2 firewalld "}
@@ -225,8 +225,13 @@ IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
 E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE e2guardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
 RSYSLOGRESTART=${RSYSLOGRESTART:="$CMDSERVICE rsyslog restart"}
+SSHstart=${SSHstart:="$CMDSERVICE sshd start"}
+SSHstop=${SSHstop:="$CMDSERVICE sshd stop"}
+SSHrestart=${SSHrestart:="$CMDSERVICE sshd restart"}
 PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
+
+PORTSSH=${PORTSSH:=22}
 
 #### LOCALISATION du fichier PID lighttpd par defaut ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
@@ -2926,6 +2931,134 @@ importconf() {
 	 eval_gettext "\$FILEimpconf is not a configuration file
 "
      fi
+}
+
+genpasswd() {
+  local length=${1:-8}
+  tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${length} | xargs
+}
+serversyncon () {
+	echo <serversyncon>
+	if [ "$i_WAN_ipv6" =  "" ];then
+	SRVipv6linklocal=$(ip addr show $i_WAN_ipv4  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+	else
+	SRVipv6linklocal=$(ip addr show $i_WAN_ipv6  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+	fi
+	useradd --shell /bin/bash --create-home --system ctsync
+	chmod 750 /home/ctsync
+	passwordsrv=$(genpasswd)
+	echo "ctsync:$passwordsrv" | chpasswd
+	rm -rf /home/ctsync/.ssh
+	mkdir -p /home/ctsync/.ssh
+	{ echo "
+Port $PORTSSH
+AddressFamily inet6
+ListenAddress fe80::/10
+
+#SyslogFacility AUTH
+#LogLevel INFO
+StrictModes yes
+PubkeyAuthentication yes
+AuthorizedKeysFile	.ssh/authorized_keys
+PasswordAuthentication yes
+PermitEmptyPasswords no
+UsePAM yes
+AllowAgentForwarding yes
+AllowTcpForwarding yes
+X11Forwarding no
+PrintMotd no
+Banner none
+AcceptEnv LANG LC_*
+# override default of no subsystems
+Subsystem	sftp	/usr/lib/openssh/sftp-server"
+} > /etc/ssh/sshd_config
+$SSHrestart
+
+{
+echo" # pour activer la syncro avec ce poste lancer les commandes suivante sur les postes de votre réseaux local que vous voulez syncroniser
+CTparental -cson \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
+SRVSYNC=ON
+PORTSSH=$PORTSSH
+"
+} > "$DIR_CONF"/ctsync.conf
+echo "* */15 * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
+$CRONrestart
+echo </serversyncon>
+}
+
+serversyncoff () {
+	$SSHstop
+	pkill -u ctsync
+	deluser --quiet --system --remove-home --remove-all-files ctsync
+	rm -f /etc/cron.d/CTparentalsrv
+	$CRONrestart
+	$SSHstart
+}
+
+clientsyncon () {
+	echo "<clientsyncon>"
+	
+	useradd --shell /bin/bash --create-home --system ctsync
+	chmod 750 /home/ctsync
+	password=$(genpasswd)
+	echo "ctsync:$password" | chpasswd
+	rm -rf /home/ctsync/.ssh
+	mkdir -p /home/ctsync/.ssh
+	echo "le mots de passe demandée est le suivant:
+$passwordsrv
+"
+	ssh-keygen -t rsa -b 2048 -P "" -f /home/ctsync/.ssh/id_rsa -q
+	chown root:root /home/ctsync/.ssh/id_rsa
+	chmod 600 /home/ctsync/.ssh/id_rsa
+	ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub "-p $PORTSSH ctsync@$SRVipv6linklocal"
+	echo "* */15 * * * root  sleep $(/usr/bin/perl -e 'print int(rand(120))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
+	{
+	echo"
+SRVipv6linklocal=$SRVipv6linklocal
+PORTSSH=$PORTSSH
+CSYNC=ON
+"
+	} > "$DIR_CONF"/ctsync.conf
+	echo "</clientsyncon>"
+}
+
+clientsyncoff () {
+	$SSHstop
+	pkill -u ctsync
+	deluser --quiet --system --remove-home --remove-all-files ctsync
+	rm -f /etc/cron.d/CTparentalclient
+	$CRONrestart
+	$SSHstart
+}
+
+clientsync () {
+	SRVipv6linklocal=$(grep -c "SRVipv6linklocal=" "$DIR_CONF"/ctsync.conf | cut-d"=" -f2)
+	PORTSSH=$(grep -c "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut-d"=" -f2)
+	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@$SRVipv6linklocal:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz.md5
+	error1=$?
+	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@$SRVipv6linklocal:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz
+	error2=$?
+	if [ $(( $error1 + $error2 )) -ge 1 ] ;then
+	exit 1
+	fi
+	md5fileorig=$(grep " " "/home/ctsync/confCTparental.tar.gz.md5" | cut -d" " -f1)
+	md5filenew=$( md5sum /home/ctsync/confCTparental.tar.gz | cut -d" " -f1 )
+	## on sassure que les fichiers sont pas corrompus.
+	if [ "$md5fileorig" = "$md5filenew" ]; then
+	 if [ -f /home/ctsync/confCTparental.tar.gz.md5.old ];then
+		md5fileorig=$(grep " " "/home/ctsync/confCTparental.tar.gz.md5.old" | cut -d" " -f1)
+		## on verifie si il y a un changement dans la conf
+		if [ "$md5fileorig" = "$md5filenew" ]; then
+		FILEimpconf=/home/ctsync/confCTparental.tar.gz
+		importconf
+		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5.old
+		fi
+	 else
+		FILEimpconf=/home/ctsync/confCTparental.tar.gz
+		importconf
+		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5.old
+	 fi
+	fi
 }
 
 # and func # ne pas effacer cette ligne !!
