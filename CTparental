@@ -3095,7 +3095,6 @@ case $arg1 in
 		echo "$usage"
 	;;
 	-i )
-		CTparental -i -dirhtml /home/toto/html/ -nodep
 		if [ $2 = "-dirhtml" ]; then
 			if [ $# == 3 ]; then
 				DIRhtmlPersonaliser=$3
