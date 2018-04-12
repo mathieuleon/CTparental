@@ -2948,7 +2948,7 @@ Subsystem	sftp	/usr/lib/openssh/sftp-server"
 
 		{
 		echo" # pour activer la syncro avec ce poste lancer les commandes suivante sur les postes de votre réseaux local que vous voulez syncroniser
-		CTparental -cson \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
+		CTparental -syncon \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
 		SRVSYNC=ON
 		PORTSSH=$PORTSSH
 		"
@@ -2988,7 +2988,7 @@ clientsyncon () {
 		chown root:root /home/ctsync/.ssh/id_rsa
 		chmod 600 /home/ctsync/.ssh/id_rsa
 		ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub "-p $PORTSSH ctsync@$SRVipv6linklocal"
-		echo "* */15 * * * root  sleep $(/usr/bin/perl -e 'print int(rand(120))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
+		echo "* */10 * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
 		{
 		echo"
 	SRVipv6linklocal=$SRVipv6linklocal
@@ -3392,6 +3392,23 @@ then run the command CTparental -ipton')
 			echo "CTparental -setadmin \"login\" \"password\" ";
 		fi
 	;;
+	-srvon )
+		serversyncon
+	;;
+	-srvoff )
+		serversyncoff
+	;;
+	-expsync )
+		expsync
+	;;
+	-syncon )
+		clientsyncon
+	;;
+	-syncoff )
+		clientsyncoff
+	;;
+	-csync )
+		clientsync
 	*)
 	echo "$(gettext "Unknown argument"):$1";
 	echo "$usage";
