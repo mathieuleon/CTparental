@@ -2993,6 +2993,11 @@ serversyncoff () {
 
 clientsyncon () {
 	echo "<clientsyncon>"
+	if [ "$i_WAN_ipv6" =  "" ];then
+			i_WAN=$i_WAN_ipv4
+	else
+			i_WAN=$i_WAN_ipv6
+	fi
 	SRVipv6linklocal=$1
 	passwordsrv=$2
 	PORTSSH=$3
@@ -3012,7 +3017,7 @@ clientsyncon () {
 		ssh-keygen -t rsa -b 2048 -P "" -f /home/ctsync/.ssh/id_rsa -q
 		chown root:root /home/ctsync/.ssh/id_rsa
 		chmod 600 /home/ctsync/.ssh/id_rsa
-		ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub -p $PORTSSH ctsync@$SRVipv6linklocal
+		ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub -p $PORTSSH ctsync@${SRVipv6linklocal}%${i_WAN}
 		echo "*/10 * * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
 		{
 		echo "
@@ -3038,11 +3043,16 @@ clientsyncoff () {
 }
 
 clientsync () {
+	if [ "$i_WAN_ipv6" =  "" ];then
+			i_WAN=$i_WAN_ipv4
+	else
+			i_WAN=$i_WAN_ipv6
+	fi
 	SRVipv6linklocal=$(grep -c "SRVipv6linklocal=" "$DIR_CONF"/ctsync.conf | cut-d"=" -f2)
 	PORTSSH=$(grep -c "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut-d"=" -f2)
-	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@$SRVipv6linklocal:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz.md5
+	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@${SRVipv6linklocal}%${i_WAN}:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz.md5
 	error1=$?
-	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@$SRVipv6linklocal:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz
+	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@${SRVipv6linklocal}%${i_WAN}:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz
 	error2=$?
 	if [ $(( $error1 + $error2 )) -ge 1 ] ;then
 	exit 1
