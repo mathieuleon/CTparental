@@ -2108,7 +2108,8 @@ updatelistgctoff() {
 	    $SED "s/^$${PCUSER}$/+$PCUSER/g" "$FILE_tmp"
 	fi
      done
-
+	## on supprimes les lignes vide du fichier.
+	$SED '/^$/d' "$FILE_tmp"
      ## on supprime tout ceux qui n'existent plus sur le pc.
      while read PCUSER
      do
