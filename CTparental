@@ -3005,6 +3005,7 @@ clientsyncon () {
 		echo "ctsync:$password" | chpasswd
 		rm -rf /home/ctsync/.ssh
 		mkdir -p /home/ctsync/.ssh
+		mkdir -p /root/.ssh
 		echo "$(gettext "The requested password is:")
 	$passwordsrv
 	"
