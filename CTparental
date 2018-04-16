@@ -1098,7 +1098,17 @@ ipglobal() {
     $IPTABLES -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
     $IPTABLES6 -A OUTPUT -p tcp --dport 21 -j ACCEPT
     $IPTABLES6 -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
+	
+	# On autorise la syncro ctparental
+	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
+	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
+	$IPTABLES6 -A OUTPUT -p tcp --dport $SSHport -j ACCEPT
+	fi
+	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
+	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
+	$IPTABLES6 -A INPUT -p tcp --dport $SSHport -j ACCEPT
+	fi
+	
     echo "<$FILEIPTABLES>"
 	source "$FILEIPTABLES"
 	echo "</$FILEIPTABLES>"
