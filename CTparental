@@ -199,6 +199,9 @@ PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
 
 PORTSSH=${PORTSSH:=22}
+ENABLESSH=${ENABLESSH:="systemctl enable ssh"}
+DISABLESSH=${DISABLESSH:="systemctl disable ssh"}
+
 
 #### LOCALISATION du fichier PID lighttpd par defaut ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
@@ -1846,6 +1849,7 @@ install() {
 	    exit 0
 	fi
 	fi
+	$DISABLESSH
     {
 	echo "$ADMIN_IP4 admin.ct.local "
 	echo "$ADMIN_IP6 admin.ct.local "
@@ -2948,6 +2952,7 @@ expsync () {
 }
 serversyncon () {
 	echo "<serversyncon>"
+	$ENABLESSH
 	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 		echo "$(gettext "You must first disable client mode")"
 	else
@@ -3015,7 +3020,7 @@ serversyncoff () {
 	rm -f /etc/cron.d/CTparentalsrv
 	$SED "s?^SRVSYNC=.*?SRVSYNC=OFF?g" "$DIR_CONF"/ctsync.conf
 	$CRONrestart
-	$SSHstart
+	$DISABLESSH
 }
 
 clientsyncon () {

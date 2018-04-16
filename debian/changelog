@@ -2,7 +2,7 @@ ctparental (4.22.01-1.0) unstable; urgency=medium
 
   * optimisation des mise a jour iptables.
   * corection des erreurs de désinstallation du deb.
-  * tentative d'ajout d'option de sync entre clients (test).
+  * ajout du fonctionnement client<=>serveur.
 
  -- Guillaume marsat <CTparental1@laposte.net>  Sun, 01 Apr 2018 22:06:51 +0200
  
