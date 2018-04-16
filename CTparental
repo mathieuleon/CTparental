@@ -2843,6 +2843,29 @@ EOF
     chmod 755 /etc/grub.d/99_password
     update-grub2
 }
+
+exportconfsrv() {
+date="$( date +%y.%m.%d )"
+FILEexpconf=${FILEexpconf:=$(echo "$DIRexpconf"/CTparental.conf.srv."$date".tar.gz | sed -e "s|\/\{2,10\}|\/|g" )}
+tar -cvzf "$FILEexpconf" /home/ctsync/.ssh/authorized_keys /etc/ssh/ 
+chmod 744 "$FILEexpconf"
+eval_gettext "Conf exported to \$FILEexpconf
+"
+}
+
+importconfsrv() {
+if [ "$(tar -tf "$FILEimpconf" | grep -c home/ctsync/.ssh/authorized_keys )" -eq 1 ] ;then
+clientsyncoff
+serversyncon
+tar -xvzf "$FILEimpconf" -C /
+$SSHrestart
+else
+eval_gettext "\$FILEimpconf is not a configuration server file
+"
+fi
+
+}
+
 exportconf() {
     if [ ! -e "$FILEIPTABLES" ] ;  then
 	echo > "$FILEIPTABLES"
@@ -2913,7 +2936,7 @@ expsync () {
  "$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/* "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
  "$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
  "$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
- "$FILEIPTABLES" "$FILEIPBLACKLIST" | md5sum | cut -d" " -f1 
+ "$FILEIPTABLES" "$FILEIPBLACKLIST" /home/ctsync/.ssh/authorized_keys | md5sum | cut -d" " -f1 
  })"
 		if [ ! "$md5old" = "$md5new" ]; then
 		FILEexpconf="/home/ctsync/confCTparental.tar.gz"
@@ -2978,6 +3001,7 @@ PORTSSH=$PORTSSH
 		cat "$DIR_CONF"/ctsync.conf
 		chown root:root "$DIR_CONF"/ctsync.conf
 		chmod 640 "$DIR_CONF"/ctsync.conf
+		expsync
 		echo "*/15 * * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
 		$CRONrestart
 	fi
@@ -3148,6 +3172,12 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 -syncon$(gettext "    => To activate the client role.")
 -syncoff$(gettext "    => to disable the client role.")
 -csync$(gettext "    => To synchronize the client with the server.")
+-expsrv$(gettext "	 => Export server configuration.
+	   exemple:
+	           CTparental -expsrv /home/myhomedir/")
+-impsrv$(gettext "	    => Import a server configuration.
+	      exemple:
+	              CTparental -impsrv /home/myhomedir/CTparental.conf.srv.yy.mm.dd.tar.gz")
 "
 arg1=${1}
 case $arg1 in
@@ -3471,6 +3501,34 @@ then run the command CTparental -ipton')
 	;;
 	-csync )
 		clientsync
+	;;
+	-expsrv )
+		if [ $# == 2 ]; then
+			DIRexpconf=$2
+			if [ ! -d "$DIRexpconf" ];then
+				gettext 'Invalid directory path!'
+				exit 0
+			fi
+		else
+			echo "$(gettext "Missing argument, directory path")";
+			echo "CTparental -expsrv \"/directory/path\"";
+			exit 0
+		fi
+		exportconfsrv
+	;;
+	-impsrv )
+		if [ $# == 2 ]; then
+			FILEimpconf=$2
+			if [ ! -e "$FILEimpconf" ];then
+				gettext 'Error opening the file'
+				exit 0
+			fi
+		else
+			echo "$(gettext "Missing argument, fileconf path")";
+			echo "CTparental -impsrv \"/directory/fileconf\"";
+			exit 0
+		fi
+		importconfsrv
 	;;
 	*)
 	echo "$(gettext "Unknown argument"):$1";
