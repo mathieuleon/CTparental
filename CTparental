@@ -194,6 +194,7 @@ RSYSLOGRESTART=${RSYSLOGRESTART:="$CMDSERVICE rsyslog restart"}
 SSHstart=${SSHstart:="$CMDSERVICE sshd start"}
 SSHstop=${SSHstop:="$CMDSERVICE sshd stop"}
 SSHrestart=${SSHrestart:="$CMDSERVICE sshd restart"}
+SFTPPATH=${SFTPPATH:="/usr/lib/openssh/sftp-server"}
 PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
 
@@ -2942,12 +2943,12 @@ PrintMotd no
 Banner none
 AcceptEnv LANG LC_*
 # override default of no subsystems
-Subsystem	sftp	/usr/lib/openssh/sftp-server"
+Subsystem	sftp	$SFTPPATH"
 } > /etc/ssh/sshd_config
 		$SSHrestart
 
 		{
-		echo" # pour activer la syncro avec ce poste lancer les commandes suivante sur les postes de votre réseaux local que vous voulez syncroniser
+		echo"# $(gettext "to enable sync with this server, run the following commands on the client on your local network that you want to synchronize")
 		CTparental -syncon \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
 		SRVSYNC=ON
 		PORTSSH=$PORTSSH
@@ -2981,7 +2982,7 @@ clientsyncon () {
 		echo "ctsync:$password" | chpasswd
 		rm -rf /home/ctsync/.ssh
 		mkdir -p /home/ctsync/.ssh
-		echo "le mots de passe demandée est le suivant:
+		echo "$(gettext "The requested password is:")
 	$passwordsrv
 	"
 		ssh-keygen -t rsa -b 2048 -P "" -f /home/ctsync/.ssh/id_rsa -q
@@ -3101,6 +3102,12 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	      Enabling dnsmasq query log in the /var/log/dnsmasq.query.log file.")
 -logdnsoff$(gettext "  => To disable dnsmasq query log in /var/log/dnsmasq.query.log .")
 -setadmin$(gettext "    => To change the login couple password.")
+-expsync$(gettext "    => To update the conf distribute by the server.")
+-srvon$(gettext "    => To activate the server role.")
+-srvoff$(gettext "    => to disable the server role.")
+-syncon$(gettext "    => To activate the client role.")
+-syncoff$(gettext "    => to disable the client role.")
+-csync$(gettext "    => To synchronize the client with the server.")
 "
 
 arg1=${1}
