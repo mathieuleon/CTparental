@@ -107,14 +107,29 @@ if [ ! -f $FILE_CONF ] ; then
     mkdir -p "$DIR_SHARE"/
     cat << EOF > $FILE_CONF
 LASTUPDATE=0
-#LANG=$LANG
+#LANG=fr_FR.UTF-8
+
+## currently 3 languages are supported, English, French and Spanish.
+## by default the application takes the default language of the local system or if not supported english but we can
+## force with one of the following values provided you have it
+## activate in the local system example under Debian via the "dpkg-reconfigure locales" command.
+## possible values for LANG
+## es_AR.UTF-8, es_BO.UTF-8, es_CL.UTF-8, es_CO.UTF-8
+## es_CR.UTF-8, es_CU.UTF-8, es_DO.UTF-8, es_EC.UTF-8
+## es_ES.UTF-8, es_GT.UTF-8, es_HN.UTF-8, es_MX.UTF-8
+## es_NI.UTF-8, es_PA.UTF-8, es_PE.UTF-8, es_PR.UTF-8
+## es_PY.UTF-8, es_SV.UTF-8, es_US.UTF-8, es_UY.UTF-8
+## es_VE.UTF-8, en_BE.UTF-8, fr_CA.UTF-8, fr_CH.UTF-8
+## en_EN.UTF-8, en_LU.UTF-8
+## taking into account in the web interface requires to restart the service lighttpd
+
 DNSMASQ=BLACK
 AUTOUPDATE=OFF
 HOURSCONNECT=OFF
 GCTOFF=OFF
 PRIVOXYDF=ON
 REDIRECT=ON
-# Pare-feu minimal.
+# Parfeux minimal.
 IPRULES=OFF
 MD5DREAB=
 MD5IPT=
@@ -195,7 +210,6 @@ RSYSLOGRESTART=${RSYSLOGRESTART:="$CMDSERVICE rsyslog restart"}
 SSHstart=${SSHstart:="$CMDSERVICE ssh start"}
 SSHstop=${SSHstop:="$CMDSERVICE ssh stop"}
 SSHrestart=${SSHrestart:="$CMDSERVICE ssh restart"}
-SFTPPATH=${SFTPPATH:="/usr/lib/openssh/sftp-server"}
 PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
 
@@ -1085,7 +1099,17 @@ ipglobal() {
     $IPTABLES -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
     $IPTABLES6 -A OUTPUT -p tcp --dport 21 -j ACCEPT
     $IPTABLES6 -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
+	
+	# On autorise les syncronisations client serveur ctparental
+	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
+	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
+	$IPTABLES6 -A OUTPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
+	fi
+	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
+	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
+	$IPTABLES6 -A INPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
+	fi
+	
     echo "<$FILEIPTABLES>"
 	source "$FILEIPTABLES"
 	echo "</$FILEIPTABLES>"
@@ -2977,6 +3001,7 @@ serversyncon () {
 			touch /home/ctsync/.ssh/authorized_keys
 			chown ctsync:ctsync /home/ctsync/.ssh/authorized_keys
 			chmod 644 /home/ctsync/.ssh/authorized_keys
+			SFTPPATH=$(find / -type f -name sftp-server -executable 2>/dev/null)
 			
 			{ echo "
 Port $PORTSSH
@@ -3005,6 +3030,8 @@ Subsystem	sftp	$SFTPPATH"
 		{
 		echo "# $(gettext "to enable sync with this server, run the following commands on the client on your local network that you want to synchronize")
 CTparental -syncon \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
+
+SRVipv6linklocal=$SRVipv6linklocal
 SRVSYNC=ON
 PORTSSH=$PORTSSH
 "
