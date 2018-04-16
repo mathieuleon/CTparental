@@ -1832,6 +1832,20 @@ CActparental() {
 }
 
 install() {
+	# on empaiche la réinstall manuel par dessus une install par paquet.
+	if [ $nomanuel -eq 0 ]; then
+	muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
+	if [ "$(dpkg -l ctparental | grep -c ^i)" -eq 1 ] ;then
+	    echo "$muninstall"
+	    echo "$CMDREMOVE ctparental"
+	    exit 0
+	fi
+	if [ "$(rpm -q -a | grep -c ctparental )" -eq 1 ] ;then
+	    echo "$muninstall"
+	    echo "$CMDREMOVE ctparental"
+	    exit 0
+	fi
+	fi
     {
 	echo "$ADMIN_IP4 admin.ct.local "
 	echo "$ADMIN_IP6 admin.ct.local "
