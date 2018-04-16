@@ -3028,7 +3028,7 @@ clientsyncon () {
 clientsyncoff () {
 	$SSHstop
 	pkill -u ctsync
-	deluser --quiet --system --remove-home --remove-all-files ctsync
+	deluser --quiet --system --remove-home ctsync
 	rm -f /etc/cron.d/CTparentalclient
 	$SED "s?^CSYNC=.*?CSYNC=OFF?g" "$DIR_CONF"/ctsync.conf
 	$CRONrestart
