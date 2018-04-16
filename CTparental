@@ -2859,7 +2859,7 @@ exportconf() {
 	"$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
 	"$FILEIPTABLES" "$FILEIPBLACKLIST"
 
-    chmod 744 "$DIRexpconf"/CTparental.conf."$date".tar.gz
+    chmod 744 "$FILEexpconf"
     eval_gettext "Conf exported to \$FILEexpconf
 "
 }
@@ -2906,14 +2906,16 @@ genpasswd() {
   tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${length} | xargs
 }
 expsync () {
-	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
+	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
      md5old=$(grep " " "/home/ctsync/MD5EXPSYNC.txt" | cut -d" " -f1)
-     md5new="$({cat "$FILEexpconf" "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
+     md5new="$({ 
+ cat "$FILEexpconf" "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
  "$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
  "$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
  "$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
  "$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
- "$FILEIPTABLES" "$FILEIPBLACKLIST" | md5sum })"
+ "$FILEIPTABLES" "$FILEIPBLACKLIST" | md5sum 
+ })"
 		if [ ! "$md5old" = "$md5new" ]; then
 		FILEexpconf="/home/ctsync/confCTparental.tar.gz"
 		exportconf
