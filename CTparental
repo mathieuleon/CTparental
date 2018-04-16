@@ -2906,7 +2906,7 @@ genpasswd() {
   tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${length} | xargs
 }
 expsync () {
-	if [ $(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf ) -eq 1 ] ;then
+	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
      md5old=$(grep " " "/home/ctsync/MD5EXPSYNC.txt" | cut -d" " -f1)
      md5new="$({cat "$FILEexpconf" "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
  "$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
@@ -2924,7 +2924,7 @@ expsync () {
 }
 serversyncon () {
 	echo "<serversyncon>"
-	if [ $(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf ) -eq 1 ] ;then
+	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 		echo "$(gettext "You must first disable client mode")"
 	else
 			if [ "$i_WAN_ipv6" =  "" ];then
@@ -2963,7 +2963,7 @@ Subsystem	sftp	$SFTPPATH"
 		$SSHrestart
 
 		{
-		echo"# $(gettext "to enable sync with this server, run the following commands on the client on your local network that you want to synchronize")
+		echo "# $(gettext "to enable sync with this server, run the following commands on the client on your local network that you want to synchronize")
 		CTparental -syncon \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
 		SRVSYNC=ON
 		PORTSSH=$PORTSSH
@@ -2988,7 +2988,7 @@ serversyncoff () {
 
 clientsyncon () {
 	echo "<clientsyncon>"
-	if [ $(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf ) -eq 1 ] ;then
+	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ] ;then
 		echo "$(gettext "You must first disable server mode")"
 	else
 		useradd --shell /bin/bash --create-home --system ctsync
