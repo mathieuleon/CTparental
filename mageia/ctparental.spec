@@ -120,7 +120,7 @@ fi
 exit 0
 
 %preun
-pkill -15 CTparental
-rm -f /var/run/CTparental.pid
+pkill -15 CTparental || true
+rm -f /var/run/CTparental.pid || true
 CTparental -u -nodep -nomanuel  1>&2
 exit 0

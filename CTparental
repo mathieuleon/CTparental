@@ -80,40 +80,6 @@ echo $$ > $PIDFILE
 
 noinstalldep="0"
 nomanuel="0"
-x=($*)
-narg=0
-for arg in $* ; do
-    narg=$(( $narg + 1 ))
-    case $arg in
-	-nodep )
-	   noinstalldep=1
-	   ;;
-	-nomanuel )
-	   nomanuel=1
-	   ;;
-	-dirhtml )
-	   DIRhtmlPersonaliser=${x[$narg]}
-	   if [ ! -d "$DIRhtmlPersonaliser" ];then
-		gettext 'Invalid directory path!'
-		exit 0
-	   fi
-	   ;;
-	-exp )
-	   DIRexpconf=${x[$narg]}
-	   if [ ! -d "$DIRexpconf" ];then
-		gettext 'Invalid directory path!'
-		exit 0
-	   fi
-	   ;;
-	-imp )
-	   FILEimpconf=${x[$narg]}
-	   if [ ! -e "$FILEimpconf" ];then
-		gettext 'Error opening the file'
-		exit 0
-	   fi
-	   ;;
-    esac
-done
 
 # fonction pause pour debugage
 pause() {
@@ -151,6 +117,7 @@ REDIRECT=ON
 # Pare-feu minimal.
 IPRULES=OFF
 MD5DREAB=
+MD5IPT=
 I_WAN_IPV4=
 I_WAN_IPV6=
 IP_BOX_IPV4=
@@ -199,7 +166,7 @@ E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 
 #### DEPENDANCES par DEFAUT #####
-DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail dnsutils rsyslog "}
+DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail dnsutils rsyslog rsync openssh-server "}
 
 #### PAQUETS EN CONFLIT par DEFAUT #####
 CONFLICTS=${CONFLICTS:=" dansguardian mini-httpd apache2 firewalld "}
@@ -224,8 +191,14 @@ IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
 E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE e2guardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
 RSYSLOGRESTART=${RSYSLOGRESTART:="$CMDSERVICE rsyslog restart"}
+SSHstart=${SSHstart:="$CMDSERVICE sshd start"}
+SSHstop=${SSHstop:="$CMDSERVICE sshd stop"}
+SSHrestart=${SSHrestart:="$CMDSERVICE sshd restart"}
+SFTPPATH=${SFTPPATH:="/usr/lib/openssh/sftp-server"}
 PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
+
+PORTSSH=${PORTSSH:=22}
 
 #### LOCALISATION du fichier PID lighttpd par defaut ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
@@ -320,58 +293,7 @@ if [ -z "$CMDINSTALL" ] ; then
     exit 1
 fi
 
-i_WAN_ipv4="$(ip -4 route | grep default | awk '{print $5}')" # GW!
-if [ "$i_WAN_ipv4" =  "" ];then
-    ipbox_ipv4=""
-    ip_i_WAN_ipv4=""
-    ip_broadcast_ipv4=""
-    reseau_box_ipv4=""
-else
-    ipbox_ipv4="$(ip -4 route | grep default | awk '{print $3}')"
-    ip_i_WAN_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/inet /{print substr($2,1)}')"
-    ip_broadcast_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/brd /{print substr($4,1)}')"
-    reseau_box_ipv4="$(ip -4 route | grep "$i_WAN_ipv4" | grep -v default | grep "src" | awk '//{print substr($1,1)}' )"
-fi
-export i_WAN_ipv4
-export ipbox_ipv4
-export ip_i_WAN_ipv4
-export reseau_box_ipv4
-export ip_broadcast_ipv4
-
-DNS1v4="$(dig -4 +all +retry=1 +tries=1 | grep SERVER | cut -d "(" -f2 | sed -e "s/)//g")"
-if [ ! "$DNS1v4" =  "" ];then
-    iptables -A OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
-    DNS2v4="$(dig -4 +all +retry=1 +tries=1 | grep SERVER | cut -d "(" -f2 | sed -e "s/)//g")"
-    iptables -D OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
-fi
-
-#echo "intefaceWAN="$i_WAN_ipv4" ipbox_ipv4="$ipbox_ipv4" ipinterfaceWan="$ip_i_WAN_ipv4" reseau_box_ipv4="$reseau_box_ipv4" broadcast="$ip_broadcast_ipv4" dns1="$DNS1" dns2="$DNS2
-# on utilise les DNS google en cas de problême de détection de ceux du fai
-export DNS1v4=${DNS1v4:=8.8.8.8}
-export DNS2v4=${DNS2v4:=8.8.4.4}
-
-
-i_WAN_ipv6="$(ip -6 route | grep default | awk '{print $5}')" # GW!
-if [ "$i_WAN_ipv6" =  "" ];then
-    ipbox_ipv6=""
-    ip_i_WAN_ipv6=""
-    reseau_box_ipv6_g=""
-else
-    ipbox_ipv6="$(ip -6 route | grep default | awk '{print $3}')"
-    ip_i_WAN_ipv6="$(ip -6 address show "$i_WAN_ipv6" | awk '/inet/{print substr($2,1)}')"
-    reseau_box_ipv6_g="$(ip -6 route | grep "$i_WAN_ipv6" | grep -v default | awk '//{print substr($1,1)}')"
-fi
-
-reseau_box_ipv6_l="fe80::/64"
-
-export i_WAN_ipv6
-export ipbox_ipv6
-export ip_i_WAN_ipv6
-export reseau_box_ipv6_g
-export reseau_box_ipv6_l
-# on utilise les DNS google en cas de problême de détection de ceux du fai
-export DNS1v6=${DNS1v6:=2001:4860:4860::8888}
-export DNS2v6=${DNS2v6:=2001:4860:4860::8844}
+source "$DIR_SHARE/ConfLanIs"
 
 ipV4ok() {
 	ip=$(echo "$1" | cut -d"/" -f1)
@@ -487,9 +409,10 @@ resolvconffixoff() {
 
 
 PRIVATE_IP4="127.0.0.10"
-PRIVATE_IP6="fc00::127:10"
+PRIVATE_IP6="fd00::127:10"
 ADMIN_IP4="127.0.0.11"
-ADMIN_IP6="fc00::127:11"
+ADMIN_IP6="fd00::127:11"
+
 
 
 FILE_tmp=${FILE_tmp:="$tempDIRRamfs/filetmp.txt"}
@@ -1084,7 +1007,6 @@ ipglobal() {
     $IPTABLES -A INPUT -p udp -m limit --limit 10/s -j ACCEPT
     $IPTABLES6 -A INPUT -p udp -m limit --limit 10/s -j ACCEPT
     ### IP indésirables
-    if [ -e "$FILEIPBLACKLIST" ] ;  then
     echo "<$FILEIPBLACKLIST>"
 	while read ligne
 	do
@@ -1099,20 +1021,8 @@ ipglobal() {
 	   fi
 	done < $FILEIPBLACKLIST
 	echo "</$FILEIPBLACKLIST>"
-    else
-    {
-	echo '# - one ip per line.
-# - ipv4 address or subnet ipv4 / mask (ip/xxx.xxx.xxx.xxx or ip/1 to 32)
-# - ipv6 address or subnet ipv6 / mask (ip/ 1 to 128)
-# examples:
-# 10.10.2.3
-# 192.168.182.0/24
-# 2001:db8::f23f
-# 2001:db8::/44'
-	} >  $FILEIPBLACKLIST
-	chown root:root  $FILEIPBLACKLIST
-	chmod 750  $FILEIPBLACKLIST
-    fi
+
+
     ## bloque le multicast dns (mDNS)
     $IPTABLES6 -A OUTPUT -p udp --dport 5353 -j DROP
     $IPTABLES6 -A INPUT -p udp --sport 5353 -j DROP
@@ -1172,14 +1082,10 @@ ipglobal() {
     $IPTABLES6 -A OUTPUT -p tcp --dport 21 -j ACCEPT
     $IPTABLES6 -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
-    if [ -e "$FILEIPTABLES" ] ;  then
     echo "<$FILEIPTABLES>"
 	source "$FILEIPTABLES"
 	echo "</$FILEIPTABLES>"
-    else
-	initfileiptables
-	source "$FILEIPTABLES"
-    fi
+
     ### LOG ### Log tout ce qui qui n'est pas accepté par une règle précédente
     $IPTABLES6 -A OUTPUT -j LOG  --log-prefix "ip6tables: "
     $IPTABLES6 -A INPUT -j LOG   --log-prefix "ip6tables: "
@@ -1315,91 +1221,123 @@ EOF
 }
 
 iptablesreload() {
+
     echo "<iptablesreload>"
-    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
-    $IPTABLES6 -F
-    $IPTABLES6 -X
-    $IPTABLES6 -t nat -F
-    $IPTABLES6 -t mangle -F
-    $IPTABLES6 -t nat -X
-    $IPTABLES6 -t nat -N ctparental
-    $IPTABLES6 -P INPUT ACCEPT
-    $IPTABLES6 -P OUTPUT ACCEPT
-    $IPTABLES6 -P FORWARD ACCEPT
-    $IPTABLES -F
-    $IPTABLES -X
-    $IPTABLES -t nat -F
-    $IPTABLES -t mangle -F
-    $IPTABLES -t nat -X
-    $IPTABLES -t nat -N ctparental
-    $IPTABLES -P INPUT ACCEPT
-    $IPTABLES -P OUTPUT ACCEPT
-    $IPTABLES -P FORWARD ACCEPT
-
-    if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-	$IPTABLES -t nat -A OUTPUT -j ctparental
-	$IPTABLES6 -t nat -A OUTPUT -j ctparental
-    ## bloque le multicast dns (mDNS)
-    $IPTABLES6 -A OUTPUT -p udp --dport 5353 -j DROP
-    $IPTABLES6 -A INPUT -p udp --sport 5353 -j DROP
-    $IPTABLES -A OUTPUT -p udp --dport 5353 -j DROP
-    $IPTABLES -A INPUT -p udp --sport 5353 -j DROP
-
-	# Force privoxy à utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
-	$IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-	$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
-
-	ipdailymotion=$( grep "address=/.dailymotion.com/" $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | cut -d "/" -f3)
-	# on rejette l'acces https à dailymotion.com
-	$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
-
-	for user in $(listeusers) ; do
-	    if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
-		#on redirige les requêtes DNS ipv4 des usagers filtrés sur dnsmasq très important pour l'https.
-		$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54
-		$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-		#on redirige les requêtes DNS ipv6 des usagers filtrés sur dnsmasq très important pour l'https.
-		$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to [::1]:54
-		$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to [::1]:54
-		#force passage par dansguardian pour les utilisateurs filtrés
-		$IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
-		$IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
-		# e2guardian ne gérant pas encore ipv6 on se contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
-		$IPTABLES6 -t nat -A ctparental -d 2000::/3 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
-		# on rejette l'accès https à dailymotion.com
-		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT
-		#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
-		#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
-		#le proxy ne faisant que forwarder les flux https
-		#forcer le passage par celui-ci pour https n'apporte
-		#pas de sécurité seul dnsmasq peut bloquer.
-		#$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
-		#$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'accès https sans passer par le proxy pour les utilisateurs filtrés.
-		#$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
-	   fi
-	done
-	if [ -e "$FILEIPTIMEWEB" ] ;  then
-	   echo "<$FILEIPTIMEWEB>"
-	   source "$FILEIPTIMEWEB"
-	   echo "</$FILEIPTIMEWEB>"
-	fi
-
-	if [ "$( grep -c IPRULES=ON $FILE_CONF )" -eq 1 ];then
-	   ipglobal
-	fi
-	#setproxy
-	#else
-	#unsetproxy
+    if [ ! -f $FILEIPTIMEWEB ]; then 
+    touch $FILEIPTIMEWEB
+    chown root:root  $FILEIPTIMEWEB
+	chmod 750  $FILEIPTIMEWEB
     fi
-
-    # Save configuration so that it survives a reboot
-    if [ "$IPTABLESsaveFILE" = "" ] ;then
-	$IPTABLESsave
-    else
-	$IPTABLESsave > "$IPTABLESsaveFILE"
+    if [ ! -f $FILEIPBLACKLIST ]; then 
+    {
+	echo '# - one ip per line.
+# - ipv4 address or subnet ipv4 / mask (ip/xxx.xxx.xxx.xxx or ip/1 to 32)
+# - ipv6 address or subnet ipv6 / mask (ip/ 1 to 128)
+# examples:
+# 10.10.2.3
+# 192.168.182.0/24
+# 2001:db8::f23f
+# 2001:db8::/44'
+	} >  $FILEIPBLACKLIST
+	chown root:root  $FILEIPBLACKLIST
+	chmod 750  $FILEIPBLACKLIST
+    
     fi
-    if [ -e "$DIRHTML"/cactparental.crt ];then
-	updatecauser
+    if [ ! -f $FILEIPTABLES ]; then 
+    initfileiptables
+    fi
+    md5iptold=$(grep MD5IPT= "$FILE_CONF" | cut -d"=" -f2)
+    md5iptnew="$({
+md5sum ${FILEIPBLACKLIST} ${FILEIPTABLES} ${FILEIPTIMEWEB} ${FILE_GCTOFFCONF}
+listeusers
+echo $( grep -c IPRULES=ON $FILE_CONF )
+echo $FILTRAGEISOFF
+} | md5sum )"
+    if [ ! "$md5iptold" = "$md5iptnew" ]; then
+		### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
+		$IPTABLES6 -F
+		$IPTABLES6 -X
+		$IPTABLES6 -t nat -F
+		$IPTABLES6 -t mangle -F
+		$IPTABLES6 -t nat -X
+		$IPTABLES6 -t nat -N ctparental
+		$IPTABLES6 -P INPUT ACCEPT
+		$IPTABLES6 -P OUTPUT ACCEPT
+		$IPTABLES6 -P FORWARD ACCEPT
+		$IPTABLES -F
+		$IPTABLES -X
+		$IPTABLES -t nat -F
+		$IPTABLES -t mangle -F
+		$IPTABLES -t nat -X
+		$IPTABLES -t nat -N ctparental
+		$IPTABLES -P INPUT ACCEPT
+		$IPTABLES -P OUTPUT ACCEPT
+		$IPTABLES -P FORWARD ACCEPT
+
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+		$IPTABLES -t nat -A OUTPUT -j ctparental
+		$IPTABLES6 -t nat -A OUTPUT -j ctparental
+		## bloque le multicast dns (mDNS)
+		$IPTABLES6 -A OUTPUT -p udp --dport 5353 -j DROP
+		$IPTABLES6 -A INPUT -p udp --sport 5353 -j DROP
+		$IPTABLES -A OUTPUT -p udp --dport 5353 -j DROP
+		$IPTABLES -A INPUT -p udp --sport 5353 -j DROP
+
+		# Force privoxy à utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
+		$IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
+		$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
+
+		ipdailymotion=$( grep "address=/.dailymotion.com/" $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | cut -d "/" -f3)
+		# on rejette l'acces https à dailymotion.com
+		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
+
+		for user in $(listeusers) ; do
+			if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
+			#on redirige les requêtes DNS ipv4 des usagers filtrés sur dnsmasq très important pour l'https.
+			$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54
+			$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
+			#on redirige les requêtes DNS ipv6 des usagers filtrés sur dnsmasq très important pour l'https.
+			$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to [::1]:54
+			$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to [::1]:54
+			#force passage par dansguardian pour les utilisateurs filtrés
+			$IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
+			$IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
+			# e2guardian ne gérant pas encore ipv6 on se contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
+			$IPTABLES6 -t nat -A ctparental -d 2000::/3 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
+			# on rejette l'accès https à dailymotion.com
+			$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT
+			#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
+			#$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
+			#le proxy ne faisant que forwarder les flux https
+			#forcer le passage par celui-ci pour https n'apporte
+			#pas de sécurité seul dnsmasq peut bloquer.
+			#$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
+			#$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'accès https sans passer par le proxy pour les utilisateurs filtrés.
+			#$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
+		   fi
+		done
+		   echo "<$FILEIPTIMEWEB>"
+		   source "$FILEIPTIMEWEB"
+		   echo "</$FILEIPTIMEWEB>"
+
+		if [ "$( grep -c IPRULES=ON $FILE_CONF )" -eq 1 ];then
+		   ipglobal
+		fi
+		#setproxy
+		#else
+		#unsetproxy
+		fi
+
+		# Save configuration so that it survives a reboot
+		if [ "$IPTABLESsaveFILE" = "" ] ;then
+		$IPTABLESsave
+		else
+		$IPTABLESsave > "$IPTABLESsaveFILE"
+		fi
+		if [ -e "$DIRHTML"/cactparental.crt ];then
+		updatecauser
+		fi
+    $SED "s?^MD5IPT.*?MD5IPT=$md5iptnew?g" $FILE_CONF
     fi
     echo "</iptablesreload>"
 }
@@ -1894,6 +1832,20 @@ CActparental() {
 }
 
 install() {
+	# on empaiche la réinstall manuel par dessus une install par paquet.
+	if [ $nomanuel -eq 0 ]; then
+	muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
+	if [ "$(dpkg -l ctparental | grep -c ^i)" -eq 1 ] ;then
+	    echo "$muninstall"
+	    echo "$CMDREMOVE ctparental"
+	    exit 0
+	fi
+	if [ "$(rpm -q -a | grep -c ctparental )" -eq 1 ] ;then
+	    echo "$muninstall"
+	    echo "$CMDREMOVE ctparental"
+	    exit 0
+	fi
+	fi
     {
 	echo "$ADMIN_IP4 admin.ct.local "
 	echo "$ADMIN_IP6 admin.ct.local "
@@ -2081,6 +2033,7 @@ up ip addr add $ADMIN_IP6/128 dev lo:2
     $ENNETWORK
     { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalcron
     echo "*/1 * * * * root /usr/bin/CTparental -cron > /dev/null" >> /etc/cron.d/CTparentalcron
+    echo > "$DIR_CONF"/ctsync.conf
 }
 
 nomade() {
@@ -2155,7 +2108,8 @@ updatelistgctoff() {
 	    $SED "s/^$${PCUSER}$/+$PCUSER/g" "$FILE_tmp"
 	fi
      done
-
+	## on supprimes les lignes vide du fichier.
+	$SED '/^$/d' "$FILE_tmp"
      ## on supprime tout ceux qui n'existent plus sur le pc.
      while read PCUSER
      do
@@ -2216,7 +2170,6 @@ desactivegourpectoff() {
 
 uninstall() {
      $SED "/.ct.local/d" /etc/hosts
-
      # On force la désinstall par dpkg ou rpm si l'install a été effectuée par un package.
      if [ $nomanuel -eq 0 ]; then
 	muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
@@ -2351,6 +2304,7 @@ uninstall() {
      else
 	$IPTABLESsave > "$IPTABLESsaveFILE"
      fi
+     rm -f "$DIR_CONF"/ctsync.conf
 }
 
 choiblenabled() {
@@ -2733,17 +2687,7 @@ desactivetimelogin() {
     echo "</desactivetimelogin>"
 }
 
-listeusers() {
-    for LIGNES in $(getent passwd | cut -d":" -f1,3,6)
-    do
-	#echo $(echo $LIGNES | cut -d":" -f2)
-	if [ "$(echo "$LIGNES" | cut -d":" -f2)" -ge "$UIDMINUSER" ] ;then
-	    if [ -d "$( echo "$LIGNES" | cut -d":" -f3 )" ] ;then
-		echo "$LIGNES" | cut -d":" -f1
-	    fi
-	fi
-    done
-}
+source "$DIR_SHARE/listeusers"
 
 readTimeFILECONF() {
     requiredpamtime
@@ -2899,7 +2843,6 @@ EOF
     chmod 755 /etc/grub.d/99_password
     update-grub2
 }
-
 exportconf() {
     if [ ! -e "$FILEIPTABLES" ] ;  then
 	echo > "$FILEIPTABLES"
@@ -2908,7 +2851,7 @@ exportconf() {
 	echo > "$FILEIPBLACKLIST"
     fi
     date="$( date +%y.%m.%d )"
-    FILEexpconf=$(echo "$DIRexpconf"/CTparental.conf."$date".tar.gz | sed -e "s|\/\{2,10\}|\/|g" )
+    FILEexpconf=${FILEexpconf:=$(echo "$DIRexpconf"/CTparental.conf."$date".tar.gz | sed -e "s|\/\{2,10\}|\/|g" )}
     tar -cvzf "$FILEexpconf" "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
 	"$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
 	"$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
@@ -2916,7 +2859,7 @@ exportconf() {
 	"$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
 	"$FILEIPTABLES" "$FILEIPBLACKLIST"
 
-    chmod 744 "$DIRexpconf"/CTparental.conf."$date".tar.gz
+    chmod 744 "$FILEexpconf"
     eval_gettext "Conf exported to \$FILEexpconf
 "
 }
@@ -2958,13 +2901,191 @@ importconf() {
      fi
 }
 
+genpasswd() {
+  local length=${1:-8}
+  tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${length} | xargs
+}
+expsync () {
+	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
+     md5old=$(cat "/home/ctsync/MD5EXPSYNC.txt" | cut -d" " -f1)
+     md5new="$({ cat "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
+ "$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
+ "$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/* "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
+ "$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
+ "$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
+ "$FILEIPTABLES" "$FILEIPBLACKLIST" | md5sum | cut -d" " -f1 
+ })"
+		if [ ! "$md5old" = "$md5new" ]; then
+		FILEexpconf="/home/ctsync/confCTparental.tar.gz"
+		exportconf
+		echo $md5new > /home/ctsync/MD5EXPSYNC.txt
+		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5
+		fi
+	fi
+}
+serversyncon () {
+	echo "<serversyncon>"
+	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
+		echo "$(gettext "You must first disable client mode")"
+	else
+			if [ "$i_WAN_ipv6" =  "" ];then
+			i_WAN=$i_WAN_ipv4
+			SRVipv6linklocal=$(ip addr show $i_WAN_ipv4  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+			else
+			i_WAN=$i_WAN_ipv6
+			SRVipv6linklocal=$(ip addr show $i_WAN_ipv6  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
+			fi
+			useradd --shell /bin/bash --create-home --system ctsync
+			chmod 750 /home/ctsync
+			passwordsrv=$(genpasswd)
+			echo "ctsync:$passwordsrv" | chpasswd
+			rm -rf /home/ctsync/.ssh
+			mkdir -p /home/ctsync/.ssh
+			{ echo "
+Port $PORTSSH
+AddressFamily inet6
+ListenAddress ${SRVipv6linklocal}%${i_WAN}
+
+#SyslogFacility AUTH
+#LogLevel INFO
+StrictModes yes
+PubkeyAuthentication yes
+AuthorizedKeysFile	.ssh/authorized_keys
+PasswordAuthentication yes
+PermitEmptyPasswords no
+UsePAM yes
+AllowAgentForwarding yes
+AllowTcpForwarding yes
+X11Forwarding no
+PrintMotd no
+Banner none
+AcceptEnv LANG LC_*
+# override default of no subsystems
+Subsystem	sftp	$SFTPPATH"
+} > /etc/ssh/sshd_config
+		$SSHrestart
+
+		{
+		echo "# $(gettext "to enable sync with this server, run the following commands on the client on your local network that you want to synchronize")
+CTparental -syncon \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
+SRVSYNC=ON
+PORTSSH=$PORTSSH
+"
+		} > "$DIR_CONF"/ctsync.conf
+		cat "$DIR_CONF"/ctsync.conf
+		chown root:root "$DIR_CONF"/ctsync.conf
+		chmod 640 "$DIR_CONF"/ctsync.conf
+		echo "*/15 * * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
+		$CRONrestart
+	fi
+echo "</serversyncon>"
+}
+
+serversyncoff () {
+	$SSHstop
+	pkill -u ctsync
+	deluser --quiet --system --remove-home ctsync 
+	rm -f /etc/cron.d/CTparentalsrv
+	$SED "s?^SRVSYNC=.*?SRVSYNC=OFF?g" "$DIR_CONF"/ctsync.conf
+	$CRONrestart
+	$SSHstart
+}
+
+clientsyncon () {
+	echo "<clientsyncon>"
+	if [ "$i_WAN_ipv6" =  "" ];then
+			i_WAN=$i_WAN_ipv4
+	else
+			i_WAN=$i_WAN_ipv6
+	fi
+	SRVipv6linklocal=$1
+	passwordsrv=$2
+	PORTSSH=$3
+	if [ "$( grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
+		echo "$(gettext "You must first disable server mode")"
+	else
+		useradd --shell /bin/bash --create-home --system ctsync
+		chmod 750 /home/ctsync
+		password=$(genpasswd)
+		echo "ctsync:$password" | chpasswd
+		rm -rf /home/ctsync/.ssh
+		mkdir -p /home/ctsync/.ssh
+		mkdir -p /root/.ssh
+		echo "$(gettext "The requested password is:")
+	$passwordsrv
+	"
+		ssh-keygen -t rsa -b 2048 -P "" -f /home/ctsync/.ssh/id_rsa -q
+		chown root:root /home/ctsync/.ssh/id_rsa
+		chmod 600 /home/ctsync/.ssh/id_rsa
+		ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub -p $PORTSSH ctsync@${SRVipv6linklocal}%${i_WAN}
+		echo "*/10 * * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
+		{
+		echo "
+SRVipv6linklocal=$SRVipv6linklocal
+PORTSSH=$PORTSSH
+CSYNC=ON
+"
+		} > "$DIR_CONF"/ctsync.conf
+		chown root:root "$DIR_CONF"/ctsync.conf
+		chmod 640 "$DIR_CONF"/ctsync.conf
+	fi
+	echo "</clientsyncon>"
+}
+
+clientsyncoff () {
+	$SSHstop
+	pkill -u ctsync
+	deluser --quiet --system --remove-home ctsync
+	rm -f /etc/cron.d/CTparentalclient
+	$SED "s?^CSYNC=.*?CSYNC=OFF?g" "$DIR_CONF"/ctsync.conf
+	$CRONrestart
+	$SSHstart
+}
+
+clientsync () {
+	if [ "$i_WAN_ipv6" =  "" ];then
+			i_WAN=$i_WAN_ipv4
+	else
+			i_WAN=$i_WAN_ipv6
+	fi
+	SRVipv6linklocal=$(grep "SRVipv6linklocal=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
+	echo $SRVipv6linklocal
+	PORTSSH=$(grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
+	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@[${SRVipv6linklocal}%${i_WAN}]:/home/ctsync/confCTparental.tar.gz.md5 /home/ctsync/confCTparental.tar.gz.md5
+	error1=$?
+	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@[${SRVipv6linklocal}%${i_WAN}]:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz
+	error2=$?
+	if [ $(( $error1 + $error2 )) -ge 1 ] ;then
+	exit 1
+	fi
+	md5fileorig=$(grep " " "/home/ctsync/confCTparental.tar.gz.md5" | cut -d" " -f1)
+	md5filenew=$( md5sum /home/ctsync/confCTparental.tar.gz | cut -d" " -f1 )
+	## on sassure que les fichiers sont pas corrompus.
+	if [ "$md5fileorig" = "$md5filenew" ]; then
+	 if [ -f /home/ctsync/confCTparental.tar.gz.md5.old ];then
+		echo "$md5fileorig  = $md5filenew"
+		md5fileorig=$(grep " " "/home/ctsync/confCTparental.tar.gz.md5.old" | cut -d" " -f1)
+		## on verifie si il y a un changement dans la conf
+		if [ ! "$md5fileorig" = "$md5filenew" ]; then
+		FILEimpconf=/home/ctsync/confCTparental.tar.gz
+		importconf
+		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5.old
+		fi
+	 else
+		FILEimpconf=/home/ctsync/confCTparental.tar.gz
+		importconf
+		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5.old
+	 fi
+	fi
+}
+
 # and func # ne pas effacer cette ligne !!
 
 usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -off }|{ -cble }|{ -dble }
 		     |{ -tlo }|{ -tlu }|{ -uhtml }|{ -aupon }|{ -aupoff }|{ -aup }
 -i$(gettext "	    => Install parental control on the computer (desktop PC). Can be used with
 	      an additional parameter to specify a source path for the redirection page.
-	      example: CTparental -dirhtml -i /home/toto/html/
+	      example: CTparental -i -dirhtml /home/toto/html/
 	      if no option a default page is used.")
 -u$(gettext "	    => uninstall the Parental Control Computer (desktop PC)")
 -dl$(gettext "	    => updates parental control from the blacklist of the University of Toulouse")
@@ -2989,7 +3110,7 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	      we prefer to install them by hand, or for the postinst and prerm script of deb.
 	      examples:
 	              CTparental -i -nodep
-	              CTparental -dirhtml -i /home/toto/html/ -nodep
+	              CTparental -i -dirhtml /home/toto/html/ -nodep
 	              CTparental -u -nodep")
 -nomanuel$(gettext "   => used only for the postinst and prerm script.")
 -gcton$(eval_gettext "	    => Enable a group of privileged users that will not undergo filtering.
@@ -2999,7 +3120,7 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	              CTparental -gctalist")
 -gctoff$(gettext "	    => Disable privileged group.")
 	      $(gettext "all users of the system undergo the filtering!")
--gctapl$(eval_gettext "	    => Add / Delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF")
+-gctalist$(eval_gettext "   => Add / Delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF")
 -ipton$(gettext "	    => Enable rules of custom firewall.")
 -iptoff$(gettext "	    => Disable rules of custom firewall.")
 -grubPon$(gettext "    => Enable the superuser of grub2.")
@@ -3018,19 +3139,62 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	      Enabling dnsmasq query log in the /var/log/dnsmasq.query.log file.")
 -logdnsoff$(gettext "  => To disable dnsmasq query log in /var/log/dnsmasq.query.log .")
 -setadmin$(gettext "    => To change the login couple password.")
+-expsync$(gettext "    => To update the conf distribute by the server.")
+-srvon$(gettext "    => To activate the server role.")
+-srvoff$(gettext "    => to disable the server role.")
+-syncon$(gettext "    => To activate the client role.")
+-syncoff$(gettext "    => to disable the client role.")
+-csync$(gettext "    => To synchronize the client with the server.")
 "
-
 arg1=${1}
 case $arg1 in
 	-\? | -h* | --h*)
 		echo "$usage"
 	;;
 	-i )
+		if [ $# -ge 2 ]; then
+			if [ $2 = "-dirhtml" ]; then
+				if [ $# -ge 3 ]; then
+					DIRhtmlPersonaliser=$3
+					if [ ! -d "$DIRhtmlPersonaliser" ];then
+						gettext 'Invalid directory path!'
+						exit 0
+					fi
+					if [ $# == 4 ]; then
+						if [ $4 = "-nodep" ]; then
+							noinstalldep=1
+						fi
+					fi
+				else
+					echo "$(gettext "Missing argument, wwwCTadminPath")";
+					echo "CTparental -uhtml -dirhtml \"/dir/wwwCTadminPath\" ";
+				fi
+			fi
+			
+			if [ $2 = "-nodep" ]; then
+				noinstalldep=1
+			fi
+			if [ $# == 3 ]; then
+				if [ $3 = "-nomanuel" ]; then
+					nomanuel=1
+				fi
+			fi
+		fi
 		networkisoknext
 		install
 	;;
 	-u )
-	    uninstall
+		if [ $# -ge 2 ]; then
+			if [ $2 = "-nodep" ]; then
+				noinstalldep=1
+			fi
+		fi
+		if [ $# -ge 3 ]; then
+			if [ $3 = "-nomanuel" ]; then
+				nomanuel=1
+			fi
+		fi
+		uninstall
 	;;
 	-dl )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -3051,8 +3215,21 @@ case $arg1 in
 		fi
 	;;
 	-uhtml )
-		networkisoknext
-		FoncHTTPDCONF
+		if [ $2 = "-dirhtml" ]; then
+			if [ $# == 3 ]; then
+				DIRhtmlPersonaliser=$3
+				if [ ! -d "$DIRhtmlPersonaliser" ];then
+					gettext 'Invalid directory path!'
+					exit 0
+				fi
+			else
+				echo "$(gettext "Missing argument, wwwCTadminPath")";
+				echo "CTparental -uhtml -dirhtml \"/dir/wwwCTadminPath\" ";
+			fi
+		else
+			networkisoknext
+			FoncHTTPDCONF
+		fi
 	;;
 	-rl )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
@@ -3120,9 +3297,6 @@ case $arg1 in
 			autoupdate
 		fi
 	;;
-	-listusers )
-		listeusers
-	;;
 	-gcton )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			networkisoknext
@@ -3136,12 +3310,10 @@ case $arg1 in
 	;;
 	-gctulist )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-			networkisoknext
 			updatelistgctoff
-			iptablesreload
 		fi
 	;;
-	-gctapl )
+	-gctalist )
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			networkisoknext
 			if [ "$(updatelistgctoff)" -eq 1 ];then
@@ -3189,7 +3361,6 @@ then run the command CTparental -ipton')
 			iptablesreload
 			fi
 		fi
-		updatecauser
 	;;
 	-dgreload )
 		$E2GUARDIANrestart
@@ -3237,18 +3408,66 @@ then run the command CTparental -ipton')
 		rm -f /var/log/dnsmasq.query.log
 	;;
 	-exp )
+		if [ $# == 2 ]; then
+			DIRexpconf=$2
+			if [ ! -d "$DIRexpconf" ];then
+				gettext 'Invalid directory path!'
+				exit 0
+			fi
+		else
+			echo "$(gettext "Missing argument, directory path")";
+			echo "CTparental -exp \"/directory/path\"";
+			exit 0
+		fi
 		exportconf
 	;;
 	-imp )
+		if [ $# == 2 ]; then
+			FILEimpconf=$2
+			if [ ! -e "$FILEimpconf" ];then
+				gettext 'Error opening the file'
+				exit 0
+			fi
+		else
+			echo "$(gettext "Missing argument, fileconf path")";
+			echo "CTparental -imp \"/directory/fileconf\"";
+			exit 0
+		fi
 		importconf
 	;;
 	-cainstall )
-	updatecauser
+		updatecauser
 	;;
 	-setadmin )
 		if [ $# == 3 ]; then
 			addadminhttpd $2 $3
+		else
+			echo "$(gettext "Missing argument, login or password")";
+			echo "CTparental -setadmin \"login\" \"password\" ";
 		fi
+	;;
+	-srvon )
+		serversyncon
+	;;
+	-srvoff )
+		serversyncoff
+	;;
+	-expsync )
+		expsync
+	;;
+	-syncon )
+		if [ $# == 4 ]; then
+			clientsyncon $2 $3 $4
+		else
+		echo "$(gettext "Missing argument, Ipv6 server or password or port")"
+		echo "CTparental -syncon \"fe80::ffff:eeee:dddd:aaaa\" \"srvpassword\" \"22\" ";
+		fi
+	;;
+	-syncoff )
+		clientsyncoff
+	;;
+	-csync )
+		clientsync
 	;;
 	*)
 	echo "$(gettext "Unknown argument"):$1";
