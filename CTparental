@@ -194,7 +194,6 @@ RSYSLOGRESTART=${RSYSLOGRESTART:="$CMDSERVICE rsyslog restart"}
 SSHstart=${SSHstart:="$CMDSERVICE ssh start"}
 SSHstop=${SSHstop:="$CMDSERVICE ssh stop"}
 SSHrestart=${SSHrestart:="$CMDSERVICE ssh restart"}
-SFTPPATH=${SFTPPATH:="/usr/lib/openssh/sftp-server"}
 PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
 
@@ -2976,6 +2975,7 @@ serversyncon () {
 			touch /home/ctsync/.ssh/authorized_keys
 			chown ctsync:ctsync /home/ctsync/.ssh/authorized_keys
 			chmod 644 /home/ctsync/.ssh/authorized_keys
+			SFTPPATH=$(find / -type f -name sftp-server -executable 2>/dev/null)
 			
 			{ echo "
 Port $PORTSSH
