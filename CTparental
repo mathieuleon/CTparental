@@ -2935,6 +2935,9 @@ genpasswd() {
 }
 expsync () {
 	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
+	if [ ! -e "/home/ctsync/MD5EXPSYNC.txt" ] ;  then
+		touch "/home/ctsync/MD5EXPSYNC.txt"
+    fi
      md5old=$(cat "/home/ctsync/MD5EXPSYNC.txt" | cut -d" " -f1)
      md5new="$({ cat "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
  "$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
@@ -2969,10 +2972,11 @@ serversyncon () {
 			passwordsrv=$(genpasswd)
 			echo "ctsync:$passwordsrv" | chpasswd
 			rm -rf /home/ctsync/.ssh
+			mkdir -p /home/ctsync/.ssh
 			touch /home/ctsync/.ssh/authorized_keys
 			chown ctsync:ctsync /home/ctsync/.ssh/authorized_keys
 			chmod 644 /home/ctsync/.ssh/authorized_keys
-			mkdir -p /home/ctsync/.ssh
+			
 			{ echo "
 Port $PORTSSH
 AddressFamily inet6
