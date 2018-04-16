@@ -1099,7 +1099,7 @@ ipglobal() {
     $IPTABLES6 -A OUTPUT -p tcp --dport 21 -j ACCEPT
     $IPTABLES6 -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 	
-	# On autorise la syncro ctparental
+	# On autorise les syncronisations client serveur ctparental
 	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
 	$IPTABLES6 -A OUTPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
