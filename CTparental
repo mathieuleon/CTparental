@@ -2915,10 +2915,7 @@ expsync () {
  "$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
  "$FILEIPTABLES" "$FILEIPBLACKLIST" | md5sum | cut -d" " -f1 
  })"
-		echo "$md5old"
-		echo "$md5new"
 		if [ ! "$md5old" = "$md5new" ]; then
-
 		FILEexpconf="/home/ctsync/confCTparental.tar.gz"
 		exportconf
 		echo $md5new > /home/ctsync/MD5EXPSYNC.txt
@@ -3015,7 +3012,7 @@ clientsyncon () {
 		chown root:root /home/ctsync/.ssh/id_rsa
 		chmod 600 /home/ctsync/.ssh/id_rsa
 		ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub -p $PORTSSH ctsync@$SRVipv6linklocal
-		echo "* */10 * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
+		echo "*/10 * * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
 		{
 		echo "
 SRVipv6linklocal=$SRVipv6linklocal
