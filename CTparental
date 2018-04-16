@@ -1102,11 +1102,11 @@ ipglobal() {
 	# On autorise la syncro ctparental
 	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
-	$IPTABLES6 -A OUTPUT -p tcp --dport $SSHport -j ACCEPT
+	$IPTABLES6 -A OUTPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
 	fi
 	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
-	$IPTABLES6 -A INPUT -p tcp --dport $SSHport -j ACCEPT
+	$IPTABLES6 -A INPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
 	fi
 	
     echo "<$FILEIPTABLES>"
@@ -3029,6 +3029,8 @@ Subsystem	sftp	$SFTPPATH"
 		{
 		echo "# $(gettext "to enable sync with this server, run the following commands on the client on your local network that you want to synchronize")
 CTparental -syncon \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
+
+SRVipv6linklocal=$SRVipv6linklocal
 SRVSYNC=ON
 PORTSSH=$PORTSSH
 "
