@@ -3063,9 +3063,10 @@ clientsync () {
 	## on sassure que les fichiers sont pas corrompus.
 	if [ "$md5fileorig" = "$md5filenew" ]; then
 	 if [ -f /home/ctsync/confCTparental.tar.gz.md5.old ];then
+		echo "$md5fileorig  = $md5filenew"
 		md5fileorig=$(grep " " "/home/ctsync/confCTparental.tar.gz.md5.old" | cut -d" " -f1)
 		## on verifie si il y a un changement dans la conf
-		if [ "$md5fileorig" = "$md5filenew" ]; then
+		if [ ! "$md5fileorig" = "$md5filenew" ]; then
 		FILEimpconf=/home/ctsync/confCTparental.tar.gz
 		importconf
 		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5.old
