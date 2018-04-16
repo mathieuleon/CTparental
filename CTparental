@@ -3014,10 +3014,10 @@ clientsyncon () {
 		echo "* */10 * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
 		{
 		echo "
-	SRVipv6linklocal=$SRVipv6linklocal
-	PORTSSH=$PORTSSH
-	CSYNC=ON
-	"
+SRVipv6linklocal=$SRVipv6linklocal
+PORTSSH=$PORTSSH
+CSYNC=ON
+"
 		} > "$DIR_CONF"/ctsync.conf
 		chown root:root "$DIR_CONF"/ctsync.conf
 		chmod 640 "$DIR_CONF"/ctsync.conf
