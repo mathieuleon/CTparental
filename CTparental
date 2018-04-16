@@ -2978,7 +2978,7 @@ PORTSSH=$PORTSSH
 		cat "$DIR_CONF"/ctsync.conf
 		chown root:root "$DIR_CONF"/ctsync.conf
 		chmod 640 "$DIR_CONF"/ctsync.conf
-		echo "* */15 * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
+		echo "*/15 * * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
 		$CRONrestart
 	fi
 echo "</serversyncon>"
