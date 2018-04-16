@@ -2940,6 +2940,9 @@ serversyncon () {
 			passwordsrv=$(genpasswd)
 			echo "ctsync:$passwordsrv" | chpasswd
 			rm -rf /home/ctsync/.ssh
+			touch /home/ctsync/.ssh/authorized_keys
+			chown ctsync:ctsync /home/ctsync/.ssh/authorized_keys
+			chmod 644 /home/ctsync/.ssh/authorized_keys
 			mkdir -p /home/ctsync/.ssh
 			{ echo "
 Port $PORTSSH
