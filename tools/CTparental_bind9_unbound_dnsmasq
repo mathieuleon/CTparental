@@ -384,9 +384,30 @@ cat  "$FILE_tmp" >> $dnsmasqzonefile
 
 
 echo "</reabdomaine>"
-
-
-download
-adapt_available
-catChoice
-adapt_enabled
+usage="Use: CTparental    { -dl }|{ -ubl }
+-dl	    => updates filtrage dns from the blacklist of the University of Toulouse and ctparental blacklist
+-ubl	    => To be done after each change of the file $DNS_FILTER_OSSI or $DREAB
+"
+arg1=${1}
+case $arg1 in
+	-\? | -h* | --h*)
+		echo "$usage"
+	;;
+	-dl )
+		download
+		adapt_available
+		catChoice
+		adapt_enabled
+		systemctl restart unbound
+	;;
+	-ubl )
+		catChoice
+		adapt_enabled
+		systemctl restart unbound
+	;;
+	*)
+	echo "$(gettext "Unknown argument"):$1";
+	echo "$usage";
+	exit 1
+	;;
+esac

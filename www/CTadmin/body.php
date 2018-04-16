@@ -39,6 +39,7 @@ $wl_domains            = $dirconf."domaine-rehabiliter.conf";
 $bl_domains            = $dirconf."blacklist-local.conf";
 
 $cmdCT = "sudo -h localhost -u root /usr/bin/CTparental ";
+$cmdListUsers = "/usr/bin/CTlistusers ";
 $pidfilecmdCT = "/var/run/CTparental.pid";
 function WaitForTheFileToDisappear ($filewait)
 {
@@ -455,7 +456,7 @@ case 'change_user' :
 		}
 	else {echo gettext('Error opening the file')." $conf_ctoff_file";}
 	WaitForTheFileToDisappear ($pidfilecmdCT);
-	exec ($cmdCT."-gctapl");
+	exec ($cmdCT."-gctalist");
 	break;
 }
 
