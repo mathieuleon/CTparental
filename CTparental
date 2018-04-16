@@ -3416,6 +3416,7 @@ then run the command CTparental -ipton')
 	;;
 	-csync )
 		clientsync
+	;;
 	*)
 	echo "$(gettext "Unknown argument"):$1";
 	echo "$usage";
