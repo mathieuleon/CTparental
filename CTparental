@@ -3048,8 +3048,8 @@ clientsync () {
 	else
 			i_WAN=$i_WAN_ipv6
 	fi
-	SRVipv6linklocal=$(grep -c "SRVipv6linklocal=" "$DIR_CONF"/ctsync.conf | cut-d"=" -f2)
-	PORTSSH=$(grep -c "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut-d"=" -f2)
+	SRVipv6linklocal=$(grep -c "SRVipv6linklocal=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
+	PORTSSH=$(grep -c "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
 	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@${SRVipv6linklocal}%${i_WAN}:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz.md5
 	error1=$?
 	rsync --chmod 755 -av -e "ssh -i /home/ctsync/.ssh/id_rsa -p $PORTSSH" ctsync@${SRVipv6linklocal}%${i_WAN}:/home/ctsync/confCTparental.tar.gz /home/ctsync/confCTparental.tar.gz
