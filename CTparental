@@ -2966,10 +2966,10 @@ Subsystem	sftp	$SFTPPATH"
 
 		{
 		echo "# $(gettext "to enable sync with this server, run the following commands on the client on your local network that you want to synchronize")
-		CTparental -syncon \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
-		SRVSYNC=ON
-		PORTSSH=$PORTSSH
-		"
+CTparental -syncon \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
+SRVSYNC=ON
+PORTSSH=$PORTSSH
+"
 		} > "$DIR_CONF"/ctsync.conf
 		cat "$DIR_CONF"/ctsync.conf
 		chown root:root "$DIR_CONF"/ctsync.conf
@@ -2985,13 +2985,17 @@ serversyncoff () {
 	pkill -u ctsync
 	deluser --quiet --system --remove-home ctsync 
 	rm -f /etc/cron.d/CTparentalsrv
+	$SED "s?^SRVSYNC=.*?SRVSYNC=OFF?g" "$DIR_CONF"/ctsync.conf
 	$CRONrestart
 	$SSHstart
 }
 
 clientsyncon () {
 	echo "<clientsyncon>"
-	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ] ;then
+	SRVipv6linklocal=$1
+	passwordsrv=$2
+	PORTSSH=$3
+	if [ "$( grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
 		echo "$(gettext "You must first disable server mode")"
 	else
 		useradd --shell /bin/bash --create-home --system ctsync
@@ -3006,10 +3010,10 @@ clientsyncon () {
 		ssh-keygen -t rsa -b 2048 -P "" -f /home/ctsync/.ssh/id_rsa -q
 		chown root:root /home/ctsync/.ssh/id_rsa
 		chmod 600 /home/ctsync/.ssh/id_rsa
-		ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub "-p $PORTSSH ctsync@$SRVipv6linklocal"
+		ssh-copy-id -i /home/ctsync/.ssh/id_rsa.pub -p $PORTSSH ctsync@$SRVipv6linklocal
 		echo "* */10 * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
 		{
-		echo"
+		echo "
 	SRVipv6linklocal=$SRVipv6linklocal
 	PORTSSH=$PORTSSH
 	CSYNC=ON
@@ -3026,6 +3030,7 @@ clientsyncoff () {
 	pkill -u ctsync
 	deluser --quiet --system --remove-home --remove-all-files ctsync
 	rm -f /etc/cron.d/CTparentalclient
+	$SED "s?^CSYNC=.*?CSYNC=OFF?g" "$DIR_CONF"/ctsync.conf
 	$CRONrestart
 	$SSHstart
 }
@@ -3438,7 +3443,12 @@ then run the command CTparental -ipton')
 		expsync
 	;;
 	-syncon )
-		clientsyncon
+		if [ $# == 4 ]; then
+			clientsyncon $2 $3 $4
+		else
+		echo "$(gettext "Missing argument, Ipv6 server or password or port")"
+		echo "CTparental -syncon \"fe80::ffff:eeee:dddd:aaaa\" \"srvpassword\" \"22\" ";
+		fi
 	;;
 	-syncoff )
 		clientsyncoff
