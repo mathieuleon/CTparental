@@ -2908,7 +2908,7 @@ expsync () {
 	fi
 }
 serversyncon () {
-	echo <serversyncon>
+	echo "<serversyncon>"
 	if [ $(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf ) -eq 1 ] ;then
 		echo "$(gettext "You must first disable client mode")"
 	else
@@ -2959,7 +2959,7 @@ Subsystem	sftp	$SFTPPATH"
 		echo "* */15 * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
 		$CRONrestart
 	fi
-echo </serversyncon>
+echo "</serversyncon>"
 }
 
 serversyncoff () {
