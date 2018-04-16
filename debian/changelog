@@ -4,7 +4,7 @@ ctparental (4.22.01-1.0) unstable; urgency=medium
   * corection des erreurs de désinstallation du deb.
   * ajout du fonctionnement client<=>serveur.
 
- -- Guillaume marsat <CTparental1@laposte.net>  Sun, 01 Apr 2018 22:06:51 +0200
+ -- Guillaume marsat <CTparental1@laposte.net>  Mon, 16 Apr 2018 22:42:38 +0200
  
 ctparental (4.21.06-1.0) unstable; urgency=medium
 
