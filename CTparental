@@ -191,9 +191,9 @@ IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
 E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE e2guardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
 RSYSLOGRESTART=${RSYSLOGRESTART:="$CMDSERVICE rsyslog restart"}
-SSHstart=${SSHstart:="$CMDSERVICE sshd start"}
-SSHstop=${SSHstop:="$CMDSERVICE sshd stop"}
-SSHrestart=${SSHrestart:="$CMDSERVICE sshd restart"}
+SSHstart=${SSHstart:="$CMDSERVICE ssh start"}
+SSHstop=${SSHstop:="$CMDSERVICE ssh stop"}
+SSHrestart=${SSHrestart:="$CMDSERVICE ssh restart"}
 SFTPPATH=${SFTPPATH:="/usr/lib/openssh/sftp-server"}
 PING4=${PING4:="ping -4 "}
 PING6=${PING6:="ping -6 "}
