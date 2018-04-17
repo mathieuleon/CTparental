@@ -1102,10 +1102,12 @@ ipglobal() {
 	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
 	$IPTABLES6 -A OUTPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
+	
 	fi
 	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
-	$IPTABLES6 -A INPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
+	$IPTABLES6 -A INPUT -p tcp -d fe80::/10 --dport $SSHport -j ACCEPT
+	$IPTABLES6 -A INPUT -p icmpv6 -s fe80::/10  -j ACCEPT
 	fi
 	
     echo "<$FILEIPTABLES>"
