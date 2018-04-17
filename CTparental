@@ -3207,12 +3207,6 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 -syncon$(gettext "    => To activate the client role.")
 -syncoff$(gettext "    => to disable the client role.")
 -csync$(gettext "    => To synchronize the client with the server.")
--expsrv$(gettext "	 => Export server configuration.
-	   exemple:
-	           CTparental -expsrv /home/myhomedir/")
--impsrv$(gettext "	    => Import a server configuration.
-	      exemple:
-	              CTparental -impsrv /home/myhomedir/CTparental.conf.srv.yy.mm.dd.tar.gz")
 "
 arg1=${1}
 case $arg1 in
