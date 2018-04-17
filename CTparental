@@ -2902,7 +2902,7 @@ importconf() {
 			if [ "$( grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
 				clientsyncoff
 				serversyncon
-				tar -xvzf "$FILEimpconf" home/ctsync/.ssh/authorized_keys -C /
+				tar -xvzf "$FILEimpconf" -C / home/ctsync/.ssh/authorized_keys 
 				chown ctsync:ctsync /home/ctsync/.ssh/authorized_keys
 				chmod 644 /home/ctsync/.ssh/authorized_keys
 			fi
@@ -2912,8 +2912,8 @@ importconf() {
 				chmod 750 /home/ctsync
 				password=$(genpasswd)
 				echo "ctsync:$password" | chpasswd
-				tar -xvzf "$FILEimpconf" home/ctsync/.ssh/* -C /
-				tar -xvzf "$FILEimpconf" root/.ssh/* -C /
+				tar -xvzf "$FILEimpconf" -C / home/ctsync/.ssh/*
+				tar -xvzf "$FILEimpconf" -C / root/.ssh/*
 				chown root:root /home/ctsync/.ssh/id_rsa
 				chmod 600 /home/ctsync/.ssh/id_rsa
 				echo "*/10 * * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
