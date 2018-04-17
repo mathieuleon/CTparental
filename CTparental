@@ -214,7 +214,7 @@ PING6=${PING6:="ping -6 "}
 PORTSSH=${PORTSSH:=22}
 ENABLESSH=${ENABLESSH:="systemctl enable ssh"}
 DISABLESSH=${DISABLESSH:="systemctl disable ssh"}
-
+clientsync=0
 
 #### LOCALISATION du fichier PID lighttpd par defaut ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
@@ -2897,6 +2897,7 @@ importconf() {
      # si l'archive contient bien la bonne liste de fichiers.
      dirtar=$(echo "$DIR_CONF" | sed -e "s/\///1")
      if [ "$(tar -tf "$FILEimpconf" | grep -c $dirtar/CTparental.conf )" -eq 1 ] ;then
+		if [ $clientsync -eq 0 ];then
 		tar -xvzf "$FILEimpconf" -C /
 		if [ -f "$DIR_CONF"/ctsync.conf ];then
 			if [ "$( grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
@@ -2919,6 +2920,15 @@ importconf() {
 				echo "*/10 * * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
 				$CRONrestart
 			fi
+		fi
+		else
+		tar -xvzf "$FILEimpconf" -C / "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
+		"$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
+		"$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
+		"$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
+		"$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
+		"$FILEIPTABLES" "$FILEIPBLACKLIST"
+		
 		fi
 		$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
 		FILTRAGEISOFF="$( grep -c "DNSMASQ=OFF" $FILE_CONF )"
@@ -3132,11 +3142,13 @@ clientsync () {
 		## on verifie si il y a un changement dans la conf
 		if [ ! "$md5fileorig" = "$md5filenew" ]; then
 		FILEimpconf=/home/ctsync/confCTparental.tar.gz
+		clientsync=1
 		importconf
 		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5.old
 		fi
 	 else
 		FILEimpconf=/home/ctsync/confCTparental.tar.gz
+		clientsync=1
 		importconf
 		md5sum /home/ctsync/confCTparental.tar.gz > /home/ctsync/confCTparental.tar.gz.md5.old
 	 fi
