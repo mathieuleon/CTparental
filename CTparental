@@ -159,7 +159,6 @@ EOF
 fi
 
 FILTRAGEISOFF="$( grep -c "DNSMASQ=OFF" $FILE_CONF )"
-REDIRECT="$( grep -c "REDIRECT=ON" $FILE_CONF )"
 
 tempDIR="/tmp/alcasar"
 tempDIRRamfs="/tmp/alcasarRamfs"
@@ -2924,28 +2923,31 @@ importconf() {
 		$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
 		FILTRAGEISOFF="$( grep -c "DNSMASQ=OFF" $FILE_CONF )"
 		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-			 adapt
-			 catChoice
-			 dnsmasqon
-		 else
-			 rm -f /etc/cron.d/CTparental*
-			 desactivegourpectoff
-			 autoupdateoff
-			 dnsmasqoff
-			 FILTRAGEISOFF=1
-		 fi
-		 if [ "$( grep -c GCTOFF=ON $FILE_CONF )" -eq 1 ];then
-			 activegourpectoff
-		 else
-			 desactivegourpectoff
-		 fi
-		 if [ "$( grep -c HOURSCONNECT=ON $FILE_CONF )" -eq 1 ];then
-			 readTimeFILECONF
-		 else
-			 desactivetimelogin
-		 fi
-
-		 iptablesreload
+			adapt
+			catChoice
+			dnsmasqon
+		else
+			rm -f /etc/cron.d/CTparental*
+			desactivegourpectoff
+			autoupdateoff
+			dnsmasqoff
+			FILTRAGEISOFF=1
+		fi
+		if [ "$( grep -c GCTOFF=ON $FILE_CONF )" -eq 1 ];then
+			activegourpectoff
+		else
+			desactivegourpectoff
+		fi
+		if [ "$( grep -c HOURSCONNECT=ON $FILE_CONF )" -eq 1 ];then
+			readTimeFILECONF
+		else
+			desactivetimelogin
+		fi
+		if [ "$( grep -c "REDIRECT=ON" $FILE_CONF )" -eq 1 ];then
+			redirecton
+		else
+			redirectoff
+		fi
      else
 		 eval_gettext "\$FILEimpconf is not a configuration file
 "
@@ -3140,7 +3142,26 @@ clientsync () {
 	 fi
 	fi
 }
-
+REDIRECT
+redirecton () {
+	cp -f "$DIR_SHARE"/www/CTparental/index.php "$DIRHTML"/index.php
+	cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
+	cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
+	chown -R root:"$GROUPHTTPD" "$DIRHTML"
+	echo $E2GUARDIANrestart
+	$E2GUARDIANrestart
+	iptablesreload
+	$SED "s?^REDIRECT=.*?REDIRECT=ON?g"  "$FILE_CONF"
+}
+redirectoff () {
+	cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRHTML"/index.php
+	cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
+	cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
+	chown -R root:"$GROUPHTTPD" "$DIRHTML"
+	$E2GUARDIANrestart
+	iptablesreload
+	$SED "s?^REDIRECT=.*?REDIRECT=OFF?g"  "$FILE_CONF"
+}
 # and func # ne pas effacer cette ligne !!
 
 usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -off }|{ -cble }|{ -dble }
@@ -3441,21 +3462,10 @@ then run the command CTparental -ipton')
 		privoxydefaultfilteron
 	;;
 	-ron )
-		cp -f "$DIR_SHARE"/www/CTparental/index.php "$DIRHTML"/index.php
-		cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
-		cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
-		chown -R root:"$GROUPHTTPD" "$DIRHTML"
-		echo $E2GUARDIANrestart
-		$E2GUARDIANrestart
-		iptablesreload
+		redirecton
 	;;
 	-roff )
-		cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRHTML"/index.php
-		cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
-		cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
-		chown -R root:"$GROUPHTTPD" "$DIRHTML"
-		$E2GUARDIANrestart
-		iptablesreload
+		redirectoff
 	;;
 	-logdnson )
 		{
