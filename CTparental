@@ -2873,28 +2873,6 @@ EOF
     update-grub2
 }
 
-exportconfsrv() {
-date="$( date +%y.%m.%d )"
-FILEexpconf=${FILEexpconf:=$(echo "$DIRexpconf"/CTparental.conf.srv."$date".tar.gz | sed -e "s|\/\{2,10\}|\/|g" )}
-tar -cvzf "$FILEexpconf" /home/ctsync/.ssh/authorized_keys /etc/ssh/ 
-chmod 744 "$FILEexpconf"
-eval_gettext "Conf exported to \$FILEexpconf
-"
-}
-
-importconfsrv() {
-if [ "$(tar -tf "$FILEimpconf" | grep -c home/ctsync/.ssh/authorized_keys )" -eq 1 ] ;then
-clientsyncoff
-serversyncon
-tar -xvzf "$FILEimpconf" -C /
-$SSHrestart
-else
-eval_gettext "\$FILEimpconf is not a configuration server file
-"
-fi
-
-}
-
 exportconf() {
     if [ ! -e "$FILEIPTABLES" ] ;  then
 	echo > "$FILEIPTABLES"
@@ -2909,7 +2887,7 @@ exportconf() {
 	"$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
 	"$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
 	"$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
-	"$FILEIPTABLES" "$FILEIPBLACKLIST"
+	"$FILEIPTABLES" "$FILEIPBLACKLIST" /root/.ssh /home/ctsync/.ssh/ /etc/ssh/ "$DIR_CONF"/ctsync.conf 2>/dev/null
 
     chmod 744 "$FILEexpconf"
     eval_gettext "Conf exported to \$FILEexpconf
@@ -2920,35 +2898,56 @@ importconf() {
      # si l'archive contient bien la bonne liste de fichiers.
      dirtar=$(echo "$DIR_CONF" | sed -e "s/\///1")
      if [ "$(tar -tf "$FILEimpconf" | grep -c $dirtar/CTparental.conf )" -eq 1 ] ;then
+		tar -xvzf "$FILEimpconf" -C /
+		if [ -f "$DIR_CONF"/ctsync.conf ];then
+			if [ "$( grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
+				clientsyncoff
+				serversyncon
+				tar -xvzf "$FILEimpconf" home/ctsync/.ssh/authorized_keys -C /
+				chown ctsync:ctsync /home/ctsync/.ssh/authorized_keys
+				chmod 644 /home/ctsync/.ssh/authorized_keys
+			fi
+			if [ "$( grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
+				serversyncoff
+				useradd --shell /bin/bash --create-home --system ctsync
+				chmod 750 /home/ctsync
+				password=$(genpasswd)
+				echo "ctsync:$password" | chpasswd
+				tar -xvzf "$FILEimpconf" home/ctsync/.ssh/* -C /
+				tar -xvzf "$FILEimpconf" root/.ssh/* -C /
+				chown root:root /home/ctsync/.ssh/id_rsa
+				chmod 600 /home/ctsync/.ssh/id_rsa
+				echo "*/10 * * * * root  sleep $(/usr/bin/perl -e 'print int(rand(540))') && /usr/bin/CTparental -csync > /dev/null 2>&1" > /etc/cron.d/CTparentalclient
+				$CRONrestart
+			fi
+		fi
+		$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
+		FILTRAGEISOFF="$( grep -c "DNSMASQ=OFF" $FILE_CONF )"
+		if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+			 adapt
+			 catChoice
+			 dnsmasqon
+		 else
+			 rm -f /etc/cron.d/CTparental*
+			 desactivegourpectoff
+			 autoupdateoff
+			 dnsmasqoff
+			 FILTRAGEISOFF=1
+		 fi
+		 if [ "$( grep -c GCTOFF=ON $FILE_CONF )" -eq 1 ];then
+			 activegourpectoff
+		 else
+			 desactivegourpectoff
+		 fi
+		 if [ "$( grep -c HOURSCONNECT=ON $FILE_CONF )" -eq 1 ];then
+			 readTimeFILECONF
+		 else
+			 desactivetimelogin
+		 fi
 
-	 tar -xvzf "$FILEimpconf" -C /
-	 $SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
-	 FILTRAGEISOFF="$( grep -c "DNSMASQ=OFF" $FILE_CONF )"
-	 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-	     adapt
-	     catChoice
-	     dnsmasqon
-	 else
-	     rm -f /etc/cron.d/CTparental*
-	     desactivegourpectoff
-	     autoupdateoff
-	     dnsmasqoff
-	     FILTRAGEISOFF=1
-	 fi
-	 if [ "$( grep -c GCTOFF=ON $FILE_CONF )" -eq 1 ];then
-	     activegourpectoff
-	 else
-	     desactivegourpectoff
-	 fi
-	 if [ "$( grep -c HOURSCONNECT=ON $FILE_CONF )" -eq 1 ];then
-	     readTimeFILECONF
-	 else
-	     desactivetimelogin
-	 fi
-
-	 iptablesreload
+		 iptablesreload
      else
-	 eval_gettext "\$FILEimpconf is not a configuration file
+		 eval_gettext "\$FILEimpconf is not a configuration file
 "
      fi
 }
@@ -2991,7 +2990,7 @@ serversyncon () {
 			i_WAN=$i_WAN_ipv6
 			SRVipv6linklocal=$(ip addr show $i_WAN_ipv6  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
 			fi
-			useradd --shell /bin/bash --create-home --system ctsync
+			useradd --shell /bin/bash --create-home --system ctsync 2>/dev/null
 			chmod 750 /home/ctsync
 			passwordsrv=$(genpasswd)
 			echo "ctsync:$passwordsrv" | chpasswd
@@ -3001,7 +3000,6 @@ serversyncon () {
 			chown ctsync:ctsync /home/ctsync/.ssh/authorized_keys
 			chmod 644 /home/ctsync/.ssh/authorized_keys
 			SFTPPATH=$(find / -type f -name sftp-server -executable 2>/dev/null)
-			
 			{ echo "
 Port $PORTSSH
 AddressFamily inet6
@@ -3032,6 +3030,7 @@ CTparental -syncon \"$SRVipv6linklocal\" \"$passwordsrv\" \"$PORTSSH\"
 
 SRVipv6linklocal=$SRVipv6linklocal
 SRVSYNC=ON
+CSYNC=OFF
 PORTSSH=$PORTSSH
 "
 		} > "$DIR_CONF"/ctsync.conf
@@ -3088,6 +3087,7 @@ clientsyncon () {
 SRVipv6linklocal=$SRVipv6linklocal
 PORTSSH=$PORTSSH
 CSYNC=ON
+SRVSYNC=OFF
 "
 		} > "$DIR_CONF"/ctsync.conf
 		chown root:root "$DIR_CONF"/ctsync.conf
@@ -3097,13 +3097,11 @@ CSYNC=ON
 }
 
 clientsyncoff () {
-	$SSHstop
 	pkill -u ctsync
 	deluser --quiet --system --remove-home ctsync
 	rm -f /etc/cron.d/CTparentalclient
 	$SED "s?^CSYNC=.*?CSYNC=OFF?g" "$DIR_CONF"/ctsync.conf
 	$CRONrestart
-	$SSHstart
 }
 
 clientsync () {
@@ -3538,34 +3536,6 @@ then run the command CTparental -ipton')
 	;;
 	-csync )
 		clientsync
-	;;
-	-expsrv )
-		if [ $# == 2 ]; then
-			DIRexpconf=$2
-			if [ ! -d "$DIRexpconf" ];then
-				gettext 'Invalid directory path!'
-				exit 0
-			fi
-		else
-			echo "$(gettext "Missing argument, directory path")";
-			echo "CTparental -expsrv \"/directory/path\"";
-			exit 0
-		fi
-		exportconfsrv
-	;;
-	-impsrv )
-		if [ $# == 2 ]; then
-			FILEimpconf=$2
-			if [ ! -e "$FILEimpconf" ];then
-				gettext 'Error opening the file'
-				exit 0
-			fi
-		else
-			echo "$(gettext "Missing argument, fileconf path")";
-			echo "CTparental -impsrv \"/directory/fileconf\"";
-			exit 0
-		fi
-		importconfsrv
 	;;
 	*)
 	echo "$(gettext "Unknown argument"):$1";
