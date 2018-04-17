@@ -1,4 +1,6 @@
 #!/bin/bash
+pkill -15 CTparental || true
+rm -f /var/run/CTparental.pid || true
 CTparental -u -nodep -nomanuel
 exit 0
 
