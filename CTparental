@@ -3142,7 +3142,6 @@ clientsync () {
 	 fi
 	fi
 }
-REDIRECT
 redirecton () {
 	cp -f "$DIR_SHARE"/www/CTparental/index.php "$DIRHTML"/index.php
 	cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
