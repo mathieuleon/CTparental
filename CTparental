@@ -2943,7 +2943,7 @@ importconf() {
 		else
 			desactivetimelogin
 		fi
-		if [ "$( grep -c "REDIRECT=ON" $FILE_CONF )" -eq 1 ];then
+		if [ "$( grep -c "REDIRECT=ON" $FILE_CONF )" -eq 1 ];then
 			redirecton
 		else
 			redirectoff
