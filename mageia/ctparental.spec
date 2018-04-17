@@ -1,5 +1,5 @@
 %define	name ctparental
-%define version	4.21.06e
+%define version	4.22.01e
 %define release	1
 
 Summary: Parental Controls
@@ -12,7 +12,7 @@ Group: Amusements/Graphics
 BuildRoot: %{_builddir}/%{name}-%{version}-root
 URL: https://github.com/marsat/CTparental
 Provides: %{name}
-Requires: dnsmasq , lighttpd , lighttpd-mod_auth , lighttpd-mod_magnet , perl , sudo , wget , php-cgi , libnotify , notification-daemon , rsyslog , e2guardian , privoxy , newt , shorewall , shorewall-ipv6 , shorewall-core , /usr/bin/certutil
+Requires: dnsmasq , lighttpd , lighttpd-mod_auth , lighttpd-mod_magnet , perl , sudo , wget , php-cgi , libnotify , notification-daemon , rsyslog , e2guardian , privoxy , newt , shorewall , shorewall-ipv6 , shorewall-core , rsync , openssh-server , /usr/bin/certutil
 
 %description
 CTparental est un Contrôle parental
@@ -34,6 +34,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/share/locale/es/LC_MESSAGES
 mkdir -p $RPM_BUILD_ROOT/usr/share/CTparental
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
 install -m755 $RPM_BUILD_DIR/CTparental $RPM_BUILD_ROOT/usr/bin
+install -m755 $RPM_BUILD_DIR/CTlistusers $RPM_BUILD_ROOT/usr/bin
 install -m755 $RPM_BUILD_DIR/CTparental-bl-infos $RPM_BUILD_ROOT/usr/bin
 install -m644 $RPM_BUILD_DIR/debian/CTparental.conf $RPM_BUILD_ROOT/etc/CTparental
 install -m644 $RPM_BUILD_DIR/mageia/dist.conf $RPM_BUILD_ROOT/etc/CTparental
@@ -41,6 +42,8 @@ install -m644 $RPM_BUILD_DIR/locale/fr/LC_MESSAGES/ctparental.mo $RPM_BUILD_ROOT
 install -m644 $RPM_BUILD_DIR/locale/es/LC_MESSAGES/ctparental.mo $RPM_BUILD_ROOT/usr/share/locale/es/LC_MESSAGES/
 cp -r $RPM_BUILD_DIR/www $RPM_BUILD_ROOT/usr/share/CTparental
 cp -r $RPM_BUILD_DIR/confe2guardian $RPM_BUILD_ROOT/usr/share/CTparental
+cp -r $RPM_BUILD_DIR/fonctions/ConfLanIs $RPM_BUILD_ROOT/usr/share/CTparental
+cp -r $RPM_BUILD_DIR/fonctions/listeusers $RPM_BUILD_ROOT/usr/share/CTparental
 install -m644 $RPM_BUILD_DIR/man/CTparental.1.gz $RPM_BUILD_ROOT/usr/share/man/man1
 
 exit 0
@@ -54,6 +57,9 @@ exit 0
 /etc/CTparental/dist.conf
 /usr/bin/CTparental
 /usr/bin/CTparental-bl-infos
+/usr/bin/CTlistusers
+/usr/share/CTparental/listeusers
+/usr/share/CTparental/ConfLanIs
 /usr/share/CTparental/confe2guardian/template-es.html
 /usr/share/CTparental/confe2guardian/template-fr.html
 /usr/share/CTparental/confe2guardian/template.html

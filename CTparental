@@ -1103,10 +1103,12 @@ ipglobal() {
 	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
 	$IPTABLES6 -A OUTPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
+	
 	fi
 	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
-	$IPTABLES6 -A INPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
+	$IPTABLES6 -A INPUT -p tcp -d fe80::/10 --dport $SSHport -j ACCEPT
+	$IPTABLES6 -A INPUT -p icmpv6 -s fe80::/10  -j ACCEPT
 	fi
 	
     echo "<$FILEIPTABLES>"
@@ -2897,6 +2899,12 @@ exportconf() {
 importconf() {
      # si l'archive contient bien la bonne liste de fichiers.
      dirtar=$(echo "$DIR_CONF" | sed -e "s/\///1")
+		dir2gtar=$(echo "$DIRE2G" | sed -e "s/\///1")
+		privoxyconftar=$(echo "$PRIVOXYCONF" | sed -e "s/\///1")
+		privoxyuseratar=$(echo "$PRIVOXYUSERA" | sed -e "s/\///1")
+		privoxyctatar=$(echo "$PRIVOXYCTA" | sed -e "s/\///1")
+		fileiptablestar=$(echo "$FILEIPTABLES" | sed -e "s/\///1")
+		fileipblacklisttar=$(echo "$FILEIPBLACKLIST" | sed -e "s/\///1")
      if [ "$(tar -tf "$FILEimpconf" | grep -c $dirtar/CTparental.conf )" -eq 1 ] ;then
 		## si on fait in import manuel
 		if [ $clientsync -eq 0 ];then
@@ -2925,12 +2933,12 @@ importconf() {
 		fi
 		else
 		## si l'import et efectuer par la syncro client serveur
-		tar -xvzf "$FILEimpconf" -C / "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
-		"$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
-		"$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
-		"$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYUSERA" "$PRIVOXYCTA" \
-		"$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
-		"$FILEIPTABLES" "$FILEIPBLACKLIST"
+		tar -xvzf "$FILEimpconf" -C / "$dirtar"/wl-categories-available "$dirtar"/categories-enabled.conf \
+		"$dirtar"/CThourscompteur "$dirtar"/CTsafe.conf "$dirtar"/blacklist-local.conf "$dirtar"/bl-categories-available \
+		"$dirtar"/CThours.conf  "$dirtar"/dnsfilter-available/ "$dirtar"/CTparental.conf "$dirtar"/domaine-rehabiliter.conf \
+		"$dirtar"/GCToff.conf "$privoxyconftar" "$privoxyuseratar" "$privoxyctatar" \
+		"$dir2gtar"lists/bannedmimetypelist "$dir2gtar"lists/bannedextensionlist "$dir2gtar"lists/bannedsitelist \
+		"$fileiptablestar" "$fileipblacklisttar"
 		
 		fi
 		$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
