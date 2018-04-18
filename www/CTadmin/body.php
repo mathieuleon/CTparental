@@ -32,6 +32,7 @@ $dirconf               = "/etc/CTparental/";
 $bl_categories         = $dirconf."bl-categories-available";
 $bl_categories_enabled = $dirconf."categories-enabled.conf";
 $conf_file             = $dirconf."CTparental.conf";
+$conf_csync_file       = $dirconf."ctsync.conf";
 $conf_ctoff_file       = $dirconf."GCToff.conf";
 $hconf_file            = $dirconf."CThours.conf";
 $hcompteur_file        = $dirconf."CThourscompteur";
@@ -65,7 +66,26 @@ else
 {
     echo gettext('Error opening the file')." ".$conf_file;
 }
+if (is_file ($conf_csync_file))
+{
+    $tab = file($conf_csync_file);
 
+    if ($tab)
+    {
+        foreach ($tab as $line)
+        {
+            $field = explode("=", $line);
+            if (strpos($line, 'CTparental -syncon') !== false) { $cmd_syncon=$line; }
+            if ($field[0] == "SRVSYNC")      { $SRVSYNC   = trim($field[1]); }
+            if ($field[0] == "CSYNC")         { $CSYNC      = trim($field[1]); }
+            if ($field[0] == "SRVipv6linklocal")         { $SRVipv6linklocal      = trim($field[1]); }
+        }
+    }
+}
+else
+{
+    echo gettext('Error opening the file')." ".$conf_csync_file;
+}
 if (isset($_GET['dgfile']))
 {
     $dg_confswitch=$_GET['dgfile'];
@@ -484,7 +504,6 @@ else
     echo gettext('Error opening the file')." ".$conf_file;
 }
 
-
 echo "<nav class='navbar navbar-inverse navbar-fixed-top'>";
 echo "<div class='container-fluid'>";
 echo "<div class='navbar-header'>";
@@ -496,6 +515,13 @@ if ($DNSMASQ <> "OFF")
     echo "<p class='navbar-text'>";
     echo gettext('Actually, the Domain name filter is on');
     echo "&nbsp;<span class='glyphicon glyphicon-ok' style='color: green;' aria-hidden='true'></span>";
+    if ($SRVSYNC == "ON"){
+    echo "<br>".gettext('Server turned on, launch this command to join it.')."<br>";
+    echo $cmd_syncon;}
+    if ($CSYNC == "ON"){
+    echo "<br>".gettext('Synchronized client on ipv6.').$SRVipv6linklocal;
+	}
+}
     echo "</p>";
 }
 else
