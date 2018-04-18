@@ -69,6 +69,7 @@ $l_explain_associations_religieuses = gettext("Sites of Religious Associations")
 $l_explain_shortener          = gettext("URLs shortening sites");
 $l_explain_ossi               = gettext("Domain names and URLs you add to the blacklist (see below)");
 $l_explain_ctparental         = gettext("Site related to as pop up advertising or pornography not present in the Toulouse blacklist.");
+$l_explain_adultsearchengine  = gettext("Search engine whose Safesearch function does not exist or is not yet supported by CTparental.");
 if (isset($_GET['cat']))
 {
     $categorie = $_GET['cat'];
