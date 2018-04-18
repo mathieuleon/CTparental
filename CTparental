@@ -932,9 +932,6 @@ EOF
 
 	echo "address=/.dailymotion.com/$(host -ta dailymotion.com|cut -d" " -f4 | grep -v alias | sed '1q;d')"
 
-	# on bloque les moteurs de recherche pas assez sûrs
-	echo "address=/search.yahoo.com/$PRIVATE_IP4"
-
 	# pour les navigateurs qui ne prennent pas en compte
 	# /etc/hosts comme google chrome
 	echo "address=/admin.ct.local/$ADMIN_IP4"
@@ -1608,17 +1605,6 @@ fastcgi.server = (
                                ".phps" => ".php",
                                ".phtml" => ".php" )
 
-
-\$HTTP["host"] =~ "search.yahoo.com" {
-	\$SERVER["socket"] == "$ADMIN_IP4:443" {
-	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/search.yahoo.com.pem"
-	server.document-root = "$DIRHTML"
-	server.errorfile-prefix = "$DIRHTML/err"
-	}
-}
-
-
 \$HTTP["host"] =~ "duckduckgo.com" {
 	\$SERVER["socket"] == "$ADMIN_IP4:443" {
 	ssl.engine = "enable"
@@ -1839,11 +1825,6 @@ CActparental() {
      openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=www.qwant.com" -key "$DIR_TMP"/qwant.key > "$DIR_TMP"/qwant.csr
      openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.qwant.com,DNS:qwant.com") -in "$DIR_TMP"/qwant.csr -days 5000 -out "$DIR_TMP"/qwant.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
 
-    ## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
-    openssl genrsa 1024 > "$DIR_TMP"/search.yahoo.com.key 2> /dev/null
-    openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key "$DIR_TMP"/search.yahoo.com.key > "$DIR_TMP"/search.yahoo.com.csr
-    openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.search.yahoo.com,DNS:search.yahoo.com")  -in "$DIR_TMP"/search.yahoo.com.csr -days 5000 -out "$DIR_TMP"/search.yahoo.com.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
-
     ## instalation de la CA dans les ca de confiance.
     cp -f "$DIR_TMP"/cactparental.crt "$CADIR"/
     cp -f "$DIR_TMP"/cactparental.crt "$DIRHTML"
@@ -1852,7 +1833,6 @@ CActparental() {
     cat "$DIR_TMP"/ct.local.key "$DIR_TMP"/ct.local.crt > "$PEMSRVDIR"/ct.local.pem
     cat "$DIR_TMP"/duckduckgo.key "$DIR_TMP"/duckduckgo.crt > "$PEMSRVDIR"/duckduckgo.pem
     cat "$DIR_TMP"/qwant.key "$DIR_TMP"/qwant.crt > "$PEMSRVDIR"/qwant.pem
-    cat "$DIR_TMP"/search.yahoo.com.key "$DIR_TMP"/search.yahoo.com.crt > "$PEMSRVDIR"/search.yahoo.com.pem
     rm -rf "$DIR_TMP"
     $UPDATECASYSTEM
     updatecauser
@@ -2287,7 +2267,6 @@ uninstall() {
      rm -f "$PEMSRVDIR"/ct.local.pem
      rm -f "$PEMSRVDIR"/duckduckgo.pem
      rm -f "$PEMSRVDIR"/qwant.pem
-     rm -f "$PEMSRVDIR"/search.yahoo.com.pem
      rm -f "$CADIR"/cactparental.crt
      rm -f "$DIRHTML"/cactparental.crt
      rm -f "$REPCAMOZ"/cactparental.crt
