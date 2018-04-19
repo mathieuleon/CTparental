@@ -1095,16 +1095,15 @@ ipglobal() {
     $IPTABLES6 -A OUTPUT -p tcp --dport 21 -j ACCEPT
     $IPTABLES6 -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 	
-	# On autorise les syncronisations client serveur ctparental
-	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
-	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
-	$IPTABLES6 -A OUTPUT -p tcp -s fe80::/10 -d fe80::/10 --dport $SSHport -j ACCEPT
+	# On autorise l'incmpv6 sur les liens locaux
+	$IPTABLES6 -A INPUT -p icmpv6 -d fe80::/10  -j ACCEPT
+	$IPTABLES6 -A INPUT -p icmpv6 -s fe80::/10  -j ACCEPT
 	
-	fi
+	# An autorise le ssh en sortie vers les liens locaux (client)
+	$IPTABLES6 -A OUTPUT -p tcp -d fe80::/10 --dport $PORTSSH -j ACCEPT
 	if [ "$(grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
-	$IPTABLES6 -A INPUT -p tcp -d fe80::/10 --dport $SSHport -j ACCEPT
-	$IPTABLES6 -A INPUT -p icmpv6 -s fe80::/10  -j ACCEPT
+	$IPTABLES6 -A INPUT -p tcp -d fe80::/10 --dport $PORTSSH -j ACCEPT
 	fi
 	
     echo "<$FILEIPTABLES>"
@@ -2999,7 +2998,7 @@ serversyncon () {
 			fi
 			useradd --shell /bin/bash --create-home --system ctsync 2>/dev/null
 			chown root:ctsync /home/ctsync
-			chmod 750 /home/ctsync
+			chmod 770 /home/ctsync
 			passwordsrv=$(genpasswd)
 			echo "ctsync:$passwordsrv" | chpasswd
 			rm -rf /home/ctsync/.ssh
@@ -3018,17 +3017,22 @@ ListenAddress ${SRVipv6linklocal}%${i_WAN}
 StrictModes yes
 PubkeyAuthentication yes
 AuthorizedKeysFile	.ssh/authorized_keys
-PasswordAuthentication yes
+PasswordAuthentication no
 PermitEmptyPasswords no
-UsePAM yes
-AllowAgentForwarding yes
-AllowTcpForwarding yes
+UsePAM no
+AllowAgentForwarding no
+AllowTcpForwarding no
 X11Forwarding no
 PrintMotd no
 Banner none
 AcceptEnv LANG LC_*
 # override default of no subsystems
-Subsystem	sftp	$SFTPPATH"
+Subsystem	sftp	$SFTPPATH
+Match User ctsync
+        PasswordAuthentication yes
+        ForceCommand /usr/bin/CTctsync_ssh
+        AllowTcpForwarding no"
+        
 } > /etc/ssh/sshd_config
 		$SSHrestart
 
@@ -3077,7 +3081,7 @@ clientsyncon () {
 	else
 		useradd --shell /bin/bash --create-home --system ctsync
 		chown root:ctsync /home/ctsync
-		chmod 750 /home/ctsync
+		chmod 770 /home/ctsync
 		password=$(genpasswd)
 		echo "ctsync:$password" | chpasswd
 		rm -rf /home/ctsync/.ssh

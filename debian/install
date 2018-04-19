@@ -1,6 +1,7 @@
 CTparental									usr/bin
 CTparental-bl-infos							usr/bin
 CTlistusers									usr/bin
+CTctsync_ssh								usr/bin
 debian/CTparental.conf						etc/CTparental
 debian/dist.conf							etc/CTparental
 locale/fr/LC_MESSAGES/ctparental.mo		usr/share/locale/fr/LC_MESSAGES/
