@@ -1096,6 +1096,7 @@ ipglobal() {
 	
 	# On autorise l'incmpv6 sur les liens locaux
 	$IPTABLES6 -A INPUT -p icmpv6 -d fe80::/10  -j ACCEPT
+	$IPTABLES6 -A INPUT -p icmpv6 -s fe80::/10  -j ACCEPT
 	# On autorise les syncronisations client serveur ctparental
 	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
 	SSHport=$( grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
