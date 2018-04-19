@@ -446,6 +446,7 @@ fi
 initblenabled() {
     cat << EOF > $CATEGORIES_ENABLED
 adult
+adultsearchengine
 agressif
 ctparental
 dangerous_material
