@@ -3091,6 +3091,7 @@ SRVSYNC=OFF
 		} > "$DIR_CONF"/ctsync.conf
 		chown root:"$GROUPHTTPD" "$DIR_CONF"/ctsync.conf
 		chmod 640 "$DIR_CONF"/ctsync.conf
+		clientsync
 	fi
 	echo "</clientsyncon>"
 }
