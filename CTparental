@@ -2998,7 +2998,7 @@ serversyncon () {
 			fi
 			useradd --shell /bin/bash --create-home --system ctsync 2>/dev/null
 			chown root:ctsync /home/ctsync
-			chmod 750 /home/ctsync
+			chmod 770 /home/ctsync
 			passwordsrv=$(genpasswd)
 			echo "ctsync:$passwordsrv" | chpasswd
 			rm -rf /home/ctsync/.ssh
@@ -3017,17 +3017,22 @@ ListenAddress ${SRVipv6linklocal}%${i_WAN}
 StrictModes yes
 PubkeyAuthentication yes
 AuthorizedKeysFile	.ssh/authorized_keys
-PasswordAuthentication yes
+PasswordAuthentication no
 PermitEmptyPasswords no
-UsePAM yes
-AllowAgentForwarding yes
-AllowTcpForwarding yes
+UsePAM no
+AllowAgentForwarding no
+AllowTcpForwarding no
 X11Forwarding no
 PrintMotd no
 Banner none
 AcceptEnv LANG LC_*
 # override default of no subsystems
-Subsystem	sftp	$SFTPPATH"
+Subsystem	sftp	$SFTPPATH
+Match User ctsync
+        PasswordAuthentication yes
+        ForceCommand /usr/bin/CTctsync_ssh
+        AllowTcpForwarding no"
+        
 } > /etc/ssh/sshd_config
 		$SSHrestart
 
@@ -3076,7 +3081,7 @@ clientsyncon () {
 	else
 		useradd --shell /bin/bash --create-home --system ctsync
 		chown root:ctsync /home/ctsync
-		chmod 750 /home/ctsync
+		chmod 770 /home/ctsync
 		password=$(genpasswd)
 		echo "ctsync:$password" | chpasswd
 		rm -rf /home/ctsync/.ssh
