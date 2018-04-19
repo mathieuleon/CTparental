@@ -445,10 +445,9 @@ fi
 
 
 initblenabled() {
-    USERHTTPD=$( grep /var/www /etc/passwd | cut -d":" -f1)
-    GROUPHTTPD=$( grep "$USERHTTPD" /etc/group | cut -d":" -f1)
     cat << EOF > $CATEGORIES_ENABLED
 adult
+adultsearchengine
 agressif
 ctparental
 dangerous_material
@@ -932,9 +931,6 @@ EOF
 	fi
 
 	echo "address=/.dailymotion.com/$(host -ta dailymotion.com|cut -d" " -f4 | grep -v alias | sed '1q;d')"
-
-	# on bloque les moteurs de recherche pas assez sûrs
-	echo "address=/search.yahoo.com/$PRIVATE_IP4"
 
 	# pour les navigateurs qui ne prennent pas en compte
 	# /etc/hosts comme google chrome
@@ -1609,17 +1605,6 @@ fastcgi.server = (
                                ".phps" => ".php",
                                ".phtml" => ".php" )
 
-
-\$HTTP["host"] =~ "search.yahoo.com" {
-	\$SERVER["socket"] == "$ADMIN_IP4:443" {
-	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/search.yahoo.com.pem"
-	server.document-root = "$DIRHTML"
-	server.errorfile-prefix = "$DIRHTML/err"
-	}
-}
-
-
 \$HTTP["host"] =~ "duckduckgo.com" {
 	\$SERVER["socket"] == "$ADMIN_IP4:443" {
 	ssl.engine = "enable"
@@ -1840,11 +1825,6 @@ CActparental() {
      openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=www.qwant.com" -key "$DIR_TMP"/qwant.key > "$DIR_TMP"/qwant.csr
      openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.qwant.com,DNS:qwant.com") -in "$DIR_TMP"/qwant.csr -days 5000 -out "$DIR_TMP"/qwant.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
 
-    ## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
-    openssl genrsa 1024 > "$DIR_TMP"/search.yahoo.com.key 2> /dev/null
-    openssl req -new -sha256 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key "$DIR_TMP"/search.yahoo.com.key > "$DIR_TMP"/search.yahoo.com.csr
-    openssl x509 -req -extfile <(printf "subjectAltName=DNS:www.search.yahoo.com,DNS:search.yahoo.com")  -in "$DIR_TMP"/search.yahoo.com.csr -days 5000 -out "$DIR_TMP"/search.yahoo.com.crt -CA "$DIR_TMP"/cactparental.crt -CAkey "$DIR_TMP"/cactparental.key -CAserial "$DIR_TMP"/ca.srl
-
     ## instalation de la CA dans les ca de confiance.
     cp -f "$DIR_TMP"/cactparental.crt "$CADIR"/
     cp -f "$DIR_TMP"/cactparental.crt "$DIRHTML"
@@ -1853,7 +1833,6 @@ CActparental() {
     cat "$DIR_TMP"/ct.local.key "$DIR_TMP"/ct.local.crt > "$PEMSRVDIR"/ct.local.pem
     cat "$DIR_TMP"/duckduckgo.key "$DIR_TMP"/duckduckgo.crt > "$PEMSRVDIR"/duckduckgo.pem
     cat "$DIR_TMP"/qwant.key "$DIR_TMP"/qwant.crt > "$PEMSRVDIR"/qwant.pem
-    cat "$DIR_TMP"/search.yahoo.com.key "$DIR_TMP"/search.yahoo.com.crt > "$PEMSRVDIR"/search.yahoo.com.pem
     rm -rf "$DIR_TMP"
     $UPDATECASYSTEM
     updatecauser
@@ -2200,21 +2179,27 @@ desactivegourpectoff() {
 }
 
 uninstall() {
-     $SED "/.ct.local/d" /etc/hosts
      # On force la désinstall par dpkg ou rpm si l'install a été effectuée par un package.
      if [ $nomanuel -eq 0 ]; then
-	muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
-	if [ "$(dpkg -l ctparental | grep -c ^i)" -eq 1 ] ;then
-	    echo "$muninstall"
-	    echo "$CMDREMOVE ctparental"
-	    exit 0
-	fi
-	if [ "$(rpm -q -a | grep -c ctparental )" -eq 1 ] ;then
-	    echo "$muninstall"
-	    echo "$CMDREMOVE ctparental"
-	    exit 0
-	fi
+		muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
+		if [ "$(dpkg -l ctparental | grep -c ^i)" -eq 1 ] ;then
+			echo "$muninstall"
+			echo "$CMDREMOVE ctparental"
+			exit 0
+		fi
+		if [ "$(rpm -q -a | grep -c ctparental )" -eq 1 ] ;then
+			echo "$muninstall"
+			echo "$CMDREMOVE ctparental"
+			exit 0
+		fi
      fi
+     $SED "/.ct.local/d" /etc/hosts
+	if [ "$( grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
+		serversyncoff
+	fi
+	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
+		clientsyncoff
+	fi
      if [ -f /etc/sysconfig/network-scripts/ifcfg-lo1 ] ;then
 	rm -f /etc/sysconfig/network-scripts/ifcfg-lo1
      fi
@@ -2288,7 +2273,6 @@ uninstall() {
      rm -f "$PEMSRVDIR"/ct.local.pem
      rm -f "$PEMSRVDIR"/duckduckgo.pem
      rm -f "$PEMSRVDIR"/qwant.pem
-     rm -f "$PEMSRVDIR"/search.yahoo.com.pem
      rm -f "$CADIR"/cactparental.crt
      rm -f "$DIRHTML"/cactparental.crt
      rm -f "$REPCAMOZ"/cactparental.crt
@@ -3014,6 +2998,7 @@ serversyncon () {
 			SRVipv6linklocal=$(ip addr show $i_WAN_ipv6  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
 			fi
 			useradd --shell /bin/bash --create-home --system ctsync 2>/dev/null
+			chown root:ctsync /home/ctsync
 			chmod 750 /home/ctsync
 			passwordsrv=$(genpasswd)
 			echo "ctsync:$passwordsrv" | chpasswd
@@ -3058,7 +3043,7 @@ PORTSSH=$PORTSSH
 "
 		} > "$DIR_CONF"/ctsync.conf
 		cat "$DIR_CONF"/ctsync.conf
-		chown root:root "$DIR_CONF"/ctsync.conf
+		chown root:"$GROUPHTTPD" "$DIR_CONF"/ctsync.conf
 		chmod 640 "$DIR_CONF"/ctsync.conf
 		expsync > /dev/null
 		echo "*/15 * * * * root /usr/bin/CTparental -expsync > /dev/null 2>&1" > /etc/cron.d/CTparentalsrv
@@ -3091,11 +3076,14 @@ clientsyncon () {
 		echo "$(gettext "You must first disable server mode")"
 	else
 		useradd --shell /bin/bash --create-home --system ctsync
+		chown root:ctsync /home/ctsync
 		chmod 750 /home/ctsync
 		password=$(genpasswd)
 		echo "ctsync:$password" | chpasswd
 		rm -rf /home/ctsync/.ssh
 		mkdir -p /home/ctsync/.ssh
+		## pour les distributions basée sur ubuntu évite des erreurs ssh-copy-id
+		export HOME=/root
 		mkdir -p /root/.ssh
 		echo "$(gettext "The requested password is:")
 	$passwordsrv
@@ -3113,8 +3101,9 @@ CSYNC=ON
 SRVSYNC=OFF
 "
 		} > "$DIR_CONF"/ctsync.conf
-		chown root:root "$DIR_CONF"/ctsync.conf
+		chown root:"$GROUPHTTPD" "$DIR_CONF"/ctsync.conf
 		chmod 640 "$DIR_CONF"/ctsync.conf
+		clientsync
 	fi
 	echo "</clientsyncon>"
 }
@@ -3133,6 +3122,7 @@ clientsync () {
 	else
 			i_WAN=$i_WAN_ipv6
 	fi
+	export HOME=/root
 	SRVipv6linklocal=$(grep "SRVipv6linklocal=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
 	echo $SRVipv6linklocal
 	PORTSSH=$(grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
