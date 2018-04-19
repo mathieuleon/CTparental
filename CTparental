@@ -2991,6 +2991,7 @@ serversyncon () {
 			SRVipv6linklocal=$(ip addr show $i_WAN_ipv6  | grep inet6 | awk '{print $2}' | grep "fe80" | cut -d"/" -f1)
 			fi
 			useradd --shell /bin/bash --create-home --system ctsync 2>/dev/null
+			chown root:ctsync/home/ctsync
 			chmod 750 /home/ctsync
 			passwordsrv=$(genpasswd)
 			echo "ctsync:$passwordsrv" | chpasswd
@@ -3068,12 +3069,15 @@ clientsyncon () {
 		echo "$(gettext "You must first disable server mode")"
 	else
 		useradd --shell /bin/bash --create-home --system ctsync
+		chown root:ctsync/home/ctsync
 		chmod 750 /home/ctsync
 		password=$(genpasswd)
 		echo "ctsync:$password" | chpasswd
 		rm -rf /home/ctsync/.ssh
 		mkdir -p /home/ctsync/.ssh
 		mkdir -p /root/.ssh
+		if [ $HOME == /root 
+		mkdir -p $HOME/.ssh
 		echo "$(gettext "The requested password is:")
 	$passwordsrv
 	"
