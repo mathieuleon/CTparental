@@ -66,8 +66,6 @@ else
 {
     echo gettext('Error opening the file')." ".$conf_file;
 }
-$SRVSYNC = "OFF";
-$CSYNC = "OFF";
 if (is_file ($conf_csync_file))
 {
     $tab = file($conf_csync_file);
@@ -511,19 +509,17 @@ echo "<div class='container-fluid'>";
 echo "<div class='navbar-header'>";
 echo "<a class='navbar-brand' href='#'>".gettext('web filtering')."</a>";
 echo "</div>";
-
+echo "<p class='navbar-text'>";
+if ($SRVSYNC == "ON"){ echo gettext('Server on, launch this command on the client to join it.')."<br>".$cmd_syncon."<br>"; }
+if ($CSYNC == "ON"){ echo "<br>".gettext('Synchronized client on ipv6.').$SRVipv6linklocal."<br>";	}
 if ($DNSMASQ <> "OFF")
 {
-    echo "<p class='navbar-text'>";
     echo gettext('Actually, the Domain name filter is on');
     echo "&nbsp;<span class='glyphicon glyphicon-ok' style='color: green;' aria-hidden='true'></span>";
-    if ($SRVSYNC == "ON"){ echo "<br>".gettext('Server turned on, launch this command to join it.')."<br>".$cmd_syncon; }
-    if ($CSYNC == "ON"){ echo "<br>".gettext('Synchronized client on ipv6.').$SRVipv6linklocal;	}
     echo "</p>";
 }
 else
 {
-    echo "<p class='navbar-text'>";
     echo gettext('Actually, the Domain name filter is off');
     echo "&nbsp;<span class='glyphicon glyphicon-remove' style='color: red;' aria-hidden='true'></span>";
     echo "</p>";

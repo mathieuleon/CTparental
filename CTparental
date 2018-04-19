@@ -444,8 +444,6 @@ fi
 
 
 initblenabled() {
-    USERHTTPD=$( grep /var/www /etc/passwd | cut -d":" -f1)
-    GROUPHTTPD=$( grep "$USERHTTPD" /etc/group | cut -d":" -f1)
     cat << EOF > $CATEGORIES_ENABLED
 adult
 agressif
