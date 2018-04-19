@@ -3115,6 +3115,7 @@ clientsync () {
 	else
 			i_WAN=$i_WAN_ipv6
 	fi
+	export HOME=/root
 	SRVipv6linklocal=$(grep "SRVipv6linklocal=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
 	echo $SRVipv6linklocal
 	PORTSSH=$(grep "PORTSSH=" "$DIR_CONF"/ctsync.conf | cut -d"=" -f2)
