@@ -1,5 +1,5 @@
 %define	name ctparental
-%define version	4.22.01e
+%define version	4.22.02e
 %define release	1
 
 Summary: Parental Controls
@@ -35,6 +35,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/share/CTparental
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
 install -m755 $RPM_BUILD_DIR/CTparental $RPM_BUILD_ROOT/usr/bin
 install -m755 $RPM_BUILD_DIR/CTlistusers $RPM_BUILD_ROOT/usr/bin
+install -m755 $RPM_BUILD_DIR/CTctsync_ssh $RPM_BUILD_ROOT/usr/bin
 install -m755 $RPM_BUILD_DIR/CTparental-bl-infos $RPM_BUILD_ROOT/usr/bin
 install -m644 $RPM_BUILD_DIR/debian/CTparental.conf $RPM_BUILD_ROOT/etc/CTparental
 install -m644 $RPM_BUILD_DIR/mageia/dist.conf $RPM_BUILD_ROOT/etc/CTparental
@@ -58,6 +59,7 @@ exit 0
 /usr/bin/CTparental
 /usr/bin/CTparental-bl-infos
 /usr/bin/CTlistusers
+/usr/bin/CTctsync_ssh
 /usr/share/CTparental/listeusers
 /usr/share/CTparental/ConfLanIs
 /usr/share/CTparental/confe2guardian/template-es.html
