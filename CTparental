@@ -2178,7 +2178,6 @@ desactivegourpectoff() {
 }
 
 uninstall() {
-     $SED "/.ct.local/d" /etc/hosts
      # On force la désinstall par dpkg ou rpm si l'install a été effectuée par un package.
      if [ $nomanuel -eq 0 ]; then
 	muninstall=$(gettext "Install by package was detected, please use this command to uninstall ctparental.")
@@ -2191,6 +2190,13 @@ uninstall() {
 	    echo "$muninstall"
 	    echo "$CMDREMOVE ctparental"
 	    exit 0
+	fi
+     $SED "/.ct.local/d" /etc/hosts
+	if [ "$( grep -c "SRVSYNC=ON" "$DIR_CONF"/ctsync.conf )" -eq 1 ];then
+		serversyncoff
+	fi
+	if [ "$(grep -c "CSYNC=ON" "$DIR_CONF"/ctsync.conf)" -eq 1 ] ;then
+		clientsyncoff
 	fi
      fi
      if [ -f /etc/sysconfig/network-scripts/ifcfg-lo1 ] ;then
