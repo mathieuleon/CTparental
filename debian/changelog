@@ -1,3 +1,10 @@
+ctparental (4.22.02-1.0) unstable; urgency=medium
+
+  * corection du bug d'ajout de clients
+  * limitation des droits de l'utilisateur ssh ctsync pour une mayeur sécuritée.
+
+ -- Guillaume marsat <CTparental1@laposte.net>  Thu, 19 Apr 2018 16:22:32 +0200
+
 ctparental (4.22.01-1.0) unstable; urgency=medium
 
   * optimisation des mise a jour iptables.
@@ -5,7 +12,7 @@ ctparental (4.22.01-1.0) unstable; urgency=medium
   * ajout du fonctionnement client<=>serveur.
 
  -- Guillaume marsat <CTparental1@laposte.net>  Mon, 16 Apr 2018 22:42:38 +0200
- 
+
 ctparental (4.21.06-1.0) unstable; urgency=medium
 
   * Ajout de la mise en attente de 1 processus CTparental au cas ou une commande serais demander pendent
@@ -13,7 +20,7 @@ ctparental (4.21.06-1.0) unstable; urgency=medium
   fermer automatiquement.
 
  -- Guillaume marsat <CTparental1@laposte.net>  Fri, 16 Feb 2018 09:59:41 +0100
- 
+
 ctparental (4.21.05-1.0) unstable; urgency=medium
 
   * correction des erreurs des certificat dus a certx.db keyx.db pkcs11.txt ayans des droit root
@@ -22,7 +29,7 @@ ctparental (4.21.05-1.0) unstable; urgency=medium
   sur des profiles utilisateurs ayant beaucoups de fichiers.
 
  -- Guillaume marsat <CTparental1@laposte.net>  Wed, 14 Feb 2018 15:09:41 +0100
- 
+
 ctparental (4.21.04-1.0) unstable; urgency=medium
 
   * améliorations des iptables.
@@ -30,7 +37,6 @@ ctparental (4.21.04-1.0) unstable; urgency=medium
 
  -- Guillaume marsat <CTparental1@laposte.net>  Tue, 13 Feb 2018 09:46:26 +0100
 
- 
 ctparental (4.21.03-1.0) unstable; urgency=medium
 
   * correction bug dans les iptables.
