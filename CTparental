@@ -3075,9 +3075,9 @@ clientsyncon () {
 		echo "ctsync:$password" | chpasswd
 		rm -rf /home/ctsync/.ssh
 		mkdir -p /home/ctsync/.ssh
+		## pour les distributions basée sur ubuntu évite des erreurs ssh-copy-id
+		export HOME=/root
 		mkdir -p /root/.ssh
-		if [ $HOME == /root 
-		mkdir -p $HOME/.ssh
 		echo "$(gettext "The requested password is:")
 	$passwordsrv
 	"
