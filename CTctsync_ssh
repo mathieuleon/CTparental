@@ -5,6 +5,10 @@ exec\ sh\ -c\ \'cd\ \;\ umask\ 077\ \;\ mkdir\ -p\ \.ssh\ \&\&\ \cat\ \>\>\ \.ss
 exec sh -c 'cd ; umask 077 ; mkdir -p .ssh && cat >> .ssh/authorized_keys || exit 1 ; if type restorecon >/dev/null 2>&1 ; then restorecon -F .ssh .ssh/authorized_keys ; fi'
 exit 0
 ;;
+## on interdit toute les commandes contenant le caractaire & et ;
+## si l'on veut autorisée une commande avec l'un de ces caractaires
+## il faut l'incéret juste au dessus de ce commantaire 
+## la commande doit aitre complette et sans le carractaire générique * . 
 *\&*)
 exit 10
 ;;
