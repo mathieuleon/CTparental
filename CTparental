@@ -3018,7 +3018,7 @@ PubkeyAuthentication yes
 AuthorizedKeysFile	.ssh/authorized_keys
 PasswordAuthentication no
 PermitEmptyPasswords no
-UsePAM yes
+UsePAM no
 AllowAgentForwarding no
 AllowTcpForwarding no
 X11Forwarding no
