@@ -3009,8 +3009,8 @@ serversyncon () {
 			{ echo "
 Port $PORTSSH
 AddressFamily inet6
-ListenAddress ${SRVipv6linklocal}%${i_WAN}
-
+# ListenAddress ${SRVipv6linklocal}%${i_WAN}
+ListenAddress ::
 #SyslogFacility AUTH
 #LogLevel INFO
 StrictModes yes
