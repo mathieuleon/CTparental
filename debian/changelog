@@ -1,3 +1,9 @@
+ctparental (4.22.03-1.0) unstable; urgency=medium
+
+  * corection du bug [FAILED] Failed to start OpenBSD Secure Shell server
+
+ -- Guillaume marsat <CTparental1@laposte.net>  Thu, 19 Apr 2018 16:22:32 +0200
+ 
 ctparental (4.22.02-1.0) unstable; urgency=medium
 
   * corection du bug d'ajout de clients

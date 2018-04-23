@@ -1,22 +1,25 @@
 #!/bin/sh
 case "$SSH_ORIGINAL_COMMAND" in
-rsync\ --server\ --sender*)
-## on autorise le téléchargement rsync mais pas l'upload 
-$SSH_ORIGINAL_COMMAND
-exit 0
-;;
 ## on autorise l'ajout de cléf public a authotized_keys ssh-copy-id
 exec\ sh\ -c\ \'cd\ \;\ umask\ 077\ \;\ mkdir\ -p\ \.ssh\ \&\&\ \cat\ \>\>\ \.ssh\/authorized_keys\ \|\|\ exit\ 1\ \;\ if\ type\ restorecon\ \>\/dev\/null\ 2\>\&1\ \;\ then\ restorecon\ -F\ \.ssh\ \.ssh\/authorized_keys\ \;\ fi\')
 exec sh -c 'cd ; umask 077 ; mkdir -p .ssh && cat >> .ssh/authorized_keys || exit 1 ; if type restorecon >/dev/null 2>&1 ; then restorecon -F .ssh .ssh/authorized_keys ; fi'
 exit 0
 ;;
+## on interdit toute les commandes contenant le caractaire & et ;
+## si l'on veut autorisée une commande avec l'un de ces caractaires
+## il faut l'incéret juste au dessus de ce commantaire 
+## la commande doit aitre complette et sans le carractaire générique * . 
 *\&*)
 exit 10
 ;;
 *\;*)
 exit 10
 ;;
-
+## on autorise le téléchargement rsync mais pas l'upload 
+rsync\ --server\ --sender*)
+$SSH_ORIGINAL_COMMAND
+exit 0
+;;
 *)
 exit 10
 ;;
